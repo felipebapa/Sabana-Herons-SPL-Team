@@ -1,0 +1,12 @@
+ctrl_interface=/var/run/wpa_supplicant
+ctrl_interface_group=0
+ap_scan=1
+
+network={
+  ssid="SabanaHerons"
+  scan_ssid=1
+  proto=WPA2
+  pairwise=TKIP CCMP
+  group=TKIP CCMP
+  psk="Sabana1928"
+}
