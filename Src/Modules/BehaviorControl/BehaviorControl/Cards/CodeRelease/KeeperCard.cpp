@@ -24,7 +24,7 @@ CARD(KeeperCard,
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
-  CALLS(KeyFrameArms),
+  CALLS(KeyFrameSingleArm),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
@@ -46,6 +46,7 @@ CARD(KeeperCard,
     (Rangef)({20.f, 50.f}) ballOffsetYRange,
     (int)(10) minKickWaitTime,
     (int)(3000) maxKickWaitTime,
+	(float)
   }),
 });
 
@@ -76,8 +77,6 @@ class KeeperCard : public KeeperCardBase
       action
       {
         theLookForwardSkill();
-		theKeyFrameArmsSkill(ArmKeyFrameRequest::upKeeper, true);
-		
         theStandSkill();
 		
       }
@@ -89,12 +88,15 @@ class KeeperCard : public KeeperCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
+		if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
+          goto GoalRiskRight;
       }
 
       action
       {
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
+		
       }
     }
 	
@@ -112,7 +114,23 @@ class KeeperCard : public KeeperCardBase
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }
-  } 
+	
+	    state(GoalRiskRight)
+    {
+      transition
+      {
+		if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto searchForBall;
+	    
+      }
+
+      action
+      {
+		theKeyFrameSingleArmSkill(ArmKeyFrameRequest::back, Arms::right, false);
+      }
+    }
+  }
+  
 
 };
 
