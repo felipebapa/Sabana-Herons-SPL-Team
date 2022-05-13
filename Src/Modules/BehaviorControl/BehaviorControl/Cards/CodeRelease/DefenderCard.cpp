@@ -36,7 +36,7 @@ CARD(DefenderCard,
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
-    (int)(1000) initialWaitTime,
+    (int)(500) initialWaitTime,
     (int)(7000) ballNotSeenTimeout,
     (Angle)(5_deg) ballAlignThreshold,
     (float)(500.f) ballNearThreshold,
@@ -48,6 +48,8 @@ CARD(DefenderCard,
     (Rangef)({140.f, 170.f}) ballOffsetXRange,
     (float)(40.f) ballOffsetY,
     (Rangef)({20.f, 50.f}) ballOffsetYRange,
+    (int)(10) minKickWaitTime,
+    (int)(3000) maxKickWaitTime,
   }),
 });
 
