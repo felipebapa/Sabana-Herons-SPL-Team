@@ -13,6 +13,7 @@
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Modeling/RobotPose.h"
+#include "Representations/Modeling/BallModel.h"
 #include "Representations/MotionControl/ArmMotionRequest.h"
 #include "Representations/MotionControl/ArmKeyFrameRequest.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -31,11 +32,12 @@ CARD(DefenderCard,
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
+  REQUIRES(BallModel),
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
     (int)(1000) initialWaitTime,
-    (int)(7000) ballNotSeenTimeout,
+    (int)(4000) ballNotSeenTimeout,
     (Angle)(5_deg) ballAlignThreshold,
     (float)(500.f) ballNearThreshold,
     (Angle)(10_deg) angleToGoalThreshold,
@@ -99,9 +101,8 @@ class DefenderCard : public DefenderCardBase
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
         if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold)
-          goto walkToBall;
-      }
-
+          goto DefendBall;
+      }  
       action
       {
         theLookForwardSkill();
@@ -117,6 +118,7 @@ class DefenderCard : public DefenderCardBase
           goto searchForBall;
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
           goto alignToGoal;
+          
       }
 
       action
@@ -124,6 +126,23 @@ class DefenderCard : public DefenderCardBase
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
+      }
+    }
+
+    state(DefendBall)
+    {
+      transition
+      {
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto searchForBall;
+        if(theFieldBall.positionRelative.norm() < 1000.0f)
+          goto walkToBall;  
+      }
+
+      action
+      {
+        theLookForwardSkill();
+        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
       }
     }
 
