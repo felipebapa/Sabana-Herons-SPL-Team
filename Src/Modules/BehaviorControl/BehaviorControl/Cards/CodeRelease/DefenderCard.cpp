@@ -37,7 +37,7 @@ CARD(DefenderCard,
   {,
     (float)(0.8f) walkSpeed,
     (int)(1000) initialWaitTime,
-    (int)(4000) ballNotSeenTimeout,
+    (int)(7000) ballNotSeenTimeout,
     (Angle)(5_deg) ballAlignThreshold,
     (float)(500.f) ballNearThreshold,
     (Angle)(10_deg) angleToGoalThreshold,
@@ -48,18 +48,6 @@ CARD(DefenderCard,
     (Rangef)({140.f, 170.f}) ballOffsetXRange,
     (float)(40.f) ballOffsetY,
     (Rangef)({20.f, 50.f}) ballOffsetYRange,
-    (int)(10) minKickWaitTime,
-    (int)(3000) maxKickWaitTime,
-    (bool)(false) theRivalHasTheBall,
-    (bool)(false) theRivalIsCloserToTheBall,
-    (bool)(false) closerToTheBall,
-    (int)(0) numberOfDefenders,
-    (bool)(false) defenderLefter,
-    (bool)(false) defenderRighter,
-    (bool)(false) shootToGoal,
-    (int)(0) numberOfDefences,
-    FUNCTION(Vector2f()) bestTeammateForPass;
-    FUNCTION(int()) getNumberWithinRole;
   }),
 });
 
@@ -223,7 +211,7 @@ class DefenderCard : public DefenderCardBase
 
   Angle calcAngleToGoal() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 180.f)).angle();
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
   }
 };
 
