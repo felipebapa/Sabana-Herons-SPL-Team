@@ -29,6 +29,7 @@ CARD(DefenderCard,
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
   CALLS(KeyFrameArms),
+  CALLS(WalkAtRelativeSpeed),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
@@ -216,7 +217,7 @@ class DefenderCard : public DefenderCardBase
         if(theFieldBall.ballWasSeen())
           goto turnToBall;   
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto goBackHome
+          goto goBackHome;
       }
 
       action
