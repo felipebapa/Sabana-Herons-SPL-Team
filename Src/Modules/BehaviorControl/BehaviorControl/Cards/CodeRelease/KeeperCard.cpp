@@ -46,7 +46,9 @@ CARD(KeeperCard,
     (Rangef)({20.f, 50.f}) ballOffsetYRange,
     (int)(10) minKickWaitTime,
     (int)(3000) maxKickWaitTime,
-	(float)
+	(Pose2f)(Pose2f(0,-4450,0)) KeeperPos,
+    (int)(500) StopThreshold,
+    (float)(15_deg) AngleThreshold,
   }),
 });
 
@@ -136,6 +138,8 @@ class KeeperCard : public KeeperCardBase
 		//theKeyFrameSingleArmSkill(ArmKeyFrameRequest::back, Arms::right, false);
       }
     }
+	
+
   }
   
     Angle calcAngleToGoal() const
