@@ -29,6 +29,7 @@ CARD(DefenderCard,
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
   CALLS(KeyFrameArms),
+  CALLS(PathToTarget),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
@@ -38,6 +39,7 @@ CARD(DefenderCard,
     (float)(0.8f) walkSpeed,
     (int)(500) initialWaitTime,
     (int)(7000) ballNotSeenTimeout,
+    (Pose2f)(Pose2f(0,-3000,0)) Defender1Pos,
     (Angle)(5_deg) ballAlignThreshold,
     (float)(500.f) ballNearThreshold,
     (Angle)(10_deg) angleToGoalThreshold,
@@ -174,6 +176,17 @@ class DefenderCard : public DefenderCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
+    state(goBackHome){
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+      }
+      action
+      {
+        thePathToTargetSkill(1.0, Defender1Pos);
+      }
+    }
 
 
 
@@ -202,7 +215,9 @@ class DefenderCard : public DefenderCardBase
       transition
       {
         if(theFieldBall.ballWasSeen())
-          goto turnToBall;     
+          goto turnToBall;
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto goBackHome;  
       }
 
       action
