@@ -33,8 +33,8 @@ CARD(KeeperCard,
   {,
     (float)(0.8f) walkSpeed,
     (int)(1000) initialWaitTime,
-    (int)(7000) ballNotSeenTimeout,
-    (Angle)(5_deg) ballAlignThreshold,
+    (int)(3000) ballNotSeenTimeout,
+    (Angle)(7_deg) ballAlignThreshold,
     (float)(500.f) ballNearThreshold,
     (Angle)(10_deg) angleToGoalThreshold,
     (float)(400.f) ballAlignOffsetX,
@@ -117,6 +117,8 @@ class KeeperCard : public KeeperCardBase
 	
 	    state(GoalRiskRight)
     {
+	  const Angle angleToGoal = calcAngleToGoal();
+	  
       transition
       {
 		if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
@@ -126,9 +128,19 @@ class KeeperCard : public KeeperCardBase
 
       action
       {
-		theKeyFrameSingleArmSkill(ArmKeyFrameRequest::back, Arms::right, false);
+		  
+		  theLookForwardSkill();
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+		  
+		  //theWalkAtRelativeSpeedSkill(Pose2f(0.f, walkSpeed, 0.f));
+		//theKeyFrameSingleArmSkill(ArmKeyFrameRequest::back, Arms::right, false);
       }
     }
+  }
+  
+    Angle calcAngleToGoal() const
+  {
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
   }
   
 
