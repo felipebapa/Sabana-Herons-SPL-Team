@@ -27,6 +27,7 @@ CARD(KeeperCard,
   CALLS(WalkToTarget),
   CALLS(KeyFrameSingleArm),
   CALLS(SpecialAction),
+  CALLS(LookAtPoint),
   REQUIRES(FieldBall),
   REQUIRES(BallModel),
   REQUIRES(FieldDimensions),
@@ -42,7 +43,7 @@ CARD(KeeperCard,
     (Angle)(10_deg) angleToGoalThreshold,
     (float)(400.f) ballAlignOffsetX,
     (float)(100.f) ballYThreshold,
-	(float)(200.f) ballXThreshold,
+	(float)(100.f) ballXThreshold,
     (Angle)(2_deg) angleToGoalThresholdPrecise,
     (float)(150.f) ballOffsetX,
     (Rangef)({140.f, 170.f}) ballOffsetXRange,
@@ -83,6 +84,7 @@ class KeeperCard : public KeeperCardBase
       action
       {
         theLookForwardSkill();
+		//theLookAtPointSkill(Vector3f(theFieldBall.positionRelative.x(),theFieldBall.positionRelative.y(),0.f),(HeadMotionRequest::targetOnGroundMode));
         theStandSkill();
 		
       }
@@ -105,7 +107,15 @@ class KeeperCard : public KeeperCardBase
       action
       {
         theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
+		
+		if(theBallModel.estimate.position.x() < 3500){
+			
+           //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f)); //No quiero que camine a este angulo.
+		   //Quiero que camine horizontalmente hasta que el angulo sea 0.
+		   
+		   theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()));  //Pose2f (angulo,x,y)
+		   
+		}
 		
       }
     }
@@ -121,6 +131,7 @@ class KeeperCard : public KeeperCardBase
       action
       {
         theLookForwardSkill();
+		
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }
