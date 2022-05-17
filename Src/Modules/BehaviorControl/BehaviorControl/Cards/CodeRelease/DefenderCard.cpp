@@ -29,11 +29,7 @@ CARD(DefenderCard,
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
   CALLS(KeyFrameArms),
-<<<<<<< HEAD
-  CALLS(WalkAtRelativeSpeed),
-=======
   CALLS(PathToTarget),
->>>>>>> 4d8dd750502da3dcd14e06511bd93db24b7c7e94
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
@@ -213,33 +209,14 @@ class DefenderCard : public DefenderCardBase
         theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
-    state(goBackHome)
-    {
-      transition
-      {
-        if(theFieldBall.ballWasSeen())
-          goto turnToBall;
-      }
-      action
-      {
-        theWalkAtRelativeSpeedSkill(Pose2f(1.0f, 0.f, 0.f));
-      }
-    }
-
     state(searchForBall)
     {
       transition
       {
         if(theFieldBall.ballWasSeen())
-<<<<<<< HEAD
-          goto turnToBall;   
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto goBackHome;
-=======
           goto turnToBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto goBackHome;  
->>>>>>> 4d8dd750502da3dcd14e06511bd93db24b7c7e94
       }
 
       action

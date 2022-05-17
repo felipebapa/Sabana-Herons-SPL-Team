@@ -1,0 +1,17 @@
+motion_id = rightDive
+
+label start
+
+" HY HP LSP LSR LEY LER _LWY_ _LH_ RSP RSR REY RER _RWY_ _RH_ LHYP LHR LHP LKP LAP LAR RHYP RHR RHP RKP RAP RAR Int Dur
+
+stiffness 50 50	60 60 60 60 60 60 60 60 60 60 60 60 100 100 100 100 100 100 100 100 100 100 100 100 10
+
+0.5 -0.2 82.5 14.7 -90.0 -8.2 47.8 0 -118 -10.1  111.3 16.4 -91.3 0 -4.64965 9.4 -26.4 39 -19.2 -0.4 -4.64965 -45.3 -70.7 119.2 -57.6 -6 1 700
+
+label repeat
+
+-      -      -      -      -      -      -      -      -      -      -      -      -      -      -      -      -      -      -      -      -      -      -      -      -      -   1  100
+
+transition rightDive rightDive repeat
+
+transition allMotions extern start

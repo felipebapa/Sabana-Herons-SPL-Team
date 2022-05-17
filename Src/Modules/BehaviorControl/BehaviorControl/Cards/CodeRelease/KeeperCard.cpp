@@ -3,10 +3,11 @@
  *
  * Pruebas
  *
- * @author Andres Ramirez
+ * @author Felipe Barreto
  */
 
 #include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/Modeling/BallModel.h"
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Modeling/RobotPose.h"
@@ -25,7 +26,9 @@ CARD(KeeperCard,
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
   CALLS(KeyFrameSingleArm),
+  CALLS(SpecialAction),
   REQUIRES(FieldBall),
+  REQUIRES(BallModel),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
@@ -39,6 +42,7 @@ CARD(KeeperCard,
     (Angle)(10_deg) angleToGoalThreshold,
     (float)(400.f) ballAlignOffsetX,
     (float)(100.f) ballYThreshold,
+	(float)(200.f) ballXThreshold,
     (Angle)(2_deg) angleToGoalThresholdPrecise,
     (float)(150.f) ballOffsetX,
     (Rangef)({140.f, 170.f}) ballOffsetXRange,
@@ -90,8 +94,12 @@ class KeeperCard : public KeeperCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-		if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
+		//if(-100 > theBallModel.estimate.position.y() && theBallModel.estimate.velocity.x() < -90)
+		if(-100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < ballXThreshold)
           goto GoalRiskRight;
+		//if( 100 < theBallModel.estimate.position.y() && theBallModel.estimate.velocity.x() < -90)
+		if( 100 < theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < ballXThreshold)
+          goto GoalRiskLeft;
       }
 
       action
@@ -119,7 +127,7 @@ class KeeperCard : public KeeperCardBase
 	
 	    state(GoalRiskRight)
     {
-	  const Angle angleToGoal = calcAngleToGoal();
+	  //const Angle angleToGoal = calcAngleToGoal();
 	  
       transition
       {
@@ -132,8 +140,30 @@ class KeeperCard : public KeeperCardBase
       {
 		  
 		  theLookForwardSkill();
-          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+          //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+		  theSpecialActionSkill(SpecialActionRequest::rightDive);
+		  //theWalkAtRelativeSpeedSkill(Pose2f(0.f, walkSpeed, 0.f));
+		//theKeyFrameSingleArmSkill(ArmKeyFrameRequest::back, Arms::right, false);
+      }
+    }
+	
+	   state(GoalRiskLeft)
+    {
+	  //const Angle angleToGoal = calcAngleToGoal();
+	  
+      transition
+      {
+		if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto searchForBall;
+	    
+      }
+
+      action
+      {
 		  
+		  theLookForwardSkill();
+          //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+		  theSpecialActionSkill(SpecialActionRequest::leftDive);
 		  //theWalkAtRelativeSpeedSkill(Pose2f(0.f, walkSpeed, 0.f));
 		//theKeyFrameSingleArmSkill(ArmKeyFrameRequest::back, Arms::right, false);
       }
@@ -142,10 +172,10 @@ class KeeperCard : public KeeperCardBase
 
   }
   
-    Angle calcAngleToGoal() const
-  {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
-  }
+    //Angle calcAngleToGoal() const
+  //{
+  //  return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
+ // }
   
 
 };
