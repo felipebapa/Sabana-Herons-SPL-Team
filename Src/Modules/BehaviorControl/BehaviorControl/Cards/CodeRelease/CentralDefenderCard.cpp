@@ -1,5 +1,5 @@
 /**
- * @file DefenderCard.cpp
+ * @file CentralDefenderCard.cpp
  *
  * This file implements a basic striker behavior for the code release.
  * Normally, this would be decomposed into at least
@@ -19,8 +19,10 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
+#include "Representations/Communication/RobotInfo.h"
 
-CARD(DefenderCard,
+
+CARD(CentralDefenderCard,
 {,
   CALLS(Activity),
   CALLS(InWalkKick),
@@ -34,6 +36,7 @@ CARD(DefenderCard,
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(BallModel),
+  REQUIRES(RobotInfo),
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
@@ -55,21 +58,21 @@ CARD(DefenderCard,
   }),
 });
 
-class DefenderCard : public DefenderCardBase
+class CentralDefenderCard : public CentralDefenderCardBase
 {
   bool preconditions() const override
   {
-    return true;
+    return theRobotInfo.number == 5;
   }
 
   bool postconditions() const override
   {
-    return true;
+    return theRobotInfo.number != 5;
   }
 
   option
   {
-    theActivitySkill(BehaviorStatus::Defender);
+    theActivitySkill(BehaviorStatus::CentralDefender);
 
     initial_state(start)
     {
@@ -209,6 +212,7 @@ class DefenderCard : public DefenderCardBase
         theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
+
     state(searchForBall)
     {
       transition
@@ -233,4 +237,4 @@ class DefenderCard : public DefenderCardBase
   }
 };
 
-MAKE_CARD(DefenderCard);
+MAKE_CARD(CentralDefenderCard);
