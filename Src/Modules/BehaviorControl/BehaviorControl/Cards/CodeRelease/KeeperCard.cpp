@@ -3,10 +3,11 @@
  *
  * Pruebas
  *
- * @author Andres Ramirez
+ * @author Felipe Barreto
  */
 
 #include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/Modeling/BallModel.h"
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Modeling/RobotPose.h"
@@ -25,7 +26,10 @@ CARD(KeeperCard,
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
   CALLS(KeyFrameSingleArm),
+  CALLS(SpecialAction),
+  CALLS(LookAtPoint),
   REQUIRES(FieldBall),
+  REQUIRES(BallModel),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
@@ -39,6 +43,7 @@ CARD(KeeperCard,
     (Angle)(10_deg) angleToGoalThreshold,
     (float)(400.f) ballAlignOffsetX,
     (float)(100.f) ballYThreshold,
+	(float)(100.f) ballXThreshold,
     (Angle)(2_deg) angleToGoalThresholdPrecise,
     (float)(150.f) ballOffsetX,
     (Rangef)({140.f, 170.f}) ballOffsetXRange,
@@ -46,7 +51,9 @@ CARD(KeeperCard,
     (Rangef)({20.f, 50.f}) ballOffsetYRange,
     (int)(10) minKickWaitTime,
     (int)(3000) maxKickWaitTime,
-	(float)
+	(Pose2f)(Pose2f(0,-4450,0)) KeeperPos,
+    (int)(500) StopThreshold,
+    (float)(15_deg) AngleThreshold,
   }),
 });
 
@@ -77,6 +84,7 @@ class KeeperCard : public KeeperCardBase
       action
       {
         theLookForwardSkill();
+		//theLookAtPointSkill(Vector3f(theFieldBall.positionRelative.x(),theFieldBall.positionRelative.y(),0.f),(HeadMotionRequest::targetOnGroundMode));
         theStandSkill();
 		
       }
@@ -88,14 +96,26 @@ class KeeperCard : public KeeperCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-		if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
+		//if(-100 > theBallModel.estimate.position.y() && theBallModel.estimate.velocity.x() < -90)
+		if(-100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < ballXThreshold)
           goto GoalRiskRight;
+		//if( 100 < theBallModel.estimate.position.y() && theBallModel.estimate.velocity.x() < -90)
+		if( 100 < theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < ballXThreshold)
+          goto GoalRiskLeft;
       }
 
       action
       {
         theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
+		
+		if(theBallModel.estimate.position.x() < 3500){
+			
+           //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f)); //No quiero que camine a este angulo.
+		   //Quiero que camine horizontalmente hasta que el angulo sea 0.
+		   
+		   theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()));  //Pose2f (angulo,x,y)
+		   
+		}
 		
       }
     }
@@ -111,13 +131,14 @@ class KeeperCard : public KeeperCardBase
       action
       {
         theLookForwardSkill();
+		
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }
 	
 	    state(GoalRiskRight)
     {
-	  const Angle angleToGoal = calcAngleToGoal();
+	  //const Angle angleToGoal = calcAngleToGoal();
 	  
       transition
       {
@@ -130,18 +151,42 @@ class KeeperCard : public KeeperCardBase
       {
 		  
 		  theLookForwardSkill();
-          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-		  
+          //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+		  theSpecialActionSkill(SpecialActionRequest::rightDive);
 		  //theWalkAtRelativeSpeedSkill(Pose2f(0.f, walkSpeed, 0.f));
 		//theKeyFrameSingleArmSkill(ArmKeyFrameRequest::back, Arms::right, false);
       }
     }
+	
+	   state(GoalRiskLeft)
+    {
+	  //const Angle angleToGoal = calcAngleToGoal();
+	  
+      transition
+      {
+		if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto searchForBall;
+	    
+      }
+
+      action
+      {
+		  
+		  theLookForwardSkill();
+          //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+		  theSpecialActionSkill(SpecialActionRequest::leftDive);
+		  //theWalkAtRelativeSpeedSkill(Pose2f(0.f, walkSpeed, 0.f));
+		//theKeyFrameSingleArmSkill(ArmKeyFrameRequest::back, Arms::right, false);
+      }
+    }
+	
+
   }
   
-    Angle calcAngleToGoal() const
-  {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
-  }
+    //Angle calcAngleToGoal() const
+  //{
+  //  return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
+ // }
   
 
 };

@@ -209,7 +209,6 @@ class DefenderCard : public DefenderCardBase
         theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
-
     state(searchForBall)
     {
       transition
