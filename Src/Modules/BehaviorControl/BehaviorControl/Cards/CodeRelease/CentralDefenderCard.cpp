@@ -190,9 +190,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
         thePathToTargetSkill(1.0, Defender1Pos);
       }
     }
-
-
-
     state(kick)
     {
       const Angle angleToGoal = calcAngleToGoal();
