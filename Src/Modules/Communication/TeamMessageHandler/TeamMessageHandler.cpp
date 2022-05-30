@@ -311,4 +311,4 @@ void TeamMessageHandler::parseMessageIntoBMate(Teammate& currentTeammate)
 
   if(receivedMessageContainer.hasBHumanParts)
     receivedMessageContainer.theBHumanArbitraryMessage.queue.handleAllMessages(currentTeammate);
-}
+  }
