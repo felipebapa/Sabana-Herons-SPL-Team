@@ -27,6 +27,7 @@ CARD(RightDefenderCard,
   CALLS(Activity),
   CALLS(InWalkKick),
   CALLS(LookForward),
+  CALLS(LookAtAngles),
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
@@ -100,7 +101,7 @@ class RightDefenderCard : public RightDefenderCardBase
       }  
       action
       {
-        theLookForwardSkill();
+        theLookAtAnglesSkill(45, 0, 1, HeadMotionRequest::autoCamera);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
       }
     }  
