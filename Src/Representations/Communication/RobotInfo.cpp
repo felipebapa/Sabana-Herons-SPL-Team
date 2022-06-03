@@ -28,12 +28,11 @@ std::string RobotInfo::getPenaltyAsString() const
     case PENALTY_SPL_PLAYER_PUSHING: return "Player Pushing";
     case PENALTY_SPL_ILLEGAL_MOTION_IN_SET: return "Illegal Motion in Set";
     case PENALTY_SPL_INACTIVE_PLAYER: return "Inactive Player";
-    case PENALTY_SPL_ILLEGAL_DEFENDER: return "Illegal Defender";
+    case PENALTY_SPL_ILLEGAL_POSITION: return "Illegal Defender";
     case PENALTY_SPL_LEAVING_THE_FIELD: return "Leaving the Field";
-    case PENALTY_SPL_KICK_OFF_GOAL: return "Kickoff Goal";
     case PENALTY_SPL_REQUEST_FOR_PICKUP: return "Request for Pickup";
     case PENALTY_SPL_LOCAL_GAME_STUCK: return "Local Game Stuck";
-    case PENALTY_SPL_ILLEGAL_POSITIONING: return "Illegal Positioning";
+    case PENALTY_SPL_ILLEGAL_POSITION_IN_SET: return "Illegal Positioning";
     default: return "None";
   }
 }

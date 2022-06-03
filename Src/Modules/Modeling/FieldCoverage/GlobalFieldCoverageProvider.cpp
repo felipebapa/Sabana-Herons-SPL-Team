@@ -40,7 +40,7 @@ void GlobalFieldCoverageProvider::update(GlobalFieldCoverage& globalFieldCoverag
 
   for(size_t y = 0; y < theFieldCoverage.lines.size(); ++y)
     addLine(theFieldCoverage.lines[y]);
-  if(theGameInfo.competitionType == COMPETITION_TYPE_MIXEDTEAM)
+  if(theGameInfo.competitionType == COMPETITION_TYPE_7V7)
     for(size_t y = 0; y < theHulkFieldCoverage.lines.size(); ++y)
       addLine(theHulkFieldCoverage.lines[y]);
   for(const auto& teammate : theTeamData.teammates)

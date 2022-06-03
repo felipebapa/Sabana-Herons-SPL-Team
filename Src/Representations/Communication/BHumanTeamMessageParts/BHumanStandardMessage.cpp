@@ -155,7 +155,7 @@ void BHumanStandardMessage::write(void* data) const
 
   static_assert(BHUMAN_STANDARD_MESSAGE_MAX_NUM_OF_PLAYERS <= 6, "This code only works for up to six robots per team (because of array size and max player index).");
   static_assert(Settings::lowestValidPlayerNumber >= 0, "This code only works for nonnegative player numbers.");
-  static_assert(Settings::highestValidPlayerNumber <= 14, "This code only works for player numbers up to 14.");
+  static_assert(Settings::highestValidPlayerNumber <= 14, "This code only   works for player numbers up to 14.");
   uint64_t rolePassTargetTeammateRolesContainer = 0;
   for(unsigned int i = 0; i < BHUMAN_STANDARD_MESSAGE_MAX_NUM_OF_PLAYERS; ++i)
   {
@@ -178,7 +178,7 @@ void BHumanStandardMessage::write(void* data) const
   writeVal<int16_t>(data, CLIP_AND_CAST_TO_INT16(shootingTo.x()));
   writeVal<int16_t>(data, CLIP_AND_CAST_TO_INT16(shootingTo.y()));
 
-  static_assert(Settings::highestValidPlayerNumber <= 6, "This code only works for player numbers up to 6.");
+  static_assert(Settings::highestValidPlayerNumber <= 7, "This code only   works for player numbers up to 6.");
   const uint32_t teammateRolesTimestampDiff = timestamp - std::min(timestamp, teammateRolesTimestamp);
   writeVal<uint16_t>(data, static_cast<uint16_t>(teammateRolesTimestampDiff > 0x1FFE ? 0x1FFF : teammateRolesTimestampDiff) | static_cast<uint16_t>(((captain < 0) ? 0x7 : std::min(captain, 6)) << 13));
 
@@ -320,7 +320,7 @@ bool BHumanStandardMessage::read(const void* data)
   shootingTo.x() = readVal<const int16_t>(data);
   shootingTo.y() = readVal<const int16_t>(data);
 
-  static_assert(Settings::highestValidPlayerNumber <= 6, "This code only works for player numbers up to 6.");
+  static_assert(Settings::highestValidPlayerNumber <= 7, "This code only works for player numbers up to 6.");
   const uint16_t captainTeammateRolesTimestamp = readVal<const uint16_t>(data);
   captain = captainTeammateRolesTimestamp >> 13;
   if(captain == 7)

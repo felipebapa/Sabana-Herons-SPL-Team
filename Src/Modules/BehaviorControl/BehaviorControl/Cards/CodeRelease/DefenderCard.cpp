@@ -19,6 +19,8 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
+#include "Representations/Communication/RobotInfo.h"
+
 
 CARD(DefenderCard,
 {,
@@ -34,11 +36,12 @@ CARD(DefenderCard,
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(BallModel),
+  REQUIRES(RobotInfo),
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
     (int)(500) initialWaitTime,
-    (int)(2000) ballNotSeenTimeout,
+    (int)(7000) ballNotSeenTimeout,
     (Pose2f)(Pose2f(0,-3000,0)) Defender1Pos,
     (Angle)(5_deg) ballAlignThreshold,
     (float)(500.f) ballNearThreshold,
@@ -59,12 +62,12 @@ class DefenderCard : public DefenderCardBase
 {
   bool preconditions() const override
   {
-    return true;
+    return theRobotInfo.number == 6;
   }
 
   bool postconditions() const override
   {
-    return true;
+    return theRobotInfo.number != 6;
   }
 
   option

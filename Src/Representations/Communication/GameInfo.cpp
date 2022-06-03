@@ -123,7 +123,7 @@ std::string GameInfo::getStateAsString() const
       {
         case SET_PLAY_NONE:
           return "Playing";
-        case SET_PLAY_GOAL_FREE_KICK:
+        case SET_PLAY_GOAL_KICK:
           return "Goal Free Kick";
         case SET_PLAY_PUSHING_FREE_KICK:
           return "Pushing Free Kick";
