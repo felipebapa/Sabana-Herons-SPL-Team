@@ -77,8 +77,8 @@ class KeeperCard : public KeeperCardBase
     {
       transition
       {
-        if(state_time > initialWaitTime)
-          goto turnToBall;
+        if(state_time > initialWaitTime && theBallModel.estimate.position.x() < 3500)  //Aùn no funciona lo de 3500
+          goto coverBallTrajectory;
       }
 
       action
@@ -90,7 +90,7 @@ class KeeperCard : public KeeperCardBase
       }
     }
 	
-	state(turnToBall)
+	state(coverBallTrajectory)
     {
       transition
       {
@@ -108,14 +108,13 @@ class KeeperCard : public KeeperCardBase
       {
         theLookForwardSkill();
 		
-		if(theBallModel.estimate.position.x() < 3500){
 			
            //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f)); //No quiero que camine a este angulo.
 		   //Quiero que camine horizontalmente hasta que el angulo sea 0.
 		   
 		   theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()));  //Pose2f (angulo,x,y)
 		   
-		}
+		
 		
       }
     }
@@ -124,8 +123,8 @@ class KeeperCard : public KeeperCardBase
     {
       transition
       {
-        if(theFieldBall.ballWasSeen())
-          goto turnToBall;
+        if(theFieldBall.ballWasSeen() && theBallModel.estimate.position.x() < 3500)
+          goto coverBallTrajectory;
       }
 
       action
