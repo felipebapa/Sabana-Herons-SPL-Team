@@ -109,7 +109,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     {
       transition
       {
-        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= theFieldDimensions.xPosHalfWayLine))
+        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
@@ -131,6 +131,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
     {
       transition
       {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
         if(!theFieldBall.ballWasSeen(4000))
           goto goBackHome;   
       }
@@ -147,11 +149,11 @@ class CentralDefenderCard : public CentralDefenderCardBase
     {
       transition
       {
-        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= theFieldDimensions.xPosHalfWayLine))
+        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(theFieldBall.positionRelative.norm() < 1000.0f)
+        if(theFieldBall.positionRelative.norm() < 1000.0f || (theRobotPose.translation.x() > theFieldBall.positionRelative.x()))
           goto walkToBall;  
       }
 
