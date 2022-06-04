@@ -41,7 +41,7 @@ CARD(CentralDefenderCard,
   {,
     (float)(0.8f) walkSpeed,
     (int)(500) initialWaitTime,
-    (int)(2000) ballNotSeenTimeout,
+    (int)(4000) ballNotSeenTimeout,
     (Pose2f)(Pose2f(0,-3000,0)) Defender1Pos,
     (Angle)(5_deg) ballAlignThreshold,
     (float)(500.f) ballNearThreshold,
@@ -62,12 +62,12 @@ class CentralDefenderCard : public CentralDefenderCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == 5;
+    return theRobotInfo.number == 2;
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != 5;
+    return theRobotInfo.number != 2;
   }
 
   option
@@ -109,6 +109,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
     {
       transition
       {
+        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
+          goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
@@ -118,9 +120,28 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       action
       {
-        theLookForwardSkill();
-        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
+          theLookForwardSkill();
+          theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
+        
+      }
+    }
+
+    state(waitBall)
+    {
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+        if(!theFieldBall.ballWasSeen(4000))
+          goto goBackHome;   
+      }
+
+      action
+      {
+          theLookForwardSkill();
+          theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
+          theStandSkill();
       }
     }
 
@@ -128,9 +149,11 @@ class CentralDefenderCard : public CentralDefenderCardBase
     {
       transition
       {
+        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
+          goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(theFieldBall.positionRelative.norm() < 1000.0f)
+        if(theFieldBall.positionRelative.norm() < 1000.0f || (theRobotPose.translation.x() > theFieldBall.positionRelative.x()))
           goto walkToBall;  
       }
 
@@ -190,9 +213,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
         thePathToTargetSkill(1.0, Defender1Pos);
       }
     }
-
-
-
     state(kick)
     {
       const Angle angleToGoal = calcAngleToGoal();
