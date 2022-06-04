@@ -783,7 +783,7 @@ Pose2f SelfLocator::getNewPoseReturnFromPenaltyPosition(bool leftSideOfGoal)
 
 Pose2f SelfLocator::getNewPoseAtWalkInPosition()
 {
-  const int effectivePlayerNumber = theGameInfo.competitionType != COMPETITION_TYPE_MIXEDTEAM ? theOwnTeamInfo.getSubstitutedPlayerNumber(theRobotInfo.number) : theRobotInfo.number;
+  const int effectivePlayerNumber = theGameInfo.competitionType != COMPETITION_TYPE_7V7 ? theOwnTeamInfo.getSubstitutedPlayerNumber(theRobotInfo.number) : theRobotInfo.number;
   if(effectivePlayerNumber >= 1 && effectivePlayerNumber <= 6)
   {
     const unsigned index = effectivePlayerNumber - 1;

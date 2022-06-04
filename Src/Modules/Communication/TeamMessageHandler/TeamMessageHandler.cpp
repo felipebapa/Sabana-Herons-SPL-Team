@@ -218,7 +218,7 @@ bool TeamMessageHandler::readSPLStandardMessage(const RoboCup::SPLStandardMessag
     PARSING_ERROR(MIXED_TEAM_HEADER_STRUCT_HEADER " message part failed");
 
   // B&B: B-Human provides the robots with numbers 1, 2 and 3.
-  if(theRawGameInfo.competitionType != COMPETITION_TYPE_MIXEDTEAM
+  if(theRawGameInfo.competitionType != COMPETITION_TYPE_7V7
      || ((receivedMessageContainer.theBSPLStandardMessage.playerNum >= 1 && receivedMessageContainer.theBSPLStandardMessage.playerNum <= 3)
          == (theRobotInfo.number >= 1 && theRobotInfo.number <= 3)))
   {

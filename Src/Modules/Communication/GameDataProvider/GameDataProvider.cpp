@@ -65,7 +65,7 @@ void GameDataProvider::update(RawGameInfo& theRawGameInfo)
   std::memcpy(static_cast<RoboCup::RoboCupGameControlData*>(&theRawGameInfo), &gameCtrlData, sizeof(gameCtrlData));
   theRawGameInfo.timeLastPacketReceived = whenPacketWasReceived;
   if(Global::getSettings().teamNumber >= 90)
-    theRawGameInfo.competitionType = COMPETITION_TYPE_MIXEDTEAM;
+    theRawGameInfo.competitionType = COMPETITION_TYPE_7V7;
 }
 
 bool GameDataProvider::receive()
@@ -96,9 +96,8 @@ bool GameDataProvider::receive()
 bool GameDataProvider::sendAliveMessage()
 {
   RoboCup::RoboCupGameControlReturnData returnPacket;
-  returnPacket.team = (uint8_t) Global::getSettings().teamNumber;
-  returnPacket.player = (uint8_t) Global::getSettings().playerNumber;
-  returnPacket.message = GAMECONTROLLER_RETURN_MSG_ALIVE;
+  returnPacket.teamNum = (uint8_t) Global::getSettings().teamNumber;
+  returnPacket.playerNum = (uint8_t) Global::getSettings().playerNumber;
   return socket.write(reinterpret_cast<char*>(&returnPacket), sizeof(returnPacket));
 }
 

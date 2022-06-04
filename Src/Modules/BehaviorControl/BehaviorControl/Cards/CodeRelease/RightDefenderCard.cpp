@@ -86,6 +86,7 @@ class RightDefenderCard : public RightDefenderCardBase
       action
       {
         theLookForwardSkill();
+        // theLookAtAnglesSkill(pi/4, 0, 1.25, HeadMotionRequest::autoCamera);
         theStandSkill();
       }
     }
@@ -101,7 +102,8 @@ class RightDefenderCard : public RightDefenderCardBase
       }  
       action
       {
-        theLookAtAnglesSkill(45, 0, 1, HeadMotionRequest::autoCamera);
+        theLookForwardSkill();
+        // theLookAtAnglesSkill(pi/4, 0, 1.25, HeadMotionRequest::autoCamera);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
       }
     }  
@@ -188,6 +190,8 @@ class RightDefenderCard : public RightDefenderCardBase
       }
       action
       {
+        theLookForwardSkill();
+        // theLookAtAnglesSkill(-2*pi/4, 0, 1.25, HeadMotionRequest::autoCamera);
         thePathToTargetSkill(1.0, Defender1Pos);
       }
     }
@@ -226,7 +230,9 @@ class RightDefenderCard : public RightDefenderCardBase
 
       action
       {
-        theLookForwardSkill();
+        theLookAtAnglesSkill(0.f, -0.1f, 150_deg);
+        // theLookAtAnglesSkill(pi/4, 0, 1.25, HeadMotionRequest::autoCamera);
+        // theLookAtAnglesSkill(-pi/4, 0, 1.25, HeadMotionRequest::autoCamera);
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }

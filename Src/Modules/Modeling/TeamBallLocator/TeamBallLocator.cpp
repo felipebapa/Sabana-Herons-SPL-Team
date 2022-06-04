@@ -28,7 +28,7 @@ void TeamBallLocator::update(TeamBallModel& teamBallModel)
   findAvailableBalls(false);
   // If we play a mixed team game and did not find any available balls so far, try to use the
   // balls that our partners have sent (which have been ignore before)
-  if(theGameInfo.competitionType == COMPETITION_TYPE_MIXEDTEAM && ballsAvailableForTeamBall.size() == 0)
+  if(theGameInfo.competitionType == COMPETITION_TYPE_7V7 && ballsAvailableForTeamBall.size() == 0)
     findAvailableBalls(true);
   clusterBalls();
   computeModel(teamBallModel);
@@ -308,7 +308,7 @@ bool TeamBallLocator::checkForResetByGameSituation()
   if(theGameInfo.state != STATE_PLAYING && theGameInfo.state != STATE_SET)
     reset = true;
   // Same for any goal free kick or corner kick (kick ins and pushing free kicks are different because the ball stays about where it was):
-  if((theCognitionStateChanges.lastSetPlay != SET_PLAY_GOAL_FREE_KICK && theGameInfo.setPlay == SET_PLAY_GOAL_FREE_KICK) ||
+  if((theCognitionStateChanges.lastSetPlay != SET_PLAY_GOAL_KICK && theGameInfo.setPlay == SET_PLAY_GOAL_KICK) ||
       (theCognitionStateChanges.lastSetPlay != SET_PLAY_CORNER_KICK && theGameInfo.setPlay == SET_PLAY_CORNER_KICK))
     reset = true;
   // If any of the above conditions was true, we delete every ball information that we have stored:
