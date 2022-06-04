@@ -166,8 +166,8 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theLookForwardSkill();
-        //theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-        theKickSkill((KickRequest::kickForward), true, 0.3f, false);
+        theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        //theKickSkill((KickRequest::kickForward), true, 0.3f, false);
       }
     }
 

@@ -91,7 +91,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
           }
           action
           {
-              theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+              
           }
       }
       
@@ -135,7 +135,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
           transition
           {
               if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
-                  goto kick;
+                  goto stand;
           }
           action
           {
@@ -149,7 +149,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
 
       transition
       {
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theKickSkill.isDone()))
           goto start;
       }
 
@@ -159,6 +159,17 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
         //theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
         theKickSkill((KickRequest::kickForward), false, kickDist, false);
       }
+    }
+    state(stand)
+    {
+        transition
+        {
+            
+        }
+        action
+        {
+            theStandSkill();
+        }
     }
     }
     
