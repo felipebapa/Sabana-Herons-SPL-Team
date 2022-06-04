@@ -25,6 +25,7 @@ CARD(PenaltyStrikerCard,
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
+  CALLS(Kick),
   
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
@@ -48,6 +49,7 @@ CARD(PenaltyStrikerCard,
     (int)(10) minKickWaitTime,
     (int)(3000) maxKickWaitTime,
     (int) (1) choice,
+    (float) (0.3f) kickDist,
   }),
 });
 
@@ -70,8 +72,8 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
       {
           transition
           {
-             //if(state_time > initialWaitTime)
-               // goto searchForBall;
+             if(state_time > initialWaitTime)
+               goto searchForBall;
           }
           action
           {
@@ -79,7 +81,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
               theStandSkill();
           }
       }
- /*     
+      
       state(searchForBall)
       {
           transition
@@ -114,10 +116,10 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
       state(alignRight)
       {
           const Angle angleToGoal = calcAngleToGoal();
-          
+
           transition
           {
-              if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()));
+              if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
                   goto kick;
           }
           action
@@ -132,7 +134,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
           
           transition
           {
-              if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()));
+              if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
                   goto kick;
           }
           action
@@ -143,7 +145,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
       }
       state(kick)
     {
-      const Angle angleToGoal = calcAngleToGoal();
+      //const Angle angleToGoal = calcAngleToGoal();
 
       transition
       {
@@ -154,15 +156,17 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
       action
       {
         theLookForwardSkill();
-        theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        //theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        theKickSkill((KickRequest::kickForward), false, kickDist, false);
       }
     }
+    }
+    
     Angle calcAngleToGoal() const
-      {
+    {
         return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
-      } 
-       * */
-  }
+    } 
+
 
 };
 

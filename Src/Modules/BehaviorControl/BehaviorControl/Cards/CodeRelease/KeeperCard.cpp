@@ -183,10 +183,10 @@ class KeeperCard : public KeeperCardBase
 
   }
   
-    //Angle calcAngleToGoal() const
-  //{
-  //  return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
- // }
+    Angle calcAngleToGoal() const
+  {
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
+  }
   
 
 };
