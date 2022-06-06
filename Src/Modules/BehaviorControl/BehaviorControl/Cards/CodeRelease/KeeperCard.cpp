@@ -108,7 +108,7 @@ class KeeperCard : public KeeperCardBase
       {
         theLookForwardSkill();
 		
-		if(theBallModel.estimate.position.x() < 3500){
+		if(theBallModel.estimate.position.x() < 3500 && (theRobotPose.translation.x() <= theFieldDimensions.xPosOwnGroundline) && (theRobotPose.translation.y() <= theFieldDimensions.yPosLeftGoal) && (theRobotPose.translation.y() >= theFieldDimensions.yPosRightGoal) ) {
 			
            //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f)); //No quiero que camine a este angulo.
 		   //Quiero que camine horizontalmente hasta que el angulo sea 0.
