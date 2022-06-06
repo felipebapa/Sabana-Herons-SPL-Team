@@ -95,13 +95,16 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold)
-          goto DefendBall;
+        if((std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold) || (theFieldBall.positionRelative.x() < theFieldDimensions.xPosHalfWayLine))
+          goto DefendBall;  
       }  
       action
       {
         theLookForwardSkill();
+        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
+        if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
     }  
 
@@ -109,7 +112,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     {
       transition
       {
-        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
+        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0 ))
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
@@ -129,6 +132,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
     state(waitBall)
     {
+      const Angle angleToGoal = calcAngleToGoal();
+
       transition
       {
         if(theFieldBall.ballWasSeen())
@@ -141,7 +146,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
           theLookForwardSkill();
           theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
-          theStandSkill();
+          if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
     }
 
@@ -153,8 +159,10 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(theFieldBall.positionRelative.norm() < 1000.0f || (theRobotPose.translation.x() > theFieldBall.positionRelative.x()))
+        if(theFieldBall.positionRelative.norm() < 3000.0f)
           goto walkToBall;  
+        if(theRobotPose.inversePose.translation.x() > theFieldBall.positionRelative.x()+-1)  
+          goto walkToBall;
       }
 
       action
@@ -170,6 +178,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       transition
       {
+        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
+          goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
@@ -189,6 +199,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       transition
       {
+        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
+          goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
         if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
@@ -219,6 +231,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       transition
       {
+        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
+          goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
