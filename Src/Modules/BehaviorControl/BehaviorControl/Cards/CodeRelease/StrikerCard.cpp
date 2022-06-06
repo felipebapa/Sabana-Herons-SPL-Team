@@ -24,6 +24,8 @@ CARD(StrikerCard,
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
+  CALLS(Kick),
+  
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
@@ -165,6 +167,7 @@ class StrikerCard : public StrikerCardBase
       {
         theLookForwardSkill();
         theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        //theKickSkill((KickRequest::kickForward), true, 0.3f, false);
       }
     }
 

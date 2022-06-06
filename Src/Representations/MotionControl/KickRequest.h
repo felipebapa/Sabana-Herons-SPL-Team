@@ -49,6 +49,7 @@ STREAMABLE(KickRequest,
   ENUM(KickMotionID,
   {,
     kickForward,
+    //kickForwardFastLong,
     // kicks up to here are loaded by the KickEngine
     newKick,
     none,

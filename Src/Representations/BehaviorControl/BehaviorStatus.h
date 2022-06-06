@@ -33,6 +33,7 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanMessageParticle<idBehaviorStatus>
 	Striker,
 	Keeper,
 	Defender,
+	PenaltyStriker,
   CentralDefender,
   LeftDefender,
   RightDefender,
