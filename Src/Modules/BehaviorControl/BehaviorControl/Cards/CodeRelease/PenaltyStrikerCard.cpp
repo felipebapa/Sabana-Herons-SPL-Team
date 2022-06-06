@@ -124,7 +124,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
 
           transition
           {
-              if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
+              if(std::abs(angleToGoal > 15_deg))
                   goto kick;
           }
           action
@@ -139,7 +139,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
           
           transition
           {
-              if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
+              if(std::abs(angleToGoal > 15_deg))
                   goto kick;
           }
           action
