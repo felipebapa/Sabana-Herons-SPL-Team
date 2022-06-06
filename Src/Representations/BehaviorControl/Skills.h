@@ -156,4 +156,9 @@ namespace Skills
    * @param name The text to be synthesized and pronounced
    */
   SKILL_INTERFACE(Say, (const std::string&) text);
+/**
+*Intentos nuevos 
+*/
+
+
 }
