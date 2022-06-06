@@ -3,7 +3,7 @@
  *
  * Pruebas
  *
- * @author Jose Pinzon
+ * @author Jose Pinzon and Santi
  * 
  */
 
@@ -163,7 +163,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
         theLookForwardSkill();
         //theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
         theKickSkill((KickRequest::kickForward), false, kickDist, false);
-        theSaySkill("boom");
+        
       }
     }
     state(stand)
