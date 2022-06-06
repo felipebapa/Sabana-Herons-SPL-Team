@@ -132,8 +132,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
     state(waitBall)
     {
-      const Angle angleToGoal = calcAngleToGoal();
-
       transition
       {
         if(theFieldBall.ballWasSeen())
@@ -223,6 +221,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       action
       {
         thePathToTargetSkill(1.0, Defender1Pos);
+        goto searchForBall;
       }
     }
     state(kick)
