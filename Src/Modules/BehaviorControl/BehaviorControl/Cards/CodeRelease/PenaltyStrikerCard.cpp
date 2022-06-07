@@ -41,21 +41,9 @@ CARD(PenaltyStrikerCard,
   {,
     (float)(0.8f) walkSpeed,
     (int)(1000) initialWaitTime,
-    (int)(7000) ballNotSeenTimeout,
-    (Angle)(5_deg) ballAlignThreshold,
-    (float)(500.f) ballNearThreshold,
-    (Angle)(10_deg) angleToGoalThreshold,
-    (float)(400.f) ballAlignOffsetX,
-    (float)(100.f) ballYThreshold,
-    (Angle)(2_deg) angleToGoalThresholdPrecise,
-    (float)(150.f) ballOffsetX,
-    (Rangef)({140.f, 170.f}) ballOffsetXRange,
-    (float)(40.f) ballOffsetY,
-    (Rangef)({20.f, 50.f}) ballOffsetYRange,
     (int)(10) minKickWaitTime,
     (int)(3000) maxKickWaitTime,
-    (int) (1) choice,
-    (float) (0.3f) kickDist,
+    (int) choice,
   }),
 });
 
@@ -167,7 +155,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
       {
         theLookForwardSkill();
         //theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-        theKickSkill((KickRequest::kickForward), false, kickDist, false);
+        theKickSkill((KickRequest::kickForward), false, 0.3f, false);
         
       }
     }
