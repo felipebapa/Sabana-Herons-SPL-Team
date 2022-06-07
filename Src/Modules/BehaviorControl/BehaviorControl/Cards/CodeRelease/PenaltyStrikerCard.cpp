@@ -51,12 +51,12 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
 {
   bool preconditions() const override
   {
-    return theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT;
+    return (theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber);
   }
 
   bool postconditions() const override
   {
-    return theGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT;
+    return (theGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber);
   }
   
   option

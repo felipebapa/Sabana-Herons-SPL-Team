@@ -23,19 +23,19 @@ class PenaltyShootoutTeamCard : public PenaltyShootoutTeamCardBase
 {
   bool preconditions() const override
   {
-    return theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT;
+    return true;
   }
 
   bool postconditions() const override
   {
-    return theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT;
+    return true;
   }
 
   void execute() override
   {
     theTeamActivitySkill(TeamBehaviorStatus::PenaltyShootoutTeam);
 
-    if (theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber){
+    /*if (theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber){
       Role PenaltyStriker;
       PenaltyStriker.isGoalkeeper = false;
       PenaltyStriker.playBall = true;  
@@ -46,7 +46,7 @@ class PenaltyShootoutTeamCard : public PenaltyShootoutTeamCardBase
       Goalie.isGoalkeeper = true;
       Goalie.playBall = false;
       theRoleSkill(Goalie);
-    }
+    }*/
   }
 };
 
