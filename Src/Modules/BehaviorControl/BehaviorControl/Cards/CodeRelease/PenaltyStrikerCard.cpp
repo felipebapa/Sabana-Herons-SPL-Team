@@ -77,7 +77,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
           transition
           {
              if(state_time > initialWaitTime)
-               goto kick;
+               goto searchForBall;
           }
           action
           {
