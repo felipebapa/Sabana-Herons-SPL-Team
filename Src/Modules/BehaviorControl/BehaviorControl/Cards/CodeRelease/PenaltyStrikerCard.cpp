@@ -18,6 +18,8 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamInfo.h"
 
+#include <string>
+
 CARD(PenaltyStrikerCard,
 {,
   CALLS(Activity),
@@ -77,7 +79,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
           transition
           {
              if(state_time > initialWaitTime)
-               goto kick;
+               goto searchForBall;
           }
           action
           {
@@ -95,7 +97,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
           }
           action
           {
-              
+              theSaySkill("Searching");
           }
       }
       
@@ -104,7 +106,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
           transition
           {
               if (choice==1){
-                  goto alignLeft;
+                  goto alignLeft;                
               }
               if (choice==0){
                   goto alignRight;
@@ -114,6 +116,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
           {
               srand((int)time(NULL));
               choice=0+rand()%(2-0);
+              //choice=0;
           }
 
       }
@@ -124,12 +127,13 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
 
           transition
           {
-              if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
+              if(std::abs(theFieldBall.positionRelative.x()) < 200.f && std::abs(theFieldBall.positionRelative.y())  < 50.f)
                   goto kick;
           }
           action
           {
-              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal - 0.40f, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
+              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal - 0.4f, theFieldBall.positionRelative.x() - 150.f, theFieldBall.positionRelative.y() + 50.f));
+              theSaySkill("Right Right Right");
           }
           
       }
@@ -139,23 +143,24 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
           
           transition
           {
-              if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
+              if(std::abs(theFieldBall.positionRelative.x()) < 200.f && std::abs(theFieldBall.positionRelative.y())  < 100.f)
                   goto kick;
           }
           action
           {
-              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal + 0.40f, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
+              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal + 0.4f, theFieldBall.positionRelative.x() - 150.f, theFieldBall.positionRelative.y() + 50.f));
+              theSaySkill("Left Left Left");
           }
           
       }
       state(kick)
     {
-      const Angle angleToGoal = calcAngleToGoal();
+      //const Angle angleToGoal = calcAngleToGoal();
 
       transition
       {
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theKickSkill.isDone()))
-          goto start;
+          goto stand;
       }
 
       action
