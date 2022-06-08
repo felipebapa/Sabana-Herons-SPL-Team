@@ -1,9 +1,10 @@
 /**
- * @file Striker.cpp
+ * @file Kick in.cpp
  *
- * Pruebas
+ * Pruebas Striker para kick in.
  *
- * @author Andres Ramirez
+ * @author Santi
+ * 
  */
 
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -13,23 +14,29 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
-
+#include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/TeamInfo.h"
 
-CARD(StrikerCard,
+#include <string>
+
+CARD(KickInCard,
 {,
   CALLS(Activity),
-  CALLS(InWalkKick),
   CALLS(LookForward),
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
   CALLS(Kick),
+  CALLS(Say),
   
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
+  REQUIRES(GameInfo),
+  REQUIRES(OwnTeamInfo),
+  
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
@@ -50,38 +57,36 @@ CARD(StrikerCard,
   }),
 });
 
-class StrikerCard : public StrikerCardBase
+class KickInCard : public KickInCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == 4;
+    return (theGameInfo.setPlay == SET_PLAY_KICK_IN && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber);
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != 4;
+    return (theGameInfo.setPlay != SET_PLAY_KICK_IN || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber);
   }
-
+  
   option
   {
-    theActivitySkill(BehaviorStatus::Striker);
-
-    initial_state(start)
-    {
-      transition
+      theActivitySkill(BehaviorStatus::KickIn);
+      initial_state(start)
       {
-        if(state_time > initialWaitTime)
-          goto turnToBall;
+          transition
+          {
+             if(state_time > initialWaitTime)
+               goto searchForBall;
+          }
+          action
+          {
+              theLookForwardSkill();
+              theStandSkill();
+          }
       }
-
-      action
-      {
-        theLookForwardSkill();
-        theStandSkill();
-      }
-    }
-
-    state(turnToBall)
+      
+      state(turnToBall)
     {
       transition
       {
@@ -155,7 +160,7 @@ class StrikerCard : public StrikerCardBase
 
     state(kick)
     {
-      const Angle angleToGoal = calcAngleToGoal();
+      //const Angle angleToGoal = calcAngleToGoal();
 
       transition
       {
@@ -166,8 +171,8 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theLookForwardSkill();
-        theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-        //theKickSkill((KickRequest::kickForward), true, 0.3f, false);
+        theKickSkill((KickRequest::kickForward), true, 0.3f, false);
+        theSaySkill("Boom");
       }
     }
 
@@ -194,4 +199,4 @@ class StrikerCard : public StrikerCardBase
 
 };
 
-MAKE_CARD(StrikerCard);
+MAKE_CARD(KickInCard);

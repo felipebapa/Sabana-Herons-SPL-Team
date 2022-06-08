@@ -1,7 +1,8 @@
 /**
  * @file InitialCard.cpp
  *
- * This file specifies the behavior for a robot in the Penalty Game Phase.
+ * Prueba carta de equipo para manejo de penalty. 
+ * Esta puede que no sea necesaria segun lo que hemos probado. Tal vez mas adelante en pruebas veamos que si es necesaria.
  *
  * @author Jose P y Santi.
  */

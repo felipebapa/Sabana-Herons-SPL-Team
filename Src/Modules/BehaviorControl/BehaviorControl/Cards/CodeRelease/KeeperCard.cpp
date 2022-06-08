@@ -25,6 +25,7 @@ CARD(KeeperCard,
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
+  CALLS(PathToTarget),
   CALLS(KeyFrameSingleArm),
   CALLS(SpecialAction),
   CALLS(LookAtPoint),
@@ -77,7 +78,7 @@ class KeeperCard : public KeeperCardBase
     {
       transition
       {
-        if(state_time > initialWaitTime && theBallModel.estimate.position.x() < 3500)  //Aùn no funciona lo de 3500
+        if(state_time > initialWaitTime)  
           goto coverBallTrajectory;
       }
 
@@ -96,26 +97,29 @@ class KeeperCard : public KeeperCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-		//if(-100 > theBallModel.estimate.position.y() && theBallModel.estimate.velocity.x() < -90)
-		if(-100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < ballXThreshold)
+		    //if(-100 > theBallModel.estimate.position.y() && theBallModel.estimate.velocity.x() < -90)
+		    if(-100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < ballXThreshold)
           goto GoalRiskRight;
-		//if( 100 < theBallModel.estimate.position.y() && theBallModel.estimate.velocity.x() < -90)
-		if( 100 < theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < ballXThreshold)
+		    //if( 100 < theBallModel.estimate.position.y() && theBallModel.estimate.velocity.x() < -90)
+		    if( 100 < theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < ballXThreshold)
           goto GoalRiskLeft;
+        if(theFieldBall.positionRelative.norm() >= 2500.0f)
+          goto guardGoal;
       }
 
       action
       {
         theLookForwardSkill();
-		
-			
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
+
+		    if(theBallModel.estimate.position.x() < 3500){
+
            //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f)); //No quiero que camine a este angulo.
-		   //Quiero que camine horizontalmente hasta que el angulo sea 0.
-		   
+		      //Quiero que camine horizontalmente hasta que el angulo sea 0.
+
 		   theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()));  //Pose2f (angulo,x,y)
-		   
-		
-		
+
+		    }
       }
     }
 	
@@ -125,6 +129,8 @@ class KeeperCard : public KeeperCardBase
       {
         if(theFieldBall.ballWasSeen() && theBallModel.estimate.position.x() < 3500)
           goto coverBallTrajectory;
+        if(!theFieldBall.ballWasSeen(10000))
+          goto goBackHome;   
       }
 
       action
@@ -141,8 +147,10 @@ class KeeperCard : public KeeperCardBase
 	  
       transition
       {
-		if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+		    if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
+        if((theRobotPose.translation.x() > theFieldDimensions.xPosOwnGroundline) || (theRobotPose.translation.y() > theFieldDimensions.yPosLeftGoal) || (theRobotPose.translation.y() < theFieldDimensions.yPosRightGoal))
+          goto coverBallTrajectory;
 	    
       }
 
@@ -163,7 +171,7 @@ class KeeperCard : public KeeperCardBase
 	  
       transition
       {
-		if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+		    if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
 	    
       }
@@ -179,6 +187,33 @@ class KeeperCard : public KeeperCardBase
       }
     }
 	
+    state(guardGoal) {
+      transition 
+      {
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto searchForBall;
+        if(theFieldBall.positionRelative.norm() < 2500.0f)
+          goto coverBallTrajectory;
+      }
+      action
+      {
+        theLookForwardSkill();
+        thePathToTargetSkill(walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), theFieldDimensions.xPosOwnGroundline, theFieldDimensions.yPosCenterGoal));
+      }
+    }
+
+    state(goBackHome) {
+      transition
+      {
+        if(theFieldBall.ballWasSeen() && theBallModel.estimate.position.x() < 3500)
+          goto coverBallTrajectory;
+      }
+      action
+      {
+        theLookForwardSkill();
+        thePathToTargetSkill(1.0, KeeperPos);
+      }
+    }
 
   }
   

@@ -1,7 +1,7 @@
 /**
  * @file PenaltyStriker.cpp
  *
- * Pruebas
+ * Pruebas Striker para Penalty Shoot-out.
  *
  * @author Jose Pinzon and Santi
  * 
@@ -37,6 +37,7 @@ CARD(PenaltyStrikerCard,
   REQUIRES(RobotInfo),
   REQUIRES(GameInfo),
   REQUIRES(OwnTeamInfo),
+  
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
