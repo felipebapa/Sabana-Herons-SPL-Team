@@ -20,6 +20,7 @@
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/BehaviorControl/Libraries/LibCheck.h"
 
 
 CARD(CentralDefenderCard,
@@ -32,11 +33,14 @@ CARD(CentralDefenderCard,
   CALLS(WalkToTarget),
   CALLS(KeyFrameArms),
   CALLS(PathToTarget),
+  CALLS(SpecialAction),
+  CALLS(Say),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(BallModel),
   REQUIRES(RobotInfo),
+  REQUIRES(LibCheck),
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
@@ -97,6 +101,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto searchForBall;
         if((std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold) || (theFieldBall.positionRelative.x() < theFieldDimensions.xPosHalfWayLine))
           goto DefendBall;  
+		if(theLibCheck.closerToTheBall && theFieldBall.ballWasSeen(1000))  //El que estè viendo al balon y este mas cerca.
+		  goto prueba;
       }  
       action
       {
@@ -118,7 +124,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto searchForBall;
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
           goto alignToGoal;
-          
+		if(theLibCheck.closerToTheBall && theFieldBall.ballWasSeen(1000))  //El que estè viendo al balon y este mas cerca.
+		  goto prueba;   
       }
 
       action
@@ -138,8 +145,10 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(!theFieldBall.ballWasSeen(4000))
-          goto goBackHome;   
+       // if(!theFieldBall.ballWasSeen(4000))
+        //  goto goBackHome;   
+		if(theLibCheck.closerToTheBall && theFieldBall.ballWasSeen(1000)) //El que estè viendo al balon y este mas cerca.
+		  goto prueba;
       }
 
       action
@@ -163,6 +172,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto walkToBall;  
         if(theRobotPose.inversePose.translation.x() > theFieldBall.positionRelative.x()+-1)  
           goto walkToBall;
+	    if(theLibCheck.closerToTheBall && theFieldBall.ballWasSeen(1000)) //El que estè viendo al balon y este mas cerca.
+		  goto prueba;
       }
 
       action
@@ -184,6 +195,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto searchForBall;
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
           goto alignBehindBall;
+	    if(theLibCheck.closerToTheBall && theFieldBall.ballWasSeen(1000)) //El que estè viendo al balon y este mas cerca.
+		  goto prueba;
       }
 
       action
@@ -205,6 +218,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto searchForBall;
         if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
           goto kick;
+	    if(theLibCheck.closerToTheBall && theFieldBall.ballWasSeen(1000)) //El que estè viendo al balon y este mas cerca.
+		  goto prueba;
       }
 
       action
@@ -237,6 +252,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto searchForBall;
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
           goto start;
+
       }
 
       action
@@ -253,8 +269,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(!theFieldBall.ballWasSeen(10000))
-          goto goBackHome;  
+       // if(!theFieldBall.ballWasSeen(10000))
+        //  goto goBackHome; 
       }
 
       action
@@ -263,6 +279,22 @@ class CentralDefenderCard : public CentralDefenderCardBase
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }
+	state(prueba)
+    {
+      transition
+      {
+
+		if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto searchForBall;
+        //if(!theFieldBall.ballWasSeen(10000))
+         // goto goBackHome;  
+      }
+
+      action
+      {
+        theSaySkill("CENTRAL");
+    }
+	}
   }
 
   Angle calcAngleToGoal() const
