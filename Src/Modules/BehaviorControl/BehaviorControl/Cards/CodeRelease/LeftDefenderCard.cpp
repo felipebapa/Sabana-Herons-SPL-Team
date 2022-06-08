@@ -20,6 +20,7 @@
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
 #include "Representations/Communication/RobotInfo.h"
+// #include "LookAroundCard.cpp"
 
 
 CARD(LeftDefenderCard,
@@ -27,11 +28,14 @@ CARD(LeftDefenderCard,
   CALLS(Activity),
   CALLS(InWalkKick),
   CALLS(LookForward),
+  CALLS(LookAtPoint),
+  CALLS(LookAtAngles),
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
   CALLS(KeyFrameArms),
   CALLS(PathToTarget),
+  CALLS(Say),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
@@ -55,6 +59,8 @@ CARD(LeftDefenderCard,
     (Rangef)({20.f, 50.f}) ballOffsetYRange,
     (int)(10) minKickWaitTime,
     (int)(3000) maxKickWaitTime,
+    (bool) direction,
+    (int)(0) prueba,
   }),
 });
 
@@ -79,7 +85,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       transition
       {
         if(state_time > initialWaitTime)
-          goto turnToBall;
+          goto searchForBall;
       }
 
       action
@@ -136,8 +142,10 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(!theFieldBall.ballWasSeen(10000))
-          goto goBackHome;   
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto lookLeft;
+        // if(!theFieldBall.ballWasSeen(10000))
+        //   goto goBackHome;   
       }
 
       action
@@ -210,20 +218,20 @@ class LeftDefenderCard : public LeftDefenderCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
-    state(goBackHome){
-      transition
-      {
-        if(theFieldBall.ballWasSeen())
-          goto turnToBall;
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto searchForBall;
-      }
-      action
-      {
-        theLookForwardSkill();
-        thePathToTargetSkill(1.0, Defender1Pos);
-      }
-    }
+    // state(goBackHome){
+    //   transition
+    //   {
+    //     if(theFieldBall.ballWasSeen())
+    //       goto turnToBall;
+    //     if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+    //       goto searchForBall;
+    //   }
+    //   action
+    //   {
+    //     theLookForwardSkill();
+    //     thePathToTargetSkill(1.0, Defender1Pos);
+    //   }
+    // }
 
 
 
@@ -255,16 +263,56 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(!theFieldBall.ballWasSeen(10000))
-          goto goBackHome;  
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto lookLeft;
+        // if(!theFieldBall.ballWasSeen(10000))
+        //   goto goBackHome;  
       }
 
       action
       {
-        theLookForwardSkill();
+        // LookAroundCard();
+        // theLookAtPointSkill(Vector3f(theFieldBall.positionRelative.x(),theFieldBall.positionRelative.y(),0.f),(HeadMotionRequest::autoCamera), 3);
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
         if(theRobotPose.translation.y() < theFieldDimensions.yPosLeftGoal)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldDimensions.yPosLeftGoal-500));
+      }
+    }
+
+    state(lookLeft) 
+    {
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+        if (theLookAtAnglesSkill.isDone())
+          goto lookRight;
+        
+      }
+      action
+      {
+        theLookAtAnglesSkill(pi/6, 0, 1);
+        if(theLookAtAnglesSkill.isDone())
+          theSaySkill("aaaaaaaaaaaaaaaa");
+        // theLookAtPointSkill(Vector3f(theFieldBall.positionRelative.x(),theFieldBall.positionRelative.y(),0.f),(HeadMotionRequest::targetOnGroundMode),1);
+
+
+      }
+    }
+
+    state(lookRight)
+    {
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+        if(theLookAtAnglesSkill.isDone())
+          goto lookLeft;
+      }
+      action
+      {
+        theLookAtAnglesSkill(-pi/3, 0, 1, HeadMotionRequest::autoCamera);
+        theStandSkill();
       }
     }
   }
