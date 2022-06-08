@@ -139,7 +139,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
     state(waitBall)
     {
-      const Angle angleToGoal = calcAngleToGoal();
 
       transition
       {

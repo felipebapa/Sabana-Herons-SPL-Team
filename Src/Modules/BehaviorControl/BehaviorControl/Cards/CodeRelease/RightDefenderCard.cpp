@@ -165,12 +165,17 @@ class RightDefenderCard : public RightDefenderCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
+
       //  if(!theFieldBall.ballWasSeen(4000))
       //    goto goBackHome;   
 		if(theLibCheck.closerToTheBall && theFieldBall.ballWasSeen(1000))  //El que estè viendo al balon y este mas cerca.
 		  goto prueba;
 		if(hayObstaculoCerca)
 		  goto ObsAvoid;
+
+        if(!theFieldBall.ballWasSeen(10000))
+          goto goBackHome;   
+
       }
 
       action
@@ -190,7 +195,7 @@ class RightDefenderCard : public RightDefenderCardBase
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(theFieldBall.positionRelative.norm() < 1000.0f)
+        if(theFieldBall.positionRelative.norm() < 3000.0f)
           goto walkToBall;  
 		if(theLibCheck.closerToTheBall && theFieldBall.ballWasSeen(1000))  //El que estè viendo al balon y este mas cerca.
 		  goto prueba;
