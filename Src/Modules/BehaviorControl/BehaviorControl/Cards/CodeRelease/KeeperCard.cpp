@@ -120,7 +120,9 @@ class KeeperCard : public KeeperCardBase
         if(theRobotPose.translation.y() > theFieldDimensions.yPosLeftGoal)
           theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 200));  
 
+
 		    }
+
       }
     }
 	

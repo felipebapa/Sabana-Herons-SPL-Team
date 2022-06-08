@@ -20,6 +20,7 @@
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/BehaviorControl/Libraries/LibCheck.h"
 // #include "LookAroundCard.cpp"
 
 
@@ -35,12 +36,14 @@ CARD(LeftDefenderCard,
   CALLS(WalkToTarget),
   CALLS(KeyFrameArms),
   CALLS(PathToTarget),
+  CALLS(SpecialAction),
   CALLS(Say),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(BallModel),
   REQUIRES(RobotInfo),
+  REQUIRES(LibCheck),
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
@@ -105,6 +108,8 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto DefendBall;
         // if(theFieldBall.positionRelative.y() > theFieldDimensions.yPosLeftGoal)
         //   goto walkToBall;
+		if(theLibCheck.closerToTheBall && theFieldBall.ballWasSeen(1000))  //El que estè viendo al balon y este mas cerca.
+		  goto prueba;
       }  
       action
       {
@@ -125,6 +130,8 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto searchForBall;
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
           goto alignToGoal;
+		if(theLibCheck.closerToTheBall && theFieldBall.ballWasSeen(1000))  //El que estè viendo al balon y este mas cerca.
+		  goto prueba;
           
       }
 
@@ -142,10 +149,17 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
+
+        //if(!theFieldBall.ballWasSeen(10000))
+         // goto goBackHome;   
+		if(theLibCheck.closerToTheBall && theFieldBall.ballWasSeen(1000))  //El que estè viendo al balon y este mas cerca.
+		  goto prueba;
+
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto lookLeft;
         // if(!theFieldBall.ballWasSeen(10000))
         //   goto goBackHome;   
+
       }
 
       action
@@ -167,6 +181,8 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto searchForBall;
         if(theFieldBall.positionRelative.norm() < 3000.0f)
           goto walkToBall;  
+		if(theLibCheck.closerToTheBall && theFieldBall.ballWasSeen(1000))  //El que estè viendo al balon y este mas cerca.
+		  goto prueba;
       }
 
       action
@@ -188,6 +204,8 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto searchForBall;
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
           goto alignBehindBall;
+		if(theLibCheck.closerToTheBall && theFieldBall.ballWasSeen(1000))  //El que estè viendo al balon y este mas cerca.
+		  goto prueba;
       }
 
       action
@@ -209,6 +227,8 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto searchForBall;
         if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
           goto kick;
+		if(theLibCheck.closerToTheBall && theFieldBall.ballWasSeen(1000))  //El que estè viendo al balon y este mas cerca.
+		  goto prueba;
       }
 
       action
@@ -263,10 +283,15 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
+
+       // if(!theFieldBall.ballWasSeen(10000))
+         // goto goBackHome;  
+
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto lookLeft;
         // if(!theFieldBall.ballWasSeen(10000))
         //   goto goBackHome;  
+
       }
 
       action
@@ -278,6 +303,29 @@ class LeftDefenderCard : public LeftDefenderCardBase
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldDimensions.yPosLeftGoal-500));
       }
     }
+
+	
+	state(prueba)
+    {
+      transition
+      {
+
+	    if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto searchForBall;
+        //if(!theFieldBall.ballWasSeen(10000))
+          //goto goBackHome;  
+      }
+
+      action
+      {
+		  
+		  
+        theSaySkill("LEFT");
+    }
+	}
+	
+
+
 
     state(lookLeft) 
     {
@@ -316,6 +364,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       }
     }
   }
+  
 
   Angle calcAngleToGoal() const
   {

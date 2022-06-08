@@ -31,6 +31,9 @@ void BallModel::operator>>(BHumanMessage& m) const
   m.theBHumanStandardMessage.ballCovariance[0] = estimate.covariance(0, 0);
   m.theBHumanStandardMessage.ballCovariance[1] = estimate.covariance(1, 1);
   m.theBHumanStandardMessage.ballCovariance[2] = (estimate.covariance(0, 1) + estimate.covariance(1, 0)) / 2.f;
+  
+  
+   
 
   if(timeWhenLastSeen && Blackboard::getInstance().exists("FrameInfo"))
   {
@@ -45,6 +48,7 @@ void BallModel::operator<<(const BHumanMessage& m)
 {
   estimate.position.x() = m.theBSPLStandardMessage.ball[0];
   estimate.position.y() = m.theBSPLStandardMessage.ball[1];
+  
 
   if(m.hasBHumanParts)
   {
@@ -57,6 +61,7 @@ void BallModel::operator<<(const BHumanMessage& m)
     timeWhenLastSeen = m.toLocalTimestamp(m.theBHumanStandardMessage.ballTimeWhenLastSeen);
     timeWhenDisappeared = m.toLocalTimestamp(m.theBHumanStandardMessage.ballTimeWhenDisappeared);
     seenPercentage = m.theBHumanStandardMessage.ballSeenPercentage;
+	
   }
   else
   {
@@ -74,6 +79,7 @@ void BallModel::operator<<(const BHumanMessage& m)
       timeWhenLastSeen = std::max<int>(0, Time::getCurrentSystemTime() - 200 - static_cast<int>(m.theBSPLStandardMessage.ballAge * 1000.f));
     timeWhenDisappeared = timeWhenLastSeen;
     seenPercentage = 40;
+	
   }
 }
 
