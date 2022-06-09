@@ -77,7 +77,7 @@ class WaitForKickInCard : public WaitForKickInCardBase
       theActivitySkill(BehaviorStatus::WaitForKickIn);
       if((theRobotPose.translation.x() != 0) && (theRobotPose.translation.y() != 0)){
         thePathToTargetSkill(1.0, KickInWaitPos);
-        theSaySkill("Diego is gay");
+        theSaySkill("Going to center");
       }else{
         theStandSkill();
         theSaySkill("In position");
