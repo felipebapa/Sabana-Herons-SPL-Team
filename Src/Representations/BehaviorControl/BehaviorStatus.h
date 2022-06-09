@@ -30,6 +30,7 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanMessageParticle<idBehaviorStatus>
     PenaltyShootoutTeamCard,
     codeReleaseKickAtGoal,
     codeReleasePositionForKickOff,
+    PositionForPenaltyFreeKick,
 	Striker,
 	Keeper,
 	Defender,

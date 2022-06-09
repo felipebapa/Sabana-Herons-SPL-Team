@@ -1,18 +1,19 @@
 /**
- * @file CodeReleasePositionForKickOffCard.cpp
+ * @file PositionForPenaltyFreeKickCard.cpp
  *
- * This file implements nothing.
+ * Ir a las posiciones necesarias durante los 30s de ready.
  *
  * @author Arne Hasselbring
  */
 
 #include "Representations/BehaviorControl/Skills.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
-
+#include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/RobotPose.h"
+#include "Representations/Communication/GameInfo.h"
 
-CARD(CodeReleasePositionForKickOffCard,
+CARD(PositionForPenaltyFreeKickCard,
 {,
   CALLS(Activity),
   CALLS(LookForward),
@@ -20,35 +21,37 @@ CARD(CodeReleasePositionForKickOffCard,
   CALLS(Stand),
   CALLS(PathToTarget),
   CALLS(WalkAtRelativeSpeed),
+  REQUIRES(FieldDimensions),
   REQUIRES(RobotInfo),
   REQUIRES(RobotPose),
+  REQUIRES(GameInfo),
   DEFINES_PARAMETERS(
   {,
     (Pose2f)(Pose2f(0,-4450,0)) KeeperPos,
     (Pose2f)(Pose2f(0,-3000,0)) Defender1Pos,
     (Pose2f)(Pose2f(0,-2500,1500)) Defender2Pos,
     (Pose2f)(Pose2f(0,-2500,-1500)) Defender3Pos,
-    (Pose2f)(Pose2f(0,-1000,0)) StrikerPos,
+    (Pose2f)(Pose2f(0,theFieldDimensions.xPosOpponentPenaltyMark+100.f,theFieldDimensions.yPosCenterGoal)) StrikerPos,
     (int)(100) StopThreshold,
     (float)(15_deg) AngleThreshold,
   }),
 });
 
-class CodeReleasePositionForKickOffCard : public CodeReleasePositionForKickOffCardBase
+class PositionForPenaltyFreeKickCard : public PositionForPenaltyFreeKickCardBase
 {
   bool preconditions() const override
   {
-    return (theRobotPose.translation - KeeperPos.translation).norm() > StopThreshold;
+    return theGameInfo.state == STATE_READY && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK;
   }
 
   bool postconditions() const override
   {
-    return (theRobotPose.translation - KeeperPos.translation).norm() <= StopThreshold;
+    return theGameInfo.state != STATE_READY || theGameInfo.setPlay != SET_PLAY_PENALTY_KICK;
   }
 
   void execute() override
   {
-    theActivitySkill(BehaviorStatus::codeReleasePositionForKickOff);
+    theActivitySkill(BehaviorStatus::PositionForPenaltyFreeKick);
     theLookForwardSkill();
     //theStandSkill();
     // Not implemented in the Code Release.
@@ -135,4 +138,4 @@ class CodeReleasePositionForKickOffCard : public CodeReleasePositionForKickOffCa
   }
 };
 
-MAKE_CARD(CodeReleasePositionForKickOffCard);
+MAKE_CARD(PositionForPenaltyFreeKickCard);
