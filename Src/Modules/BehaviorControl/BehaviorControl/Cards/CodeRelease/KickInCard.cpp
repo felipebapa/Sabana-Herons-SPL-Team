@@ -66,7 +66,7 @@ class KickInCard : public KickInCardBase
 
   bool postconditions() const override
   {
-    return ((theGameInfo.setPlay != SET_PLAY_KICK_IN || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber) && theRobotInfo.number == 5);
+    return (theGameInfo.setPlay != SET_PLAY_KICK_IN || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber || theRobotInfo.number == 5);
   }
   
   option

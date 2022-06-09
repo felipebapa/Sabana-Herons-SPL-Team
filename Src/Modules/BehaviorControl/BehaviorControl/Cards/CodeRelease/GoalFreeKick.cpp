@@ -1,9 +1,10 @@
 /**
- * @file Striker.cpp
+ * @file "GoalFreeKick".cpp
  *
- * Pruebas
+ * Pruebas saque de arco.
  *
- * @author Andres Ramirez
+ * @author Santi
+ * 
  */
 
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -13,23 +14,29 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
-
+#include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/TeamInfo.h"
 
-CARD(StrikerCard,
+#include <string>
+
+CARD(GoalFreeKickCard,
 {,
   CALLS(Activity),
-  CALLS(InWalkKick),
   CALLS(LookForward),
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
   CALLS(Kick),
+  CALLS(Say),
   
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
+  REQUIRES(GameInfo),
+  REQUIRES(OwnTeamInfo),
+  
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
@@ -50,38 +57,36 @@ CARD(StrikerCard,
   }),
 });
 
-class StrikerCard : public StrikerCardBase
+class GoalFreeKickCard : public GoalFreeKickCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == 4;
+    return ((theGameInfo.competitionPhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_GOAL_KICK) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theRobotInfo.number == 1);
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != 4;
+    return ((theGameInfo.competitionPhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_GOAL_KICK) && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber && theRobotInfo.number != 1);
   }
-
+  
   option
   {
-    theActivitySkill(BehaviorStatus::Striker);
-
-    initial_state(start)
-    {
-      transition
+      theActivitySkill(BehaviorStatus::GoalFreeKick);
+      initial_state(start)
       {
-        if(state_time > initialWaitTime)
-          goto turnToBall;
+          transition
+          {
+             if(state_time > initialWaitTime)
+               goto searchForBall;
+          }
+          action
+          {
+              theLookForwardSkill();
+              theStandSkill();
+          }
       }
-
-      action
-      {
-        theLookForwardSkill();
-        theStandSkill();
-      }
-    }
-
-    state(turnToBall)
+      
+      state(turnToBall)
     {
       transition
       {
@@ -155,19 +160,19 @@ class StrikerCard : public StrikerCardBase
 
     state(kick)
     {
-      const Angle angleToGoal = calcAngleToGoal();
+      //const Angle angleToGoal = calcAngleToGoal();
 
       transition
       {
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theKickSkill.isDone()))
           goto start;
       }
 
       action
       {
         theLookForwardSkill();
-        theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-        //theKickSkill((KickRequest::kickForward), true, 0.3f, false);
+        theKickSkill((KickRequest::kickForward), true, 0.3f, false);
+        theSaySkill("Go Go");
       }
     }
 
@@ -194,4 +199,4 @@ class StrikerCard : public StrikerCardBase
 
 };
 
-MAKE_CARD(StrikerCard);
+MAKE_CARD(GoalFreeKickCard);
