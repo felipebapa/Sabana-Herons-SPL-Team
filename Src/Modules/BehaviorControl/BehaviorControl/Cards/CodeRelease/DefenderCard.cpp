@@ -20,6 +20,7 @@
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/BehaviorControl/Libraries/LibCheck.h"
 
 
 CARD(DefenderCard,
@@ -32,11 +33,13 @@ CARD(DefenderCard,
   CALLS(WalkToTarget),
   CALLS(KeyFrameArms),
   CALLS(PathToTarget),
+  CALLS(SpecialAction),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(BallModel),
   REQUIRES(RobotInfo),
+  REQUIRES(LibCheck),
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
@@ -97,6 +100,8 @@ class DefenderCard : public DefenderCardBase
           goto searchForBall;
         if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold)
           goto DefendBall;
+		if(theLibCheck.closerToTheBall)
+		  goto prueba;
       }  
       action
       {
@@ -113,11 +118,14 @@ class DefenderCard : public DefenderCardBase
           goto searchForBall;
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
           goto alignToGoal;
+		if(theLibCheck.closerToTheBall)
+		  goto prueba;
           
       }
 
       action
       {
+		
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
@@ -130,8 +138,10 @@ class DefenderCard : public DefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(theFieldBall.positionRelative.norm() < 1000.0f)
+        if(theFieldBall.positionRelative.norm() < 3000.0f && theLibCheck.closerToTheBall)
           goto walkToBall;  
+		if(theLibCheck.closerToTheBall)
+		  goto prueba;
       }
 
       action
@@ -149,7 +159,7 @@ class DefenderCard : public DefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
+        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && theLibCheck.closerToTheBall)
           goto alignBehindBall;
       }
 
@@ -168,7 +178,7 @@ class DefenderCard : public DefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
+        if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && theLibCheck.closerToTheBall)
           goto kick;
       }
 
@@ -218,6 +228,10 @@ class DefenderCard : public DefenderCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
+		  
+		if(theLibCheck.closerToTheBall)
+		  goto prueba;
+		  
         if(!theFieldBall.ballWasSeen(10000))
           goto goBackHome;  
       }
@@ -228,6 +242,42 @@ class DefenderCard : public DefenderCardBase
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }
+	//state(PassMate)
+    //{
+     // transition
+     // {
+       // if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+        //  goto searchForBall;
+       // if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
+       //   goto alignToGoal;
+		  
+     // }
+
+      //action
+      //{
+		
+		  
+		
+		
+        //thePassTargetSkill(); //EL mas cercano a la cancha contraria.
+     // }
+    //}
+	state(prueba)
+    {
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+        if(!theFieldBall.ballWasSeen(10000))
+          goto goBackHome;  
+      }
+
+      action
+      {
+        theSpecialActionSkill(SpecialActionRequest::rightDive);
+    }
+	}
+	
   }
 
   Angle calcAngleToGoal() const
