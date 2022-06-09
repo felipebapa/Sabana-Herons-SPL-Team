@@ -40,7 +40,7 @@ CARD(PenaltyStrikerCard,
   
   DEFINES_PARAMETERS(
   {,
-    (float)(0.8f) walkSpeed,
+    (float)(1.0f) walkSpeed,
     (int)(1000) initialWaitTime,
     (int)(10) minKickWaitTime,
     (int)(3000) maxKickWaitTime,
@@ -103,9 +103,9 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
           }
           action
           {
-              srand((int)time(NULL));
-              choice=0+rand()%(2-0);
-              //choice=0;
+              //srand((int)time(NULL));
+              //choice=0+rand()%(2-0);
+              choice=1;
           }
 
       }
@@ -116,12 +116,16 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
 
           transition
           {
-              if(std::abs(theFieldBall.positionRelative.x()) < 200.f && std::abs(theFieldBall.positionRelative.y())  < 50.f)
+              if(theFieldBall.positionRelative.x() < 180.f)
                   goto kick;
           }
           action
           {
+<<<<<<< HEAD
               theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal - 0.7f, theFieldBall.positionRelative.x() - 150.f, theFieldBall.positionRelative.y() + 50.f));
+=======
+              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal - 0.65f, theFieldBall.positionRelative.x() - 150.f, theFieldBall.positionRelative.y() + 70.f));
+>>>>>>> 53854b50a94512763fb6792f49fecf135afb870c
               theSaySkill("Right Right Right");
           }
           
@@ -132,12 +136,12 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
           
           transition
           {
-              if(std::abs(theFieldBall.positionRelative.x()) < 200.f && std::abs(theFieldBall.positionRelative.y())  < 100.f)
+              if(theFieldBall.positionRelative.x() <180.f)
                   goto kick;
           }
           action
           {
-              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal + 0.65f, theFieldBall.positionRelative.x() - 150.f, theFieldBall.positionRelative.y() + 50.f));
+              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal + 0.65f, theFieldBall.positionRelative.x() - 150.f, theFieldBall.positionRelative.y() + 45.f));
               theSaySkill("Left Left Left");
           }
           
