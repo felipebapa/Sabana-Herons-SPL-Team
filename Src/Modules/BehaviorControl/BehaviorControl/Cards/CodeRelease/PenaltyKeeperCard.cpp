@@ -126,7 +126,7 @@ class PenaltyKeeperCard : public PenaltyKeeperCardBase
           }
           action
           {
-              //theSpecialActionSkill(SpecialActionRequest::playDead);
+              theSpecialActionSkill(SpecialActionRequest::preventBall);
           }
 
       }
