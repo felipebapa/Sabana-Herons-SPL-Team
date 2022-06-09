@@ -64,16 +64,7 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
   option
   {
-    theActivitySkill(BehaviorStatus::PruebaFelipe1);
-
-/*       bool hayObstaculoCerca = false;
-      if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
-      for(const auto& obstacle : theObstacleModel.obstacles){
-        //See if the obstacle is first than the target   
-        if (obstacle.center.norm()<500.f)   //Què es un obstàculo?
-            hayObstaculoCerca=true;
-      }
-    } */
+    theActivitySkill(BehaviorStatus::codeReleaseKickAtGoal);
 
     initial_state(start)
     {
@@ -98,15 +89,12 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto searchForBall;
         if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold)
           goto walkToBall;
-
       }
 
       action
       {
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
-        /* if(hayObstaculoCerca)
-          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()+500)); */
       }
     }
 
@@ -179,7 +167,6 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       {
         theLookForwardSkill();
         theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-        //theKickSkill((KickRequest::kickForward), true, 0.3f, false);
       }
     }
 
