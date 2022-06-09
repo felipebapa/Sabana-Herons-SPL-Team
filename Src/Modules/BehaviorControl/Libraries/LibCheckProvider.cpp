@@ -155,5 +155,35 @@ bool LibCheckProvider::isCloserToTheBall()
   return true;  //Si esto es true, el local es quien va al balòn.
 }
 
+Pose2f LibCheckProvider::teammateToPass()
+{
+  double teammateDistanceToBall = 0.0;
+  Pose2f teammatePos;
+  //double teammateCloserToBall = 0.0;
+  int counter = 0;
 
+  for(auto const& teammate : theTeamData.teammates)
+  {
+    if(!teammate.isPenalized){
+      teammatePos = (teammate.theRobotPose.inversePose);
+      teammateDistanceToBall = (teammate.theRobotPose.inversePose*theTeamBallModel.position).norm();
+      counter++;
+
+      // if(theFrameInfo.getTimeSince(teammate.theBallModel.timeWhenLastSeen)<=4000){
+      //  teammateDistanceToBall = teammate.theBallModel.estimate.position.norm();
+      // }
+
+      // if(teammateCloserToBall > teammateDistanceToBall)
+      // {
+      //   teammatePos = teammate.theRobotPose.inversePose;
+      //   teammateCloserToBall = teammateDistanceToBall;
+      // }
+    }
+  }
+
+  if(counter == 0)
+    return Pose2f(0,2500,1500);
+  else
+    return Pose2f(0,0,0);
+}
 

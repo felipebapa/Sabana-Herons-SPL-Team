@@ -45,4 +45,6 @@ STREAMABLE(LibCheck,
   FUNCTION(void()) performTeamCheck,
   
   (bool)(false) closerToTheBall,
+
+  (Pose2f)(0,0,0) teammateToPass,
 });
