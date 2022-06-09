@@ -98,8 +98,8 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto searchForBall;
         if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold)
           goto DefendBall;
-        if(theFieldBall.positionRelative.y() > theFieldDimensions.yPosLeftGoal)
-          goto walkToBall;
+        // if(theFieldBall.positionRelative.y() > theFieldDimensions.yPosLeftGoal)
+        //   goto walkToBall;
       }  
       action
       {
