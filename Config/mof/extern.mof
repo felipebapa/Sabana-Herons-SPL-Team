@@ -5,6 +5,7 @@ motion_id = extern
 label start
 
 "All mofs must be enumerated here
+transition preventBall preventBall start
 
 transition playDead playDead start
 transition sitDown sitDown start
