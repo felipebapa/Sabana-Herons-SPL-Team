@@ -117,12 +117,12 @@ class PenaltyFreekickCard : public PenaltyFreekickCardBase
 
           transition
           {
-              if(std::abs(theFieldBall.positionRelative.x()) < 200.f && std::abs(theFieldBall.positionRelative.y())  < 50.f)
+              if(theFieldBall.positionRelative.x() < 180.f)
                   goto kick;
           }
           action
           {
-              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal - 0.7f, theFieldBall.positionRelative.x() - 150.f, theFieldBall.positionRelative.y() + 50.f));
+              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal - 0.65f, theFieldBall.positionRelative.x() - 150.f, theFieldBall.positionRelative.y() + 70.f));
               theSaySkill("Right Right Right");
           }
           
@@ -133,12 +133,12 @@ class PenaltyFreekickCard : public PenaltyFreekickCardBase
           
           transition
           {
-              if(std::abs(theFieldBall.positionRelative.x()) < 200.f && std::abs(theFieldBall.positionRelative.y())  < 100.f)
+              if(theFieldBall.positionRelative.x() <180.f)
                   goto kick;
           }
           action
           {
-              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal + 0.65f, theFieldBall.positionRelative.x() - 150.f, theFieldBall.positionRelative.y() + 50.f));
+              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal + 0.65f, theFieldBall.positionRelative.x() - 150.f, theFieldBall.positionRelative.y() + 45.f));
               theSaySkill("Left Left Left");
           }
           
