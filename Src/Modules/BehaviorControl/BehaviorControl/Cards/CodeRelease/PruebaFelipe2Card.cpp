@@ -1,12 +1,9 @@
 /**
- * @file CodeReleaseKickAtGoalCard.cpp
+ * @file Striker.cpp
  *
- * This file implements a basic striker behavior for the code release.
- * Normally, this would be decomposed into at least
- * - a ball search behavior card
- * - a skill for getting behind the ball
+ * Pruebas
  *
- * @author Arne Hasselbring
+ * @author Andres Ramirez
  */
 
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -16,10 +13,10 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
-
+#include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Communication/RobotInfo.h"
 
-CARD(CodeReleaseKickAtGoalCard,
+CARD(PruebaFelipe2Card,
 {,
   CALLS(Activity),
   CALLS(InWalkKick),
@@ -27,6 +24,8 @@ CARD(CodeReleaseKickAtGoalCard,
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
+  CALLS(Kick),
+  REQUIRES(ObstacleModel),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
@@ -51,21 +50,30 @@ CARD(CodeReleaseKickAtGoalCard,
   }),
 });
 
-class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
+class PruebaFelipe2Card : public PruebaFelipe2CardBase
 {
   bool preconditions() const override
   {
-    return false;
+    return theRobotInfo.number == 5;
   }
 
   bool postconditions() const override
   {
-    return false;
+    return theRobotInfo.number != 5;
   }
 
   option
   {
-    theActivitySkill(BehaviorStatus::codeReleaseKickAtGoal);
+    theActivitySkill(BehaviorStatus::PruebaFelipe2);
+
+/*       bool hayObstaculoCerca = false;
+      if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
+      for(const auto& obstacle : theObstacleModel.obstacles){
+        //See if the obstacle is first than the target   
+        if (obstacle.center.norm()<500.f)   //Què es un obstàculo?
+            hayObstaculoCerca=true;
+      }
+    } */
 
     initial_state(start)
     {
@@ -90,12 +98,15 @@ class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
           goto searchForBall;
         if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold)
           goto walkToBall;
+
       }
 
       action
       {
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
+        /* if(hayObstaculoCerca)
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()+500)); */
       }
     }
 
@@ -168,6 +179,7 @@ class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
       {
         theLookForwardSkill();
         theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        //theKickSkill((KickRequest::kickForward), true, 0.3f, false);
       }
     }
 
@@ -190,7 +202,8 @@ class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
   Angle calcAngleToGoal() const
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
-  }
+  }  
+
 };
 
-MAKE_CARD(CodeReleaseKickAtGoalCard);
+MAKE_CARD(PruebaFelipe2Card);

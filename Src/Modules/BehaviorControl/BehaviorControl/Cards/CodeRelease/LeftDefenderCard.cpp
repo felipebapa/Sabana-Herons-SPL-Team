@@ -71,12 +71,12 @@ class LeftDefenderCard : public LeftDefenderCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == 3;
+    return theRobotInfo.number == 6;
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != 3;
+    return theRobotInfo.number != 6;
   }
 
   option
