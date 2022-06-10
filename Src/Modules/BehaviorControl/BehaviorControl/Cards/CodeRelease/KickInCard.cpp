@@ -61,12 +61,12 @@ class KickInCard : public KickInCardBase
 {
   bool preconditions() const override
   {
-    return (theGameInfo.setPlay == SET_PLAY_KICK_IN && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theRobotInfo.number != 5);
+    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_KICK_IN) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theRobotInfo.number == 4);
   }
 
   bool postconditions() const override
   {
-    return (theGameInfo.setPlay != SET_PLAY_KICK_IN || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber || theRobotInfo.number == 5);
+    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_KICK_IN) || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber || theRobotInfo.number != 4);
   }
   
   option

@@ -8,10 +8,11 @@
 
 #include "Representations/BehaviorControl/Skills.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
-#include "Representations/Configuration/FieldDimensions.h"
+
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/Communication/GameInfo.h"
+#include "Representations/Configuration/FieldDimensions.h"
 
 CARD(PositionForPenaltyFreeKickCard,
 {,
@@ -21,17 +22,18 @@ CARD(PositionForPenaltyFreeKickCard,
   CALLS(Stand),
   CALLS(PathToTarget),
   CALLS(WalkAtRelativeSpeed),
-  REQUIRES(FieldDimensions),
+  
   REQUIRES(RobotInfo),
   REQUIRES(RobotPose),
   REQUIRES(GameInfo),
+  REQUIRES(FieldDimensions),
   DEFINES_PARAMETERS(
   {,
     (Pose2f)(Pose2f(0,-4450,0)) KeeperPos,
     (Pose2f)(Pose2f(0,-3000,0)) Defender1Pos,
     (Pose2f)(Pose2f(0,-2500,1500)) Defender2Pos,
     (Pose2f)(Pose2f(0,-2500,-1500)) Defender3Pos,
-    (Pose2f)(Pose2f(0,theFieldDimensions.xPosOpponentPenaltyMark+100.f,theFieldDimensions.yPosCenterGoal)) StrikerPos,
+    (Pose2f)(Pose2f(0, 2800, 0)) StrikerPos,
     (int)(100) StopThreshold,
     (float)(15_deg) AngleThreshold,
   }),
@@ -41,12 +43,12 @@ class PositionForPenaltyFreeKickCard : public PositionForPenaltyFreeKickCardBase
 {
   bool preconditions() const override
   {
-    return theGameInfo.state == STATE_READY && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK;
+    return (theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.state == STATE_READY) && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK;
   }
 
   bool postconditions() const override
   {
-    return theGameInfo.state != STATE_READY || theGameInfo.setPlay != SET_PLAY_PENALTY_KICK;
+    return (theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.state != STATE_READY) && theGameInfo.setPlay != SET_PLAY_PENALTY_KICK;
   }
 
   void execute() override
