@@ -322,7 +322,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
   Angle calcAngleToTeammate() const
   {
-    return (theRobotPose.inversePose * Vector2f(theLibCheck.teammateToPass.translation.x(),0.f)).angle();
+    return (theRobotPose.inversePose * Vector2f(500.f,1000.f)).angle();
   }
 };
 

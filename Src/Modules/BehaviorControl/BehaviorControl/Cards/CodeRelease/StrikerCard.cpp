@@ -3,7 +3,7 @@
  *
  * Pruebas
  *
- * @author Andres Ramirez
+ * @author Dap
  */
 
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -167,7 +167,6 @@ class StrikerCard : public StrikerCardBase
       {
         theLookForwardSkill();
         theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-        //theKickSkill((KickRequest::kickForward), true, 0.3f, false);
       }
     }
 
@@ -184,6 +183,14 @@ class StrikerCard : public StrikerCardBase
         theLookForwardSkill();
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
+    }
+    state(goToPass)
+    {
+      
+    }
+    state(waitPass)
+    {
+      
     }
   }
 
