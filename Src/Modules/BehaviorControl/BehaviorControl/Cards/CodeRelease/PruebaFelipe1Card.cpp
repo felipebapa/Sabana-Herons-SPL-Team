@@ -15,6 +15,10 @@
 #include "Tools/Math/BHMath.h"
 #include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Tools/Modeling/Obstacle.h"
+
+
+
 
 CARD(PruebaFelipe1Card,
 {,
@@ -25,6 +29,7 @@ CARD(PruebaFelipe1Card,
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
   CALLS(Kick),
+  CALLS(LookAtPoint),
   REQUIRES(ObstacleModel),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
@@ -64,8 +69,17 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
   option
   {
-    theActivitySkill(BehaviorStatus::codeReleaseKickAtGoal);
+    theActivitySkill(BehaviorStatus::PruebaFelipe1);
 
+
+      bool hayObstaculoCerca = false;
+      if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
+      for(const auto& obstacle : theObstacleModel.obstacles){
+        //See if the obstacle is first than the target   
+      if (obstacle.center.norm()<400.f)   //Què es un obstàculo?
+          hayObstaculoCerca=true;
+      }
+    }
     initial_state(start)
     {
       transition
@@ -78,6 +92,7 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       {
         theLookForwardSkill();
         theStandSkill();
+        
       }
     }
 
@@ -87,14 +102,22 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold)
+        if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold && !hayObstaculoCerca)
           goto walkToBall;
+
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
+
+
+          
+        
       }
 
       action
       {
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
+
       }
     }
 
@@ -104,14 +127,19 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
+        if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold) && !hayObstaculoCerca)
           goto alignToGoal;
+
+         if(hayObstaculoCerca)
+          goto ObsAvoid;
+
       }
 
       action
       {
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
+
       }
     }
 
@@ -123,14 +151,19 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
+        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && !hayObstaculoCerca)
           goto alignBehindBall;
+
+         if(hayObstaculoCerca)
+          goto ObsAvoid;
+
       }
 
       action
       {
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
+
       }
     }
 
@@ -142,14 +175,18 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
+        if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculoCerca)
           goto kick;
+         if(hayObstaculoCerca)
+          goto ObsAvoid;
+
       }
 
       action
       {
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+
       }
     }
 
@@ -167,6 +204,7 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       {
         theLookForwardSkill();
         theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+
       }
     }
 
@@ -182,8 +220,28 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       {
         theLookForwardSkill();
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+
+
       }
     }
+
+     
+    state(ObsAvoid)
+    {
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+          goto start;
+      }
+
+      action
+      {
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()-200)); 
+      }
+    } 
+    
   }
 
   Angle calcAngleToGoal() const

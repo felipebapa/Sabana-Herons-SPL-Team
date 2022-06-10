@@ -66,14 +66,14 @@ class PruebaFelipe3Card : public PruebaFelipe3CardBase
   {
     theActivitySkill(BehaviorStatus::PruebaFelipe3);
 
-/*       bool hayObstaculoCerca = false;
+       bool hayObstaculoCerca = false;
       if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
         if (obstacle.center.norm()<500.f)   //Què es un obstàculo?
             hayObstaculoCerca=true;
       }
-    } */
+    } 
 
     initial_state(start)
     {
@@ -105,8 +105,8 @@ class PruebaFelipe3Card : public PruebaFelipe3CardBase
       {
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
-        /* if(hayObstaculoCerca)
-          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()+500)); */
+         if(hayObstaculoCerca)
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()+200)); 
       }
     }
 
@@ -124,6 +124,8 @@ class PruebaFelipe3Card : public PruebaFelipe3CardBase
       {
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
+        if(hayObstaculoCerca)
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()+200)); 
       }
     }
 
@@ -143,6 +145,8 @@ class PruebaFelipe3Card : public PruebaFelipe3CardBase
       {
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
+        if(hayObstaculoCerca)
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()+200)); 
       }
     }
 
@@ -162,6 +166,8 @@ class PruebaFelipe3Card : public PruebaFelipe3CardBase
       {
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        if(hayObstaculoCerca)
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()+200)); 
       }
     }
 
@@ -180,6 +186,8 @@ class PruebaFelipe3Card : public PruebaFelipe3CardBase
         theLookForwardSkill();
         theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
         //theKickSkill((KickRequest::kickForward), true, 0.3f, false);
+        if(hayObstaculoCerca)
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()+200)); 
       }
     }
 
@@ -195,6 +203,8 @@ class PruebaFelipe3Card : public PruebaFelipe3CardBase
       {
         theLookForwardSkill();
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+        if(hayObstaculoCerca)
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()+200)); 
       }
     }
   }
