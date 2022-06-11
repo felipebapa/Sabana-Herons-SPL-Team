@@ -3,7 +3,7 @@
  *
  * Pruebas saque de arco.
  *
- * @author Santi
+ * @author Santi and Jose
  * 
  */
 

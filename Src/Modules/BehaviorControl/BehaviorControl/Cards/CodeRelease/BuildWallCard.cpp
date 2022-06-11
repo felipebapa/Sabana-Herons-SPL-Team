@@ -1,9 +1,11 @@
 /**
- * @file Kick in.cpp
+ * @file BuildWallCard.cpp
  *
- * Pruebas Striker para kick in.
+ * Tests for defensive strategy
  *
  * @author Santi and Jose
+ * 
+ * 
  * 
  */
 
@@ -20,7 +22,7 @@
 
 #include <string>
 
-CARD(KickInCard,
+CARD(BuildWallCard,
 {,
   CALLS(Activity),
   CALLS(LookForward),
@@ -36,11 +38,13 @@ CARD(KickInCard,
   REQUIRES(RobotInfo),
   REQUIRES(GameInfo),
   REQUIRES(OwnTeamInfo),
+
+
   
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
-    (int)(1000) initialWaitTime,
+    (int)(500) initialWaitTime,
     (int)(7000) ballNotSeenTimeout,
     (Angle)(5_deg) ballAlignThreshold,
     (float)(500.f) ballNearThreshold,
@@ -57,21 +61,21 @@ CARD(KickInCard,
   }),
 });
 
-class KickInCard : public KickInCardBase
+class BuildWallCard : public BuildWallCardBase
 {
   bool preconditions() const override
   {
-    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_KICK_IN) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theRobotInfo.number == 4);
+    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK) && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber && theRobotInfo.number == 1);
   }
 
   bool postconditions() const override
   {
-    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_KICK_IN) || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber || theRobotInfo.number != 4);
+    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_PUSHING_FREE_KICK) || theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber || theRobotInfo.number != 1);
   }
   
   option
   {
-      theActivitySkill(BehaviorStatus::KickIn);
+      theActivitySkill(BehaviorStatus::BuildWall);
       initial_state(start)
       {
           transition
@@ -83,6 +87,7 @@ class KickInCard : public KickInCardBase
           {
               theLookForwardSkill();
               theStandSkill();
+              theSaySkill("Helllouuuu");
           }
       }
       
@@ -93,7 +98,7 @@ class KickInCard : public KickInCardBase
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
         if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold)
-          goto walkToBall;
+          goto walkToPos;
       }
 
       action
@@ -103,76 +108,39 @@ class KickInCard : public KickInCardBase
       }
     }
 
-    state(walkToBall)
+    state(walkToPos)
     {
+      const Angle angleOwnGoal = calcAngleOwnGoal();
+
       transition
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
-          goto alignToGoal;
+          goto buildWall;
       }
 
       action
       {
         theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleOwnGoal, theFieldBall.positionRelative.x() - 900.f, 0.0f));
       }
     }
 
-    state(alignToGoal)
+    state(buildWall)
     {
-      const Angle angleToGoal = calcAngleToGoal();
+      const Angle angleOwnGoal = calcAngleOwnGoal();
 
       transition
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
-          goto alignBehindBall;
       }
 
       action
       {
         theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
-      }
-    }
-
-    state(alignBehindBall)
-    {
-      const Angle angleToGoal = calcAngleToGoal();
-
-      transition
-      {
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto searchForBall;
-        if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
-          goto kick;
-      }
-
-      action
-      {
-        theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-      }
-    }
-
-    state(kick)
-    {
-      //const Angle angleToGoal = calcAngleToGoal();
-
-      transition
-      {
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theKickSkill.isDone()))
-          goto start;
-      }
-
-      action
-      {
-        theLookForwardSkill();
-        theKickSkill((KickRequest::kickForward), true, 0.3f, false);
-        theSaySkill("Boom");
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleOwnGoal, theFieldBall.positionRelative.x() - 900.f, 0.0f ));
       }
     }
 
@@ -190,13 +158,12 @@ class KickInCard : public KickInCardBase
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }
-  }
-
-  Angle calcAngleToGoal() const
-  {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
   }  
-
+  
+  Angle calcAngleOwnGoal() const
+  {
+    return(theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOwnGroundline, 0.f)).angle();
+  }
 };
 
-MAKE_CARD(KickInCard);
+MAKE_CARD(BuildWallCard);

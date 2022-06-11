@@ -31,6 +31,7 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanMessageParticle<idBehaviorStatus>
     codeReleaseKickAtGoal,
     codeReleasePositionForKickOff,
     PositionForPenaltyFreeKick,
+    BuildWall,
 	Striker,
 	Keeper,
 	Defender,

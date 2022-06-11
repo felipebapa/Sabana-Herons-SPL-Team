@@ -3,7 +3,7 @@
  *
  * Pruebas Striker para Penalty Shoot-out.
  *
- * @author Jose Pinzon and Santi
+ * @author Jose and Santi
  * 
  */
 

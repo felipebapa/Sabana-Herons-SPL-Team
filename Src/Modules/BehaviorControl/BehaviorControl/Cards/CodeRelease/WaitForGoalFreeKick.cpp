@@ -3,7 +3,7 @@
  *
  * Pruebas Wait para saque de arco.
  *
- * @author Santi
+ * @author Santi and Jose
  * 
  */
 

@@ -3,7 +3,7 @@
  *
  * Ir a las posiciones necesarias durante los 30s de ready.
  *
- * @author Arne Hasselbring
+ * @author Santi and Jose
  */
 
 #include "Representations/BehaviorControl/Skills.h"

@@ -3,7 +3,7 @@
  *
  * Pruebas
  *
- * @author Jose Pinzon and Santi
+ * @author Jose and Santi
  * 
  */
 

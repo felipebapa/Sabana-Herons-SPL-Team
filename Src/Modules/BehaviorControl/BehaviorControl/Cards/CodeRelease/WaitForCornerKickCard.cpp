@@ -3,7 +3,7 @@
  *
  * Pruebas Wait para tiro de esquina.
  *
- * @author Santi
+ * @author Santi and Jose
  * 
  */
 

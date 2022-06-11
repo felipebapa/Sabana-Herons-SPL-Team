@@ -3,7 +3,7 @@
  *
  * Pruebas Wait para kick in.
  *
- * @author Santi
+ * @author Santi and Jose
  * 
  */
 
