@@ -1,7 +1,7 @@
 /**
  * @file Striker.cpp
  *
- * Pruebas
+ * 
  *
  * @author Dap
  */
@@ -25,7 +25,7 @@ CARD(StrikerCard,
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
   CALLS(Kick),
-  
+  CALLS(PathToTarget),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
@@ -87,7 +87,9 @@ class StrikerCard : public StrikerCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold)
+        if(theFieldBall.positionOnField.x() <= 0.f) 
+          goto goToPass; 
+        if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold || theFieldBall.positionOnField.x() > 0.f)
           goto walkToBall;
       }
 
@@ -186,11 +188,15 @@ class StrikerCard : public StrikerCardBase
     }
     state(goToPass)
     {
-      
-    }
-    state(waitPass)
-    {
-      
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall; 
+      }
+      action
+      {
+        thePathToTargetSkill(1.0,Pose2f(pi,500.f,1000.f));
+      }
     }
   }
 
