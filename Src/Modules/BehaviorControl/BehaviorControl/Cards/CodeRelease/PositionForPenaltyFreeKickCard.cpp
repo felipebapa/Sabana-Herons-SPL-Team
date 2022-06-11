@@ -123,6 +123,7 @@ class PositionForPenaltyFreeKickCard : public PositionForPenaltyFreeKickCardBase
       if((theRobotPose.translation - StrikerPos.translation).norm() > StopThreshold)
       {
         thePathToTargetSkill(1.0, StrikerPos);
+        theSaySkill("Going to penalty mark");
       }
       else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
       {

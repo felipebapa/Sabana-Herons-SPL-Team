@@ -71,12 +71,12 @@ class WaitForKickInCard : public WaitForKickInCardBase
 {
   bool preconditions() const override
   {
-    return (theGameInfo.setPlay == SET_PLAY_KICK_IN && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber /*#Robot a sacar de banda.*/);
+    return (theGameInfo.setPlay == SET_PLAY_KICK_IN && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber);
   }
 
   bool postconditions() const override
   {
-    return (theGameInfo.setPlay != SET_PLAY_KICK_IN || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber/*#Robot a sacar de banda.*/);
+    return (theGameInfo.setPlay != SET_PLAY_KICK_IN || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber);
   }
   
   void execute() override
