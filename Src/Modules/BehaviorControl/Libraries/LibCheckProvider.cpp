@@ -155,5 +155,18 @@ bool LibCheckProvider::isCloserToTheBall()
   return true;  //Si esto es true, el local es quien va al balòn.
 }
 
+bool LibCheckProvider::positionToPass()
+{
+  const bool isInThePlace = false;
+  if(theRobotInfo.number == 4 && theRobotPose == Pose2f(pi,500,1000))
+    isInThePlace = true;
+
+  return isInThePlace;  
+
+}
+
+
+
+
 
 
