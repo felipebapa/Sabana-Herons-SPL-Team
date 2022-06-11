@@ -1,20 +1,23 @@
 /**
  * @file InitialCard.cpp
  *
- * This file specifies the behavior for a robot in the Penalty Game Phase.
+ * Prueba carta de equipo para manejo de penalty. 
+ * Esta puede que no sea necesaria segun lo que hemos probado. Tal vez mas adelante en pruebas veamos que si es necesaria.
  *
- * @author Arne Hasselbring
+ * @author Jose P y Santi.
  */
 
-#include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Communication/GameInfo.h"
-#include "Tools/BehaviorControl/Framework/Card/Card.h"
+#include "Tools/BehaviorControl/Framework/Card/TeamCard.h"
+#include "Representations/BehaviorControl/TeamSkills.h"
+#include "Representations/Communication/TeamInfo.h"
 
-CARD(PenaltyShootoutTeamCard,
+TEAM_CARD(PenaltyShootoutTeamCard,
 {,
-  CALLS(Activity),
-  CALLS(LookForward),
+  CALLS(Role),
+  CALLS(TeamActivity),
   REQUIRES(GameInfo),
+  REQUIRES(OwnTeamInfo),
 });
 
 class PenaltyShootoutTeamCard : public PenaltyShootoutTeamCardBase
@@ -31,11 +34,22 @@ class PenaltyShootoutTeamCard : public PenaltyShootoutTeamCardBase
 
   void execute() override
   {
-      theActivitySkill(BehaviorStatus::PenaltyShootoutTeamCard);
-      theLookForwardSkill();
-      //theKickSkill((KickRequest::kickForward), false, 3.f, false);
+    theTeamActivitySkill(TeamBehaviorStatus::PenaltyShootoutTeam);
+
+    /*if (theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber){
+      Role PenaltyStriker;
+      PenaltyStriker.isGoalkeeper = false;
+      PenaltyStriker.playBall = true;  
+      theRoleSkill(PenaltyStriker);
+      
+    }else if(theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber){
+      Role Goalie;
+      Goalie.isGoalkeeper = true;
+      Goalie.playBall = false;
+      theRoleSkill(Goalie);
+    }*/
   }
 };
 
-MAKE_CARD(PenaltyShootoutTeamCard);
+MAKE_TEAM_CARD(PenaltyShootoutTeamCard);
   

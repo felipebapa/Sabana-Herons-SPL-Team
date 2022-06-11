@@ -9,7 +9,7 @@ MAKE_MODULE(WhistleHandler, infrastructure)
 
 void WhistleHandler::update(GameInfo& gameInfo)
 {
-  if(theRawGameInfo.state == STATE_SET && theRawGameInfo.gamePhase == GAME_PHASE_NORMAL)
+  if(theRawGameInfo.state == STATE_SET && (theRawGameInfo.gamePhase == GAME_PHASE_NORMAL || theRawGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT))
   {
     if(checkForIllegalMotionPenalty() || lastGameState != STATE_SET)
     {

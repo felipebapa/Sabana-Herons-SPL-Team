@@ -3,7 +3,7 @@
  *
  * Pruebas
  *
- * @author Felipe Barreto
+ * @author DMF
  */
 
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -25,9 +25,11 @@ CARD(KeeperCard,
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
+  CALLS(PathToTarget),
   CALLS(KeyFrameSingleArm),
   CALLS(SpecialAction),
   CALLS(LookAtPoint),
+  CALLS(Say),
   REQUIRES(FieldBall),
   REQUIRES(BallModel),
   REQUIRES(FieldDimensions),
@@ -92,30 +94,33 @@ class KeeperCard : public KeeperCardBase
 	
 	state(coverBallTrajectory)
     {
+      const Angle angleToGoal = calcAngleToGoal();
       transition
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-		//if(-100 > theBallModel.estimate.position.y() && theBallModel.estimate.velocity.x() < -90)
-		if(-100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < ballXThreshold)
+		    //if(-100 > theBallModel.estimate.position.y() && theBallModel.estimate.velocity.x() < -90)
+        if(theRobotPose.translation.y() >= theFieldDimensions.yPosLeftGoal || theRobotPose.translation.y() <= theFieldDimensions.yPosRightGoal)
+          goto waitBall;
+		    if(-100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < ballXThreshold)
           goto GoalRiskRight;
-		//if( 100 < theBallModel.estimate.position.y() && theBallModel.estimate.velocity.x() < -90)
-		if( 100 < theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < ballXThreshold)
+		    //if( 100 < theBallModel.estimate.position.y() && theBallModel.estimate.velocity.x() < -90)
+		    if( 100 < theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < ballXThreshold)
           goto GoalRiskLeft;
+        if(theFieldBall.positionRelative.norm() >= 2500.0f)
+          goto guardGoal;
+
       }
 
       action
       {
         theLookForwardSkill();
-<<<<<<< HEAD
-		
-			
-=======
->>>>>>> d2b93939eb57cfc4f74f32b0bd17847de2bb7efb
-           //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f)); //No quiero que camine a este angulo.
-		   //Quiero que camine horizontalmente hasta que el angulo sea 0.
-		   
-		   theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()));  //Pose2f (angulo,x,y)
+		    if(theBallModel.estimate.position.x() < 3500)
+		      theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, 0.f, theFieldBall.positionRelative.y()));  //Pose2f (angulo,x,y)
+        if(theRobotPose.translation.y() > theFieldDimensions.yPosLeftGoal)
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 200));  
+        if(theRobotPose.translation.y() < theFieldDimensions.yPosRightGoal)  
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() + 200));  
       }
     }
 	
@@ -125,6 +130,8 @@ class KeeperCard : public KeeperCardBase
       {
         if(theFieldBall.ballWasSeen() && theBallModel.estimate.position.x() < 3500)
           goto coverBallTrajectory;
+        if(!theFieldBall.ballWasSeen(10000))
+          goto goBackHome;   
       }
 
       action
@@ -142,10 +149,7 @@ class KeeperCard : public KeeperCardBase
       transition
       {
 		    if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto searchForBall;
-        if((theRobotPose.translation.x() > theFieldDimensions.xPosOwnGroundline) || (theRobotPose.translation.y() > theFieldDimensions.yPosLeftGoal) || (theRobotPose.translation.y() < theFieldDimensions.yPosRightGoal))
-          goto coverBallTrajectory;
-	    
+          goto searchForBall; 
       }
 
       action
@@ -153,19 +157,38 @@ class KeeperCard : public KeeperCardBase
 		  
 		  theLookForwardSkill();
           //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-		  theSpecialActionSkill(SpecialActionRequest::rightDive);
+		  //theSpecialActionSkill(SpecialActionRequest::rightDive);
+      theSaySkill("Right Siuuuuuu");
 		  //theWalkAtRelativeSpeedSkill(Pose2f(0.f, walkSpeed, 0.f));
-		//theKeyFrameSingleArmSkill(ArmKeyFrameRequest::back, Arms::right, false);
       }
     }
-	
+    state(waitBall)
+    {
+
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+        if(!theFieldBall.ballWasSeen(4000))
+          goto goBackHome;   
+      }
+
+      action
+      {
+          theLookForwardSkill();
+          if(theRobotPose.translation.y() > theFieldDimensions.yPosLeftGoal)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 200));
+          if(theRobotPose.translation.y() < theFieldDimensions.yPosRightGoal)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() + 200));
+      }
+    }
 	   state(GoalRiskLeft)
     {
 	  //const Angle angleToGoal = calcAngleToGoal();
 	  
       transition
       {
-		if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+		    if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
 	    
       }
@@ -175,12 +198,60 @@ class KeeperCard : public KeeperCardBase
 		  
 		  theLookForwardSkill();
           //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-		  theSpecialActionSkill(SpecialActionRequest::leftDive);
+		  //theSpecialActionSkill(SpecialActionRequest::leftDive);
+      theSaySkill("Left Siuuuuuu");
 		  //theWalkAtRelativeSpeedSkill(Pose2f(0.f, walkSpeed, 0.f));
 		//theKeyFrameSingleArmSkill(ArmKeyFrameRequest::back, Arms::right, false);
       }
     }
 	
+    state(guardGoal) {
+      transition 
+      {
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto searchForBall;
+        if(theFieldBall.positionRelative.norm() < 2500.0f)
+          goto coverBallTrajectory;
+      }
+      action
+      {
+        theLookForwardSkill();
+        thePathToTargetSkill(walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), theFieldDimensions.xPosOwnGroundline, theFieldDimensions.yPosCenterGoal));
+      }
+    }
+
+    state(turnToBall)
+    {
+      transition
+      {
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto searchForBall;
+        if(theBallModel.estimate.position.y() < theFieldDimensions.yPosLeftGoal)
+          goto coverBallTrajectory;  
+      }  
+      action
+      {
+        theLookForwardSkill();
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
+        if(theRobotPose.translation.y() > theFieldDimensions.yPosLeftGoal)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 200));
+        if(theRobotPose.translation.y() < theFieldDimensions.yPosRightGoal)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() + 200));
+      }
+    }  
+
+    state(goBackHome) {
+      transition
+      {
+        if(theFieldBall.ballWasSeen() && theBallModel.estimate.position.x() < 3500)
+          goto coverBallTrajectory;
+      }
+      action
+      {
+        theLookForwardSkill();
+        thePathToTargetSkill(1.0, KeeperPos);
+      }
+    }
 
   }
   
