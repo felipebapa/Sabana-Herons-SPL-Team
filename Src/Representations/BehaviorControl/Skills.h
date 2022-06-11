@@ -126,7 +126,7 @@ namespace Skills
   /** This skill moves the head so that it looks forward.  */
   SKILL_INTERFACE(LookForward);
 
-  /**
+    /**
    * This skill sets the passTarget member of the BehaviorStatus.
    * @param passTarget The passTarget to set
    * @param shootingTo Optionally, the position where the ball should end up in robot-relative coordinates

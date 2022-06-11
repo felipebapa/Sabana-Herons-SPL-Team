@@ -16,7 +16,7 @@ SKILL_IMPLEMENTATION(HeadControl,
   IMPLEMENTS(LookAtAngles),
   IMPLEMENTS(LookAtPoint),
   IMPLEMENTS(LookForward),
-  // IMPLEMENTS(LookAround),
+
   REQUIRES(LibCheck),
   MODIFIES(HeadMotionRequest),
 });
@@ -38,10 +38,7 @@ class HeadControl : public HeadControlBase
     setPanTiltRequest(HeadMotionRequest::autoCamera, 0.f, 0.38f, 150_deg);
   }
 
-  // void execute(const LookAround& p)  
-  // {
-  //   setLookAroundTiltRequest(p.camera, p.panStart, p.panEnd, p.tilt, p.speed);
-  // }
+
 
   void setPanTiltRequest(HeadMotionRequest::CameraControlMode camera, Angle pan, Angle tilt, Angle speed, bool stopAndGoMode = false)
   {
@@ -54,17 +51,7 @@ class HeadControl : public HeadControlBase
     theLibCheck.inc(LibCheck::headMotionRequest);
   }
 
-  // void setLookAroundTiltRequest(HeadMotionRequest::CameraControlMode camera, Angle (), Angle tilt, Angle speed, bool stopAndGoMode = false)
-  // {
-  //   theHeadMotionRequest.mode = HeadMotionRequest::panTiltMode;
-  //   theHeadMotionRequest.cameraControlMode = camera;
-  //   theHeadMotionRequest.panStart = panStart;
-  //   theHeadMotionRequest.panEnd = panEnd;
-  //   theHeadMotionRequest.tilt = tilt;
-  //   theHeadMotionRequest.speed = speed;
-  //   theHeadMotionRequest.stopAndGoMode = stopAndGoMode;
-  //   theLibCheck.inc(LibCheck::headMotionRequest);
-  // }
+
 
   void setTargetOnGroundRequest(HeadMotionRequest::CameraControlMode camera, const Vector3f& target, Angle speed)
   {

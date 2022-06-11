@@ -16,6 +16,8 @@
 #include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Tools/Modeling/Obstacle.h"
+#include "Representations/MotionControl/HeadMotionRequest.h"
+
 
 
 
@@ -30,11 +32,15 @@ CARD(PruebaFelipe1Card,
   CALLS(WalkToTarget),
   CALLS(Kick),
   CALLS(LookAtPoint),
+  CALLS(LookAtAngles),
+  CALLS(Say),
   REQUIRES(ObstacleModel),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
+
+
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
@@ -52,6 +58,7 @@ CARD(PruebaFelipe1Card,
     (Rangef)({20.f, 50.f}) ballOffsetYRange,
     (int)(10) minKickWaitTime,
     (int)(3000) maxKickWaitTime,
+    (int)(0) a,
   }),
 });
 
@@ -80,6 +87,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           hayObstaculoCerca=true;
       }
     }
+
+    
     initial_state(start)
     {
       transition
@@ -90,43 +99,102 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
       action
       {
+
+      
         theLookForwardSkill();
         theStandSkill();
         
+        
       }
     }
-
-    state(turnToBall)
+      state(GiraCabezaIzq)
     {
       transition
       {
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 1500)
+          goto GiraCabezaDer;
+        
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
+        if(theFieldBall.ballWasSeen())
+          goto walkToBall;
+        if(a > 2)
           goto searchForBall;
+        
+      }
+      action
+      {
+          theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+          theLookAtAnglesSkill(1,2);
+          theSaySkill("LEFT");
+          //a+=1;
+          
+      }
+    } 
+
+    state(GiraCabezaDer)
+    {
+      
+      transition
+      {
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 1500)
+          goto GiraCabezaIzq;
+        
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
+        if(theFieldBall.ballWasSeen())
+          goto walkToBall;
+          
+
+      }
+
+      action
+      {
+
+        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+        theLookAtAnglesSkill(-1,2);
+        theSaySkill("RIGHT");
+        
+
+        
+
+      }
+    } 
+     state(turnToBall)
+    {
+      transition
+      {
+
+         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto GiraCabezaDer; 
+        //if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          //goto searchForBall;
         if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold && !hayObstaculoCerca)
           goto walkToBall;
-
+        
         if(hayObstaculoCerca)
           goto ObsAvoid;
 
 
           
-        
+
       }
 
       action
       {
-        theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
 
+        
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
+        
       }
-    }
+    } 
 
     state(walkToBall)
     {
       transition
       {
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto searchForBall;
+         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto GiraCabezaDer; 
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold) && !hayObstaculoCerca)
           goto alignToGoal;
 
@@ -137,9 +205,11 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
       action
       {
+
+        
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
-
+        
       }
     }
 
@@ -149,8 +219,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
       transition
       {
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto searchForBall;
+
+         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto GiraCabezaDer; 
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && !hayObstaculoCerca)
           goto alignBehindBall;
 
@@ -161,9 +232,10 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
       action
       {
+        
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
-
+        
       }
     }
 
@@ -173,8 +245,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
       transition
       {
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto searchForBall;
+
+         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto GiraCabezaDer; 
         if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculoCerca)
           goto kick;
          if(hayObstaculoCerca)
@@ -184,9 +257,10 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
       action
       {
+        
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-
+        
       }
     }
 
@@ -202,9 +276,10 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
       action
       {
+        
         theLookForwardSkill();
         theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-
+        
       }
     }
 
@@ -212,16 +287,17 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
     {
       transition
       {
+
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
       }
 
       action
       {
+        
         theLookForwardSkill();
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
-
-
+        
       }
     }
 
@@ -230,6 +306,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
     {
       transition
       {
+
+         if(!theFieldBall.ballWasSeen(1))
+          goto GiraCabezaDer; 
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
@@ -238,7 +317,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
       action
       {
+        
           theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()-200)); 
+          
       }
     } 
     

@@ -21,7 +21,6 @@
 #include "Tools/Math/BHMath.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/BehaviorControl/Libraries/LibCheck.h"
-// #include "LookAroundCard.cpp"
 
 
 CARD(LeftDefenderCard,
@@ -296,7 +295,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
 
       action
       {
-        // LookAroundCard();
+
         // theLookAtPointSkill(Vector3f(theFieldBall.positionRelative.x(),theFieldBall.positionRelative.y(),0.f),(HeadMotionRequest::autoCamera), 3);
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
         if(theRobotPose.translation.y() < theFieldDimensions.yPosLeftGoal)
