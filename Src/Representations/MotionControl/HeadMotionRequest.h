@@ -17,23 +17,26 @@
  */
 STREAMABLE(HeadMotionRequest,
 {
-  ENUM(Mode,
-  {,
-    panTiltMode,        /**< Use \c pan, \c tilt and \c speed. */
-    targetMode,         /**< (A target relative to the center of hip.) Use \c target and \c speed. */
-    targetOnGroundMode, /**< Use \c target and \c speed. */
-  });
 
   ENUM(CameraControlMode,
   {,
     autoCamera,
     lowerCamera,
     upperCamera,
+  });
+
+  ENUM(Mode,
+  {,
+    panTiltMode,        /**< Use \c pan, \c tilt and \c speed. */
+    targetMode,         /**< (A target relative to the center of hip.) Use \c target and \c speed. */
+    targetOnGroundMode, /**< Use \c target and \c speed. */
   }),
 
   (Mode)(panTiltMode) mode, /**< The active head motion mode. */
   (CameraControlMode)(lowerCamera) cameraControlMode, /**< The active camera control mode. */
   (Angle)(0) pan,           /**< Head pan target angle in radians. */
+  (Angle)(0) panStart,
+  (Angle)(0) panEnd,
   (Angle)(0) tilt,          /**< Head tilt target angle in radians. */
   (Angle)(1) speed,         /**< Maximum joint speed to reach target angles in radians/s. */
   (Vector3f) target,        /**< Look at target relative to the robot. */

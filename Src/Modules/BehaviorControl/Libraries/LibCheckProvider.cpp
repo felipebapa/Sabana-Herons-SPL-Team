@@ -33,6 +33,8 @@ void LibCheckProvider::update(LibCheck& libCheck)
   {
     checkOutputs(theTeamActivationGraph, LibCheck::firstTeamCheckedOutput, LibCheck::numOfCheckedOutputs);
   };
+  
+  libCheck.closerToTheBall= isCloserToTheBall();
 }
 
 void LibCheckProvider::reset()
@@ -122,3 +124,46 @@ std::string LibCheckProvider::getActivationGraphString(const ActivationGraph& ac
     options += (options == "" ? "" : ", ") + node.option + (node.state == "" ? "" : "/" + node.state);
   return options;
 }
+
+bool LibCheckProvider::isCloserToTheBall()
+{
+
+  double teammateDistanceToBall = 0.0;
+
+  distanceToBall= (theRobotPose.inversePose*theTeamBallModel.position).norm();
+
+  if(theFrameInfo.getTimeSince(theBallModel.timeWhenLastSeen)<=4000){
+    distanceToBall= theBallModel.estimate.position.norm();
+  }
+
+
+  for(auto const& teammate : theTeamData.teammates)
+  {
+    if(!teammate.isPenalized){
+      teammateDistanceToBall = (teammate.theRobotPose.inversePose*theTeamBallModel.position).norm();
+
+      if(theFrameInfo.getTimeSince(teammate.theBallModel.timeWhenLastSeen)<=4000){
+       teammateDistanceToBall = teammate.theBallModel.estimate.position.norm();
+      }
+
+      if(distanceToBall > teammateDistanceToBall)
+      {
+        return false;
+      }
+    }
+  }
+  return true;  //Si esto es true, el local es quien va al balòn.
+}
+
+bool LibCheckProvider::positionToPass()
+{
+  bool isInThePlace = false;
+  if(theRobotInfo.number == 4 && theRobotPose == Pose2f(pi,500,1000))
+    isInThePlace = true;
+
+  return isInThePlace;  
+
+}
+
+
+

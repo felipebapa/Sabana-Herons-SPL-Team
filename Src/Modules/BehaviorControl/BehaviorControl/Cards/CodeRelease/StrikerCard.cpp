@@ -1,9 +1,9 @@
 /**
  * @file Striker.cpp
  *
- * Pruebas
+ * 
  *
- * @author Andres Ramirez
+ * @author Dap
  */
 
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -25,7 +25,7 @@ CARD(StrikerCard,
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
   CALLS(Kick),
-  
+  CALLS(PathToTarget),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
@@ -87,7 +87,9 @@ class StrikerCard : public StrikerCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold)
+        if(theFieldBall.positionOnField.x() <= 0.f) 
+          goto goToPass; 
+        if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold || theFieldBall.positionOnField.x() > 0.f)
           goto walkToBall;
       }
 
@@ -167,7 +169,6 @@ class StrikerCard : public StrikerCardBase
       {
         theLookForwardSkill();
         theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-        //theKickSkill((KickRequest::kickForward), true, 0.3f, false);
       }
     }
 
@@ -183,6 +184,18 @@ class StrikerCard : public StrikerCardBase
       {
         theLookForwardSkill();
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+      }
+    }
+    state(goToPass)
+    {
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall; 
+      }
+      action
+      {
+        thePathToTargetSkill(1.0,Pose2f(pi,500.f,1000.f));
       }
     }
   }

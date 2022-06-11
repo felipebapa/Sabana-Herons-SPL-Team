@@ -55,12 +55,12 @@ class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == 4;
+    return theRobotInfo.number == 6;
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != 4;
+    return theRobotInfo.number != 6;
   }
 
   option

@@ -17,12 +17,22 @@
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/MotionControl/MotionRequest.h"
 #include "Tools/Module/Module.h"
+#include "Representations/Communication/TeamData.h"
+#include "Representations/Modeling/BallModel.h"
+#include "Representations/Modeling/TeamBallModel.h"
+#include "Representations/Modeling/ObstacleModel.h"
+#include "Representations/Modeling/RobotPose.h"
 
 MODULE(LibCheckProvider,
 {,
   USES(ActivationGraph),
   REQUIRES(FrameInfo),
   REQUIRES(RobotInfo),
+  REQUIRES(TeamData),
+  REQUIRES(BallModel),
+  REQUIRES(TeamBallModel),
+  REQUIRES(ObstacleModel),
+  REQUIRES(RobotPose),
   USES(TeamActivationGraph),
   USES(TeamBehaviorStatus),
   PROVIDES(LibCheck),
@@ -37,6 +47,13 @@ MODULE(LibCheckProvider,
 class LibCheckProvider : public LibCheckProviderBase
 {
 private:
+
+  double distanceToBall;
+  
+  bool isCloserToTheBall();
+
+  bool positionToPass();
+  
   int callCounters[LibCheck::numOfCheckedOutputs]; /**< The counters for different checks */
   bool setArmsInThisFrame[Arms::numOfArms]; /**< This arm was set in this frame */
 
@@ -73,4 +90,6 @@ private:
    * @return The compressed string that represents the activation graph
    */
   std::string getActivationGraphString(const ActivationGraph& activationGraph) const;
+  
+  
 };
