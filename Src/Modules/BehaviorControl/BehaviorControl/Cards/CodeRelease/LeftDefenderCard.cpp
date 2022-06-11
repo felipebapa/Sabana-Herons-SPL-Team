@@ -19,7 +19,9 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
+#include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Tools/Modeling/Obstacle.h"
 
 
 CARD(LeftDefenderCard,
@@ -33,6 +35,7 @@ CARD(LeftDefenderCard,
   CALLS(KeyFrameArms),
   CALLS(PathToTarget),
   CALLS(LookAtAngles),
+  REQUIRES(ObstacleModel),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
@@ -75,6 +78,15 @@ class LeftDefenderCard : public LeftDefenderCardBase
   {
     theActivitySkill(BehaviorStatus::LeftDefender);
 
+    bool hayObstaculoCerca = false;
+      if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
+      for(const auto& obstacle : theObstacleModel.obstacles){
+        //See if the obstacle is first than the target   
+      if (obstacle.center.norm()<400.f)   //Què es un obstàculo?
+          hayObstaculoCerca=true;
+      }
+    }
+
     initial_state(start)
     {
       transition
@@ -96,8 +108,10 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold)
+        if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold && !hayObstaculoCerca)
           goto DefendBall;
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
         // if(theFieldBall.positionRelative.y() > theFieldDimensions.yPosLeftGoal)
         //   goto walkToBall;
       }  
@@ -118,8 +132,10 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
+        if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold) && !hayObstaculoCerca)
           goto alignToGoal;
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
           
       }
 
@@ -158,8 +174,10 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(theFieldBall.positionRelative.norm() < 3000.0f)
+        if(theFieldBall.positionRelative.norm() < 3000.0f && !hayObstaculoCerca)
           goto walkToBall;  
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
       }
 
       action
@@ -179,8 +197,10 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
+        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && !hayObstaculoCerca)
           goto alignBehindBall;
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
       }
 
       action
@@ -200,8 +220,10 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
+        if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculoCerca)
           goto kick;
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
       }
 
       action
@@ -218,6 +240,8 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto turnToBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
       }
       action
       {
@@ -266,6 +290,21 @@ class LeftDefenderCard : public LeftDefenderCardBase
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
         if(theRobotPose.translation.y() < theFieldDimensions.yPosLeftGoal)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldDimensions.yPosLeftGoal-500));
+      }
+    }
+
+    state(ObsAvoid)
+    {  
+      transition 
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+          goto start;
+      }
+      action
+      {
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()-200)); 
       }
     }
   }
