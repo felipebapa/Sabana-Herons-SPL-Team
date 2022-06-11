@@ -252,7 +252,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
         theLookForwardSkill();
         theSaySkill("Align Behind");
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToTeammate, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 50.f, theFieldBall.positionRelative.y() - ballOffsetY- 100.f));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
@@ -321,7 +321,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
     }
     state(pass)
     {
-      const Angle angleToTeammate = calcAngleToTeammate();
       transition
       {
         if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
@@ -336,7 +335,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
         theSaySkill("Pass");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
-        theKickSkill((KickRequest::kickForward), true, (theLibCheck.teammateToPass).translation.norm(), false);
+        theKickSkill((KickRequest::kickForward), true,0.2f, false);
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
