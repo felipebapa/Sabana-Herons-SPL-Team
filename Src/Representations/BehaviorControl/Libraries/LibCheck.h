@@ -46,5 +46,6 @@ STREAMABLE(LibCheck,
   
   (bool)(false) closerToTheBall,
 
-  (Pose2f)(0,0,0) teammateToPass,
+  (bool)(false) positionToPass,
+  
 });

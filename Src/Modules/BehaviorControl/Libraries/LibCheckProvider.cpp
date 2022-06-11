@@ -155,22 +155,15 @@ bool LibCheckProvider::isCloserToTheBall()
   return true;  //Si esto es true, el local es quien va al balòn.
 }
 
-Pose2f LibCheckProvider::teammateToPass()
+bool LibCheckProvider::positionToPass()
 {
-  double teammateDistanceToBall = 0.0;
-  Pose2f teammatePos;
-  int counter = 0;
+  const bool isInThePlace = false;
+  if(theRobotInfo.number == 4 && theRobotPose == Pose2f(pi,500,1000))
+    isInThePlace = true;
 
-  for(auto const& teammate : theTeamData.teammates)
-  {
-    counter++;
-  }
+  return isInThePlace;  
 
-  if(counter == 0)
-    return Pose2f(0,-2500,-1500);
-  else if(counter == 1)
-    return Pose2f(0,-5000,0); 
-  else
-    return Pose2f(0,0,0);
 }
+
+
 
