@@ -313,7 +313,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
         theLookForwardSkill();
         theSaySkill("kick");
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
-        theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        // theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        theKickSkill(KickRequest::SideKick,false,0.2f,false);
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
