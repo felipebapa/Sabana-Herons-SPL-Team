@@ -3,7 +3,7 @@
  *
  * Pruebas
  *
- * @author Felipe Barreto
+ * @author DMF
  */
 
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -100,7 +100,7 @@ class KeeperCard : public KeeperCardBase
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
 		    //if(-100 > theBallModel.estimate.position.y() && theBallModel.estimate.velocity.x() < -90)
-        if(theRobotPose.translation.y() >= theFieldDimensions.yPosLeftGoal)
+        if(theRobotPose.translation.y() >= theFieldDimensions.yPosLeftGoal || theRobotPose.translation.y() <= theFieldDimensions.yPosRightGoal)
           goto waitBall;
 		    if(-100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < ballXThreshold)
           goto GoalRiskRight;
@@ -115,14 +115,12 @@ class KeeperCard : public KeeperCardBase
       action
       {
         theLookForwardSkill();
-		    if(theBallModel.estimate.position.x() < 3500){
+		    if(theBallModel.estimate.position.x() < 3500)
 		      theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, 0.f, theFieldBall.positionRelative.y()));  //Pose2f (angulo,x,y)
         if(theRobotPose.translation.y() > theFieldDimensions.yPosLeftGoal)
           theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 200));  
-
-
-		    }
-
+        if(theRobotPose.translation.y() < theFieldDimensions.yPosRightGoal)  
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() + 200));  
       }
     }
 	
@@ -180,6 +178,8 @@ class KeeperCard : public KeeperCardBase
           theLookForwardSkill();
           if(theRobotPose.translation.y() > theFieldDimensions.yPosLeftGoal)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 200));
+          if(theRobotPose.translation.y() < theFieldDimensions.yPosRightGoal)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() + 200));
       }
     }
 	   state(GoalRiskLeft)
@@ -235,6 +235,8 @@ class KeeperCard : public KeeperCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
         if(theRobotPose.translation.y() > theFieldDimensions.yPosLeftGoal)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 200));
+        if(theRobotPose.translation.y() < theFieldDimensions.yPosRightGoal)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() + 200));
       }
     }  
 
