@@ -137,11 +137,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
           }
           action
           {
-<<<<<<< HEAD
-              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal + 0.4f, theFieldBall.positionRelative.x() - 150.f, theFieldBall.positionRelative.y() + 50.f));
-=======
               theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal + 0.65f, theFieldBall.positionRelative.x() - 150.f, theFieldBall.positionRelative.y() + 45.f));
->>>>>>> kick
               theSaySkill("Left Left Left");
           }
           
