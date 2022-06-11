@@ -84,15 +84,12 @@ class CentralDefenderCard : public CentralDefenderCardBase
     theActivitySkill(BehaviorStatus::CentralDefender);
 
       bool hayObstaculoCerca = false;
-      bool hayObstaculo = false;
 
       if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
       if (obstacle.center.norm()<400.f)   //Què es un obstàculo?
           hayObstaculoCerca=true;
-      if(obstacle.center.norm() < 1000.f && obstacle.center.norm() > 100.f)
-        hayObstaculo = true;
       }
       
     }
@@ -233,6 +230,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     {
       const Angle angleToGoal = calcAngleToGoal();
       const Angle angleToTeammate = calcAngleToTeammate();
+      const bool hayObstaculos = hayObstaculo();
 
       transition
       {
@@ -242,7 +240,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto searchForBall;
         if(!theFieldBall.ballWasSeen(500))
           goto kick;  
-        if(!hayObstaculo)
+        if(!hayObstaculos)
           goto alignToPass;
         
       }
@@ -251,7 +249,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         theLookForwardSkill();
         theSaySkill("Align Behind");
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 45.f, theFieldBall.positionRelative.y() - ballOffsetY + 200.f));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 42.f, theFieldBall.positionRelative.y() - ballOffsetY + 200.f));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
@@ -260,12 +258,13 @@ class CentralDefenderCard : public CentralDefenderCardBase
     state(alignBehindBallToPass)
     {
       const Angle angleToTeammate = calcAngleToTeammate();
+      const bool hayObstaculos = hayObstaculo();
 
       transition
       {
-        if(hayObstaculo)
+        if(hayObstaculos)
           goto alignToGoal;
-        if(std::abs(angleToTeammate) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculo)
+        if(std::abs(angleToTeammate) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculos)
           goto pass;
       }
       action
@@ -408,6 +407,19 @@ class CentralDefenderCard : public CentralDefenderCardBase
   {
     return (theRobotPose.inversePose * Vector2f(500.f,1000.f)).angle();
   }
+
+  bool hayObstaculo() const
+  {
+    bool x = false;
+    if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
+      for(const auto& obstacle : theObstacleModel.obstacles){
+        //See if the obstacle is first than the target   
+      if(obstacle.center.norm() < 1000.f && obstacle.center.norm() > 100.f)
+        x = true;
+      }
+    }
+    return x;
+  }  
 };
 
 MAKE_CARD(CentralDefenderCard);
