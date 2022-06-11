@@ -167,6 +167,3 @@ bool LibCheckProvider::positionToPass()
 
 
 
-
-
-
