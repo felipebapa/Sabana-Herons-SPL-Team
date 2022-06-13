@@ -230,7 +230,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     {
       const Angle angleToGoal = calcAngleToGoal();
       const Angle angleToTeammate = calcAngleToTeammate();
-      const bool hayObstaculos = hayObstaculo();
+      bool hayObstaculos = hayObstaculo();
 
       transition
       {
@@ -249,7 +249,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         theLookForwardSkill();
         theSaySkill("Align Behind");
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 42.f, theFieldBall.positionRelative.y() - ballOffsetY + 200.f));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 40.f, theFieldBall.positionRelative.y() - ballOffsetY + 200.f));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
@@ -258,7 +258,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     state(alignBehindBallToPass)
     {
       const Angle angleToTeammate = calcAngleToTeammate();
-      const bool hayObstaculos = hayObstaculo();
+      bool hayObstaculos = hayObstaculo();
 
       transition
       {
@@ -311,7 +311,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
         theLookForwardSkill();
         theSaySkill("kick");
         // theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 500));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 850));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
@@ -414,7 +414,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if(obstacle.center.norm() < Vector2f(500 - theFieldBall.positionOnField.x(),1000- theFieldBall.positionOnField.y()).norm())
+      if(obstacle.center.norm() < 800)
         x = true;
       }
     }
