@@ -260,7 +260,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
         if(hayObstaculos)
           goto alignToGoal;
         if(std::abs(angleToTeammate) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculos)
-          goto pass;
+          goto avanceConBalon;
       }
       action
       {
@@ -317,8 +317,10 @@ class LeftDefenderCard : public LeftDefenderCardBase
       }
     }
 
-    state(pass)
+    state(avanceConBalon)
     {
+      const Angle angleToGoal = calcAngleToGoal();
+
       transition
       {
         if(theRobotPose.translation.y() <= theFieldDimensions.yPosLeftGoal)
@@ -330,12 +332,15 @@ class LeftDefenderCard : public LeftDefenderCardBase
       }
       action
       {
-        theSaySkill("Pass");
+        theSaySkill("go go go");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
-        theKickSkill((KickRequest::kickForward), true,0.2f, false);
-        if(theRobotPose.translation.y() < theFieldDimensions.yPosLeftGoal)
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldDimensions.xPosOpponentPenaltyMark, theFieldDimensions.yPosCenterGoal));
+        // theInWalkKickSkill(WalkKickVariant(WalkKicks::none, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        if(theRobotPose.translation.y() < theFieldDimensions.yPosLeftGoal){
+          if(theRobotPose.translation.x() < theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldDimensions.yPosLeftGoal-500));
+        }
       }
     }
 
@@ -413,6 +418,8 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto ObsAvoid;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;   
+        if(!theFieldBall.ballWasSeen(10000))
+          goto goBackHome; 
       }
 
       action
@@ -435,6 +442,8 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto turnToBall;
         if(a > 2)
           goto searchForBall;
+        if(!theFieldBall.ballWasSeen(10000))
+          goto goBackHome; 
       }
       action
       {

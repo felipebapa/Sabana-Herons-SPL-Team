@@ -335,7 +335,10 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }
       action
       {
-        theSaySkill("Pass");
+        if(theLibCheck.positionToPass)
+          theSaySkill("Yes");
+        else
+          theSaySkill("No");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theKickSkill((KickRequest::kickForward), true,0.2f, false);
