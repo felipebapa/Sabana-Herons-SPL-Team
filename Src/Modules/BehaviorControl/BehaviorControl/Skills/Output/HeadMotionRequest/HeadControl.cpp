@@ -16,7 +16,7 @@ SKILL_IMPLEMENTATION(HeadControl,
   IMPLEMENTS(LookAtAngles),
   IMPLEMENTS(LookAtPoint),
   IMPLEMENTS(LookForward),
-  IMPLEMENTS(LookAround),
+  // IMPLEMENTS(LookAround),
   REQUIRES(LibCheck),
   MODIFIES(HeadMotionRequest),
 });
@@ -38,14 +38,14 @@ class HeadControl : public HeadControlBase
     setPanTiltRequest(HeadMotionRequest::autoCamera, 0.f, 0.38f, 150_deg);
   }
 
-  void execute(const LookAround& p) override
-  {
-    setPanTiltRequest(p.camera, p.panStart, p.tilt, p.speed);
-    for(int i=0;i<1000;i++){
-      int r = 2;
-    }
-    setPanTiltRequest(p.camera, p.panEnd, p.tilt, p.speed);
-  }
+  // void execute(const LookAround& p) override
+  // {
+  //   setPanTiltRequest(p.camera, p.panStart, p.tilt, p.speed);
+  //   for(int i=0;i<1000;i++){
+  //     int r = 2;
+  //   }
+  //   setPanTiltRequest(p.camera, p.panEnd, p.tilt, p.speed);
+  // }
 
   void setPanTiltRequest(HeadMotionRequest::CameraControlMode camera, Angle pan, Angle tilt, Angle speed, bool stopAndGoMode = false)
   {
@@ -58,17 +58,17 @@ class HeadControl : public HeadControlBase
     theLibCheck.inc(LibCheck::headMotionRequest);
   }
 
-  void setLookAroundPanRequest(HeadMotionRequest::CameraControlMode camera, Angle panStart, Angle panEnd, Angle tilt, Angle speed, bool stopAndGoMode = false)
-  {
-    theHeadMotionRequest.mode = HeadMotionRequest::panTiltMode;
-    theHeadMotionRequest.cameraControlMode = camera;
-    theHeadMotionRequest.panStart = panStart;
-    theHeadMotionRequest.panEnd = panEnd;
-    theHeadMotionRequest.tilt = tilt;
-    theHeadMotionRequest.speed = speed;
-    theHeadMotionRequest.stopAndGoMode = stopAndGoMode;
-    theLibCheck.inc(LibCheck::headMotionRequest);
-  }
+  // void setLookAroundPanRequest(HeadMotionRequest::CameraControlMode camera, Angle panStart, Angle panEnd, Angle tilt, Angle speed, bool stopAndGoMode = false)
+  // {
+  //   theHeadMotionRequest.mode = HeadMotionRequest::panTiltMode;
+  //   theHeadMotionRequest.cameraControlMode = camera;
+  //   theHeadMotionRequest.panStart = panStart;
+  //   theHeadMotionRequest.panEnd = panEnd;
+  //   theHeadMotionRequest.tilt = tilt;
+  //   theHeadMotionRequest.speed = speed;
+  //   theHeadMotionRequest.stopAndGoMode = stopAndGoMode;
+  //   theLibCheck.inc(LibCheck::headMotionRequest);
+  // }
 
   void setTargetOnGroundRequest(HeadMotionRequest::CameraControlMode camera, const Vector3f& target, Angle speed)
   {

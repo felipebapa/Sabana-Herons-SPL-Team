@@ -115,7 +115,7 @@ namespace Skills
    */
   SKILL_INTERFACE(LookAtAngles, (Angle) pan, (Angle) tilt, (float)(180_deg) speed, (HeadMotionRequest::CameraControlMode)(HeadMotionRequest::autoCamera) camera);
 
-  SKILL_INTERFACE(LookAround, (Angle) panStart, (Angle) panEnd, (Angle) tilt, (float)(180_deg) speed, (HeadMotionRequest::CameraControlMode)(HeadMotionRequest::autoCamera) camera);
+  // SKILL_INTERFACE(LookAround, (Angle) panStart, (Angle) panEnd, (Angle) tilt, (float)(180_deg) speed, (HeadMotionRequest::CameraControlMode)(HeadMotionRequest::autoCamera) camera);
 
   /**
    * This skill moves the head such that a specified (robot-relative) point is focused by one camera.
