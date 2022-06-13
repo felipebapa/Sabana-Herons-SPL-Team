@@ -156,8 +156,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
       {
         theLookForwardSkill();
         //theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-        theKickSkill((KickRequest::sapo), false, 0.3f, false);
-        
+        theKickSkill((KickRequest::kickForwardFastLong), false, 0.3f, false);
       }
     }
     state(stand)

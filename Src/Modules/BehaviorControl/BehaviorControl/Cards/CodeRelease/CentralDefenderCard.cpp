@@ -234,7 +234,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     state(alignBehindBall)
     {
       const Angle angleToGoal = calcAngleToGoal();
-      const Angle angleToTeammate = calcAngleToTeammate();
+      //const Angle angleToTeammate = calcAngleToTeammate();
       bool hayObstaculos = hayObstaculo();
 
       transition
@@ -299,7 +299,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     }
     state(kick)
     {
-      const Angle angleToGoal = calcAngleToGoal();
+      //const Angle angleToGoal = calcAngleToGoal();
 
       transition
       {
