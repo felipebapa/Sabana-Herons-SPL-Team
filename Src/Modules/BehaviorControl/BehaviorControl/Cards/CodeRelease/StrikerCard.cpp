@@ -13,7 +13,7 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
-
+#include "Representations/BehaviorControl/Libraries/LibCheck.h"
 #include "Representations/Communication/RobotInfo.h"
 
 CARD(StrikerCard,
@@ -26,9 +26,11 @@ CARD(StrikerCard,
   CALLS(WalkToTarget),
   CALLS(Kick),
   CALLS(PathToTarget),
+  CALLS(Say),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
+  REQUIRES(LibCheck),
   REQUIRES(RobotInfo),
   DEFINES_PARAMETERS(
   {,
@@ -71,7 +73,8 @@ class StrikerCard : public StrikerCardBase
       transition
       {
         if(state_time > initialWaitTime)
-          goto turnToBall;
+          goto goToPass;
+          // goto turnToBall;
       }
 
       action
@@ -192,10 +195,28 @@ class StrikerCard : public StrikerCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall; 
+        if(theRobotPose == Pose2f(pi,500,1000))
+          goto prueba;
       }
       action
       {
         thePathToTargetSkill(1.0,Pose2f(pi,500.f,1000.f));
+        
+
+      }
+    }
+
+    state(prueba)
+    {
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall; 
+      }
+
+      action
+      {
+        theSaySkill("Yesssss");
       }
     }
   }

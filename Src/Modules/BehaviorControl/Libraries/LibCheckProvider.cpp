@@ -158,7 +158,7 @@ bool LibCheckProvider::isCloserToTheBall()
 bool LibCheckProvider::positionToPass()
 {
   bool isInThePlace = false;
-  if(theRobotInfo.number == 4 && theRobotPose == Pose2f(pi,500,1000))
+  if(theRobotInfo.number == 4 && theRobotPose.inversePose == Pose2f(pi,500,1000))
     isInThePlace = true;
 
   return isInThePlace;  
