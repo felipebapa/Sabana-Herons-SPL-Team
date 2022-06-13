@@ -414,7 +414,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if(obstacle.center.norm() < 1000.f && obstacle.center.norm() > 100.f)
+      if(obstacle.center.norm() < Vector2f(500 - theFieldBall.positionOnField.x(),1000- theFieldBall.positionOnField.y()).norm())
         x = true;
       }
     }
