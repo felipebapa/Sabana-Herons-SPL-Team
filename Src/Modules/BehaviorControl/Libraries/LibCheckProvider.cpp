@@ -35,6 +35,7 @@ void LibCheckProvider::update(LibCheck& libCheck)
   };
   
   libCheck.closerToTheBall= isCloserToTheBall();
+ // libCheck.GoingToTheBall= isGoingToTheBall();
 }
 
 void LibCheckProvider::reset()
@@ -154,6 +155,9 @@ bool LibCheckProvider::isCloserToTheBall()
   }
   return true;  //Si esto es true, el local es quien va al balòn.
 }
+
+
+
 
 
 

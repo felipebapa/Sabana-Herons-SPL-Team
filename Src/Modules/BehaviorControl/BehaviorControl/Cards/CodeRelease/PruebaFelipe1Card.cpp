@@ -17,6 +17,7 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Tools/Modeling/Obstacle.h"
 #include "Representations/MotionControl/HeadMotionRequest.h"
+#include "Representations/BehaviorControl/Libraries/LibCheck.h"
 
 
 
@@ -39,6 +40,7 @@ CARD(PruebaFelipe1Card,
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
+  REQUIRES(LibCheck),
 
 
   DEFINES_PARAMETERS(
@@ -83,7 +85,7 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if (obstacle.center.norm()<400.f)   //Què es un obstàculo?
+      if (obstacle.center.norm()<400.f)  
           hayObstaculoCerca=true;
       }
     }
@@ -101,7 +103,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       {
 
       
-        theLookForwardSkill();
+        //theLookForwardSkill();
+        theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
         theStandSkill();
         
         
@@ -113,7 +116,6 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 1500)
           goto GiraCabezaDer;
-        
         if(hayObstaculoCerca)
           goto ObsAvoid;
         if(theFieldBall.ballWasSeen())
@@ -126,7 +128,7 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       {
           theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
           theLookAtAnglesSkill(1,2);
-          theSaySkill("LEFT");
+          
           //a+=1;
           
       }
@@ -153,9 +155,7 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
         theLookAtAnglesSkill(-1,2);
-        theSaySkill("RIGHT");
         
-
         
 
       }
@@ -165,10 +165,10 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       transition
       {
 
-         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        //if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          //goto searchForBall;
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto searchForBall;
         if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold && !hayObstaculoCerca)
           goto walkToBall;
         
@@ -183,7 +183,6 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       action
       {
 
-        
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
         
       }
@@ -206,8 +205,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       action
       {
 
-        
-        theLookForwardSkill();
+        theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
+        //theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
         
       }
@@ -232,8 +231,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
       action
       {
-        
-        theLookForwardSkill();
+        theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
+        //theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
         
       }
@@ -257,8 +256,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
       action
       {
-        
-        theLookForwardSkill();
+        theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
+        //theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
         
       }
@@ -276,8 +275,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
       action
       {
-        
-        theLookForwardSkill();
+        theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
+        //theLookForwardSkill();
         theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
         
       }
@@ -294,8 +293,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
       action
       {
-        
-        theLookForwardSkill();
+        theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
+        //theLookForwardSkill();
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
         
       }
@@ -307,7 +306,7 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       transition
       {
 
-         if(!theFieldBall.ballWasSeen(1))
+         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
@@ -317,9 +316,14 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
       action
       {
-        
-          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()-200)); 
-          
+
+        for(const auto& obstacle : theObstacleModel.obstacles){
+//Quiero que se vaya al lado en el cual la distancia al balon sea menor.
+          //if(theFieldBall.positionRelative.y()<obstacle.center.y())
+         // theFieldBall.positionRelative.x()
+
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, obstacle.center.norm()+100)); 
+          }
       }
     } 
     

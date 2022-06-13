@@ -45,4 +45,5 @@ STREAMABLE(LibCheck,
   FUNCTION(void()) performTeamCheck,
   
   (bool)(false) closerToTheBall,
+  //(bool)(false) GoingToTheBall,
 });
