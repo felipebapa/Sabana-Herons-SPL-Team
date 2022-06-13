@@ -234,7 +234,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     state(alignBehindBall)
     {
       const Angle angleToGoal = calcAngleToGoal();
-      const Angle angleToTeammate = calcAngleToTeammate();
+      //const Angle angleToTeammate = calcAngleToTeammate();
       bool hayObstaculos = hayObstaculo();
 
       transition
@@ -299,7 +299,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     }
     state(kick)
     {
-      const Angle angleToGoal = calcAngleToGoal();
+      //const Angle angleToGoal = calcAngleToGoal();
 
       transition
       {
@@ -334,7 +334,10 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }
       action
       {
-        theSaySkill("Pass");
+        if(theLibCheck.positionToPass)
+          theSaySkill("Yes");
+        else
+          theSaySkill("No");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theKickSkill((KickRequest::kickForward), true,0.2f, false);

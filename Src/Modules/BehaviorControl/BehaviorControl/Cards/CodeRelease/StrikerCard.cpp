@@ -13,8 +13,10 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
-
+#include "Representations/BehaviorControl/Libraries/LibCheck.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Tools/Modeling/Obstacle.h"
+#include "Representations/Modeling/ObstacleModel.h"
 
 CARD(StrikerCard,
 {,
@@ -26,10 +28,15 @@ CARD(StrikerCard,
   CALLS(WalkToTarget),
   CALLS(Kick),
   CALLS(PathToTarget),
+  CALLS(Say),
+  CALLS(LookAtAngles),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
+  REQUIRES(LibCheck),
   REQUIRES(RobotInfo),
+  REQUIRES(ObstacleModel),
+
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
@@ -65,13 +72,14 @@ class StrikerCard : public StrikerCardBase
   option
   {
     theActivitySkill(BehaviorStatus::Striker);
-
+    
     initial_state(start)
     {
       transition
       {
         if(state_time > initialWaitTime)
-          goto turnToBall;
+          goto goToPass;
+          // goto turnToBall;
       }
 
       action
@@ -145,7 +153,18 @@ class StrikerCard : public StrikerCardBase
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
         if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
-          goto kick;
+          {
+          if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
+            for(const auto& obstacle : theObstacleModel.obstacles){
+              if ((obstacle.center.x() < (theFieldDimensions.xPosOpponentGoal - theFieldBall.positionOnField.x())))
+                goto kick;
+              if (std::abs(obstacle.center.y()) > 150.f)
+                goto longKick;
+              }
+              }
+              else
+                goto longKick;    
+          }
       }
 
       action
@@ -158,7 +177,7 @@ class StrikerCard : public StrikerCardBase
     state(kick)
     {
       const Angle angleToGoal = calcAngleToGoal();
-
+      
       transition
       {
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
@@ -169,6 +188,21 @@ class StrikerCard : public StrikerCardBase
       {
         theLookForwardSkill();
         theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        
+      }
+    }
+    state(longKick)
+    {     
+      transition
+      {
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+          goto start;
+      }
+
+      action
+      {
+        theLookForwardSkill();
+        theKickSkill((KickRequest::kickForward), true, 0.3f, false);
       }
     }
 
@@ -176,6 +210,8 @@ class StrikerCard : public StrikerCardBase
     {
       transition
       {
+        if(state_time > 1500)
+          goto lookLeft;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
       }
@@ -183,6 +219,23 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theLookForwardSkill();
+        theLookAtAnglesSkill(-1,2);
+        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+      }
+    }
+    state(lookLeft)
+    {
+      transition
+      {
+        if(state_time > 1500)
+          goto searchForBall;
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+      }
+      action
+      {
+        theLookForwardSkill();
+        theLookAtAnglesSkill(1,2);
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }
@@ -192,10 +245,28 @@ class StrikerCard : public StrikerCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall; 
+        if(theRobotPose.inversePose == Pose2f(pi,500,1000))
+          goto prueba;
       }
       action
       {
         thePathToTargetSkill(1.0,Pose2f(pi,500.f,1000.f));
+        
+
+      }
+    }
+
+    state(prueba)
+    {
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall; 
+      }
+
+      action
+      {
+        theSaySkill("Yesssss");
       }
     }
   }
