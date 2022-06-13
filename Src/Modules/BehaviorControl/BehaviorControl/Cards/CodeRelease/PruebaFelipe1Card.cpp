@@ -97,6 +97,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       {
         if(state_time > initialWaitTime)
           goto turnToBall;
+
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
       }
 
       action
@@ -185,6 +188,7 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
         
+        
       }
     } 
 
@@ -271,6 +275,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       {
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
           goto start;
+
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
       }
 
       action
@@ -289,6 +296,10 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
+
+
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
       }
 
       action
@@ -322,7 +333,18 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           //if(theFieldBall.positionRelative.y()<obstacle.center.y())
          // theFieldBall.positionRelative.x()
 
-          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, obstacle.center.norm()+100)); 
+         if(obstacle.left.norm()<obstacle.right.norm()){
+
+           theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, obstacle.left.norm()+100));
+         }
+         if(obstacle.left.norm()>obstacle.right.norm()){
+
+           theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, obstacle.right.norm()+100));
+         }
+
+
+           
+         // theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, obstacle.center.norm()+100)); 
           }
       }
     } 
