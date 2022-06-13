@@ -153,12 +153,14 @@ class StrikerCard : public StrikerCardBase
           {
           if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
             for(const auto& obstacle : theObstacleModel.obstacles){
-              if (obstacle.center.norm() < (theFieldDimensions.xPosOpponentGoal - theFieldBall.positionOnField.x()))
+              if ((obstacle.center.x() < (theFieldDimensions.xPosOpponentGoal - theFieldBall.positionOnField.x())))
                 goto kick;
+              if (std::abs(obstacle.center.y()) > 150.f)
+                goto longKick;
+              }
+              }
               else
-                goto longKick; 
-          }       
-        }
+                goto longKick;    
           }
       }
 
@@ -197,7 +199,7 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theLookForwardSkill();
-        theKickSkill((KickRequest::kickForward), false, 0.3f, false);
+        theKickSkill((KickRequest::kickForward), true, 0.3f, false);
       }
     }
 
