@@ -165,7 +165,8 @@ class PenaltyFreekickCard : public PenaltyFreekickCardBase
     {
         transition
         {
-            
+            if(!theFieldBall.ballWasSeen(3000.f) || theFieldBall.positionRelative.norm() > 1000.f)
+                goto start;
         }
         action
         {

@@ -19,6 +19,7 @@
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamInfo.h"
+#include "Representations/Modeling/ObstacleModel.h"
 
 #include <string>
 
@@ -26,12 +27,14 @@ CARD(PushingFreekickCard,
 {,
   CALLS(Activity),
   CALLS(LookForward),
+  CALLS(LookAtAngles),
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
   CALLS(Kick),
   CALLS(Say),
   CALLS(PathToTarget),
+  CALLS(InWalkKick),
   
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
@@ -39,8 +42,7 @@ CARD(PushingFreekickCard,
   REQUIRES(RobotInfo),
   REQUIRES(GameInfo),
   REQUIRES(OwnTeamInfo),
-
-
+  REQUIRES(ObstacleModel),
   
   DEFINES_PARAMETERS(
   {,
@@ -84,22 +86,22 @@ class PushingFreekickCard : public PushingFreekickCardBase
   
   option
   {
-      theActivitySkill(BehaviorStatus::PushingFreekick);
-      initial_state(start)
+    theActivitySkill(BehaviorStatus::PushingFreekick);
+    initial_state(start)
+    {
+      transition
       {
-          transition
-          {
-             if(state_time > initialWaitTime)
-               goto searchForBall;
-          }
-          action
-          {
-              theLookForwardSkill();
-              theStandSkill();
-          }
+         if(state_time > initialWaitTime)
+           goto searchForBall;
       }
-      
-      state(turnToBall)
+      action
+      {
+          theLookForwardSkill();
+          theStandSkill();
+      }
+    }
+    
+    state(turnToBall)
     {
       transition
       {
@@ -284,7 +286,18 @@ class PushingFreekickCard : public PushingFreekickCardBase
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
         if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
-          goto kick;
+          {
+          if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
+            for(const auto& obstacle : theObstacleModel.obstacles){
+              if ((obstacle.center.x() < (theFieldDimensions.xPosOpponentGoal - theFieldBall.positionOnField.x())))
+                goto kick;
+              if (std::abs(obstacle.center.y()) > 150.f)
+                goto longKick;
+              }
+              }
+              else
+                goto longKick;    
+          }
       }
 
       action
@@ -296,11 +309,27 @@ class PushingFreekickCard : public PushingFreekickCardBase
 
     state(kick)
     {
-      //const Angle angleToGoal = calcAngleToGoal();
-
+      const Angle angleToGoal = calcAngleToGoal();
+      
       transition
       {
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theKickSkill.isDone()))
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+          goto start;
+      }
+
+      action
+      {
+        theLookForwardSkill();
+        theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        
+      }
+    }
+
+    state(longKick)
+    {     
+      transition
+      {
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
           goto start;
       }
 
@@ -315,6 +344,8 @@ class PushingFreekickCard : public PushingFreekickCardBase
     {
       transition
       {
+        if(state_time > 1500)
+          goto lookLeft;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
       }
@@ -322,16 +353,34 @@ class PushingFreekickCard : public PushingFreekickCardBase
       action
       {
         theLookForwardSkill();
+        theLookAtAnglesSkill(-1,2);
+        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+      }
+    }
+
+    state(lookLeft)
+    {
+      transition
+      {
+        if(state_time > 1500)
+          goto searchForBall;
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+      }
+      action
+      {
+        theLookForwardSkill();
+        theLookAtAnglesSkill(1,2);
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }
   }
-
   Angle calcAngleToGoal() const
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
-  }  
-
+  }
 };
+
+
 
 MAKE_CARD(PushingFreekickCard);

@@ -55,9 +55,6 @@ class PositionForPenaltyFreeKickCard : public PositionForPenaltyFreeKickCardBase
   {
     theActivitySkill(BehaviorStatus::PositionForPenaltyFreeKick);
     theLookForwardSkill();
-    //theStandSkill();
-    // Not implemented in the Code Release.
-    //theSaySkill("Please implement a behavior for me!");
     if(theRobotInfo.number == 1)
     {
       if((theRobotPose.translation - KeeperPos.translation).norm() > StopThreshold)
