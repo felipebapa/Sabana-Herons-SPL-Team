@@ -22,6 +22,7 @@
 #include "Representations/Modeling/TeamBallModel.h"
 #include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Modeling/RobotPose.h"
+#include "Representations/Configuration/FieldDimensions.h"
 
 MODULE(LibCheckProvider,
 {,
@@ -33,6 +34,7 @@ MODULE(LibCheckProvider,
   REQUIRES(TeamBallModel),
   REQUIRES(ObstacleModel),
   REQUIRES(RobotPose),
+  REQUIRES(FieldDimensions),
   USES(TeamActivationGraph),
   USES(TeamBehaviorStatus),
   PROVIDES(LibCheck),
@@ -51,7 +53,9 @@ private:
   double distanceToBall;
   
   bool isCloserToTheBall();
-  //bool isGoingToTheBall();
+  bool isLeftUpField();
+  bool isRightUpField();
+  int isTeammateFallenNumber();
   
   int callCounters[LibCheck::numOfCheckedOutputs]; /**< The counters for different checks */
   bool setArmsInThisFrame[Arms::numOfArms]; /**< This arm was set in this frame */

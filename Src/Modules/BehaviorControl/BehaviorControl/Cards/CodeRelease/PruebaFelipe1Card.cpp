@@ -23,6 +23,7 @@
 
 
 
+
 CARD(PruebaFelipe1Card,
 {,
   CALLS(Activity),
@@ -41,6 +42,7 @@ CARD(PruebaFelipe1Card,
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
   REQUIRES(LibCheck),
+  
 
 
   DEFINES_PARAMETERS(
@@ -61,6 +63,7 @@ CARD(PruebaFelipe1Card,
     (int)(10) minKickWaitTime,
     (int)(3000) maxKickWaitTime,
     (int)(0) a,
+    (Pose2f)(Pose2f(0,-2500,-1500)) Defender1Pos,
   }),
 });
 
@@ -100,12 +103,14 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
         if(hayObstaculoCerca)
           goto ObsAvoid;
+        if(theLibCheck.TeammateFallenNumber!=0)
+          goto MateFallen;
       }
 
       action
       {
 
-      
+        theSaySkill("ONE");
         //theLookForwardSkill();
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
         theStandSkill();
@@ -125,6 +130,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto walkToBall;
         if(a > 2)
           goto searchForBall;
+        if(theLibCheck.TeammateFallenNumber!=0)
+          goto MateFallen;
         
       }
       action
@@ -149,7 +156,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto ObsAvoid;
         if(theFieldBall.ballWasSeen())
           goto walkToBall;
-          
+        if(theLibCheck.TeammateFallenNumber!=0)
+          goto MateFallen;
 
       }
 
@@ -177,6 +185,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
         
         if(hayObstaculoCerca)
           goto ObsAvoid;
+        if(theLibCheck.TeammateFallenNumber!=0)
+          goto MateFallen;
 
 
           
@@ -203,6 +213,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
          if(hayObstaculoCerca)
           goto ObsAvoid;
+        if(theLibCheck.TeammateFallenNumber!=0)
+          goto MateFallen;
 
       }
 
@@ -212,6 +224,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
         //theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
+
+        
         
       }
     }
@@ -230,6 +244,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
          if(hayObstaculoCerca)
           goto ObsAvoid;
+        if(theLibCheck.TeammateFallenNumber!=0)
+          goto MateFallen;
 
       }
 
@@ -255,6 +271,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto kick;
          if(hayObstaculoCerca)
           goto ObsAvoid;
+        if(theLibCheck.TeammateFallenNumber!=0)
+          goto MateFallen;
 
       }
 
@@ -278,6 +296,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
         if(hayObstaculoCerca)
           goto ObsAvoid;
+
+        if(theLibCheck.TeammateFallenNumber!=0)
+          goto MateFallen;
       }
 
       action
@@ -300,6 +321,13 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
         if(hayObstaculoCerca)
           goto ObsAvoid;
+
+        if(theLibCheck.TeammateFallenNumber!=0)
+          goto MateFallen;
+
+
+
+          
       }
 
       action
@@ -329,7 +357,7 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       {
 
         for(const auto& obstacle : theObstacleModel.obstacles){
-//Quiero que se vaya al lado en el cual la distancia al balon sea menor.
+          //Quiero que se vaya al lado en el cual la distancia al balon sea menor.
           //if(theFieldBall.positionRelative.y()<obstacle.center.y())
          // theFieldBall.positionRelative.x()
 
@@ -348,6 +376,30 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           }
       }
     } 
+
+        state(MateFallen)
+    {
+      transition
+      {
+
+         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto GiraCabezaDer; 
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+          goto start;
+      }
+
+      action
+      {
+        
+        theSaySkill("fell aaaaaaaaaaaaa");
+
+        //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theLibCheck.TeammateFallenNumber));
+      }
+    } 
+
+
     
   }
 

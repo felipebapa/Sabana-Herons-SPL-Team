@@ -25,6 +25,7 @@ CARD(PruebaFelipe2Card,
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
   CALLS(Kick),
+  CALLS(Say),
   REQUIRES(ObstacleModel),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
@@ -85,6 +86,7 @@ class PruebaFelipe2Card : public PruebaFelipe2CardBase
 
       action
       {
+        theSaySkill("TWO");
         theLookForwardSkill();
         theStandSkill();
       }
@@ -107,6 +109,7 @@ class PruebaFelipe2Card : public PruebaFelipe2CardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
          if(hayObstaculoCerca)
           theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()+200)); 
+          
       }
     }
 

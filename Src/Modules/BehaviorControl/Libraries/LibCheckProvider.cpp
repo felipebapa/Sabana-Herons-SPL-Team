@@ -35,7 +35,8 @@ void LibCheckProvider::update(LibCheck& libCheck)
   };
   
   libCheck.closerToTheBall= isCloserToTheBall();
- // libCheck.GoingToTheBall= isGoingToTheBall();
+  libCheck.LeftUpField= isLeftUpField();
+  libCheck.RightUpField= isRightUpField();
 }
 
 void LibCheckProvider::reset()
@@ -156,7 +157,71 @@ bool LibCheckProvider::isCloserToTheBall()
   return true;  //Si esto es true, el local es quien va al balòn.
 }
 
+bool LibCheckProvider::isLeftUpField()
+{
+    for(auto const& teammate : theTeamData.teammates)
+  {
+    if(theRobotInfo.number==2){
+      if(!teammate.isPenalized){
+        if(teammate.theTeamBehaviorStatus.role.playBall){
+          if(teammate.number==3){
+            if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
+                return true;
+            }
+          }
+        }
 
+
+
+      }
+      
+
+  
+    }
+    }
+    return false;
+    }
+
+bool LibCheckProvider::isRightUpField()
+{
+  for(auto const& teammate : theTeamData.teammates)
+  {
+    if(theRobotInfo.number==2){
+      if(!teammate.isPenalized){
+        if(teammate.theTeamBehaviorStatus.role.playBall){
+          if(teammate.number==5){
+            if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
+                return true;
+            }
+          }
+        }
+
+
+
+      }
+      
+      
+    }
+    }
+
+
+
+
+    return false;
+}
+
+int LibCheckProvider::isTeammateFallenNumber()
+{
+  for(auto const& teammate : theTeamData.teammates)
+  {
+      if(!teammate.isPenalized)
+        if(teammate.FALLEN)
+           
+          return teammate.number;
+
+    }
+    return 0;
+}
 
 
 
