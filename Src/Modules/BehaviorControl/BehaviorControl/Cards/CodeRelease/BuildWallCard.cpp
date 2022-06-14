@@ -31,6 +31,7 @@ CARD(BuildWallCard,
   CALLS(WalkToTarget),
   CALLS(Kick),
   CALLS(Say),
+  CALLS(LookAtAngles),
   
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
@@ -65,12 +66,12 @@ class BuildWallCard : public BuildWallCardBase
 {
   bool preconditions() const override
   {
-    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK) && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber && theRobotInfo.number == 1);
+    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK) && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber);
   }
 
   bool postconditions() const override
   {
-    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_PUSHING_FREE_KICK) || theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber || theRobotInfo.number != 1);
+    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_PUSHING_FREE_KICK) || theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber);
   }
   
   option
@@ -148,6 +149,8 @@ class BuildWallCard : public BuildWallCardBase
     {
       transition
       {
+        if(state_time >1500)
+          goto lookLeft;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
       }
@@ -155,6 +158,23 @@ class BuildWallCard : public BuildWallCardBase
       action
       {
         theLookForwardSkill();
+        theLookAtAnglesSkill(-1,2);
+        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+      }
+    }
+     state(lookLeft)
+    {
+      transition
+      {
+        if(state_time > 1500)
+          goto searchForBall;
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+      }
+      action
+      {
+        theLookForwardSkill();
+        theLookAtAnglesSkill(1,2);
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }

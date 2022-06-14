@@ -4,6 +4,7 @@
  * 
  *
  * @author Dap
+ * @author Jose P
  */
 
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -13,7 +14,7 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
-#include "Representations/BehaviorControl/Libraries/LibCheck.h"
+
 #include "Representations/Communication/RobotInfo.h"
 #include "Tools/Modeling/Obstacle.h"
 #include "Representations/Modeling/ObstacleModel.h"
@@ -28,12 +29,10 @@ CARD(StrikerCard,
   CALLS(WalkToTarget),
   CALLS(Kick),
   CALLS(PathToTarget),
-  CALLS(Say),
   CALLS(LookAtAngles),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
-  REQUIRES(LibCheck),
   REQUIRES(RobotInfo),
   REQUIRES(ObstacleModel),
 
@@ -78,8 +77,7 @@ class StrikerCard : public StrikerCardBase
       transition
       {
         if(state_time > initialWaitTime)
-          goto goToPass;
-          // goto turnToBall;
+          goto turnToBall;
       }
 
       action
@@ -95,8 +93,8 @@ class StrikerCard : public StrikerCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
-        if(theFieldBall.positionOnField.x() <= 0.f) 
-          goto goToPass; 
+        //if(theFieldBall.positionOnField.x() <= 0.f) 
+          //goto goToPass; 
         if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold || theFieldBall.positionOnField.x() > 0.f)
           goto walkToBall;
       }
@@ -154,10 +152,11 @@ class StrikerCard : public StrikerCardBase
           goto searchForBall;
         if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
           {
+            
           if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
             for(const auto& obstacle : theObstacleModel.obstacles){
-              if ((obstacle.center.x() < (theFieldDimensions.xPosOpponentGoal - theFieldBall.positionOnField.x())))
-                goto kick;
+              if ((obstacle.center.norm() < (theFieldDimensions.xPosOpponentGoal - theFieldBall.positionOnField.x())))
+                goto moveSide;
               if (std::abs(obstacle.center.y()) > 150.f)
                 goto longKick;
               }
@@ -170,24 +169,41 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX-20.f, theFieldBall.positionRelative.y() - ballOffsetY));
+      }
+    }
+    state(moveSide)
+    {
+      //const Angle angleToGoal = calcAngleToGoal();
+
+      transition
+      {
+        if(theFieldBall.positionRelative.y() > 100.f && theFieldBall.positionRelative.x() < 20.f || state_time > maxKickWaitTime)
+          goto kickLeft;
+      }
+      action
+      {
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y() - 150.f));
+        if(theFieldBall.positionRelative.y() > 90)
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theFieldBall.positionRelative.x() - 100.f, 0.f));
       }
     }
 
-    state(kick)
+    state(kickLeft)
     {
-      const Angle angleToGoal = calcAngleToGoal();
+      //const Angle angleToGoal = calcAngleToGoal();
       
       transition
       {
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+        if(state_time > maxKickWaitTime || theKickSkill.isDone())
           goto start;
       }
 
       action
       {
         theLookForwardSkill();
-        theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        theKickSkill((KickRequest::SideKick), true, 0.3f, false);
+        //theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
         
       }
     }
@@ -244,29 +260,13 @@ class StrikerCard : public StrikerCardBase
       transition
       {
         if(theFieldBall.ballWasSeen())
-          goto turnToBall; 
-        if(theRobotPose.inversePose == Pose2f(pi,500,1000))
-          goto prueba;
+          goto turnToBall;
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto searchForBall;        
       }
       action
       {
         thePathToTargetSkill(1.0,Pose2f(pi,500.f,1000.f));
-        
-
-      }
-    }
-
-    state(prueba)
-    {
-      transition
-      {
-        if(theFieldBall.ballWasSeen())
-          goto turnToBall; 
-      }
-
-      action
-      {
-        theSaySkill("Yesssss");
       }
     }
   }
