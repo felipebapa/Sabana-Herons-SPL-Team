@@ -42,8 +42,8 @@ phaseParameters = [
   },
   {
     duration = 200;
-    leftFootTra1 = {x = -5; y = 15; z = -230;};
-    leftFootTra2 = {x = -5; y = 15; z = -230;};
+    leftFootTra1 = {x = -5; y = 20; z = -230;};
+    leftFootTra2 = {x = -5; y = 20; z = -230;};
     leftFootRot1 = {x = 0.1; y = 0; z = 0;};
     leftFootRot2 = {x = 0.1; y = 0; z = 0;};
     rightFootTra1 = {x = -5; y = -50; z = -180;};
