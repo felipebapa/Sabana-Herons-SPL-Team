@@ -90,6 +90,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
+
+        Obstacle::isOpponent
       if (obstacle.center.norm()<400.f)  
           hayObstaculoCerca=true;
       }

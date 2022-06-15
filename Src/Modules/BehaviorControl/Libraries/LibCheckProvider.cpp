@@ -38,6 +38,8 @@ void LibCheckProvider::update(LibCheck& libCheck)
   libCheck.LeftUpField= isLeftUpField();
   libCheck.RightUpField= isRightUpField();
   libCheck.TeammateFallenNumber=isTeammateFallenNumber();
+  libCheck.TeammateObstacleAvoid=isTeammateObstacleAvoid();
+  libCheck.OpponentObstacle=isOpponentObstacle();
 }
 
 void LibCheckProvider::reset()
@@ -151,11 +153,11 @@ bool LibCheckProvider::isCloserToTheBall()
 
       if(distanceToBall > teammateDistanceToBall)
       {
-        return false;
+        return teammate.number;
       }
     }
   }
-  return true;  //Si esto es true, el local es quien va al balòn.
+  return 0;  //Devuelve el # de robot que està mas cerca al balòn.
 }
 
 bool LibCheckProvider::isLeftUpField()
@@ -175,9 +177,7 @@ bool LibCheckProvider::isLeftUpField()
 
 
       }
-      
-
-  
+        
     }
     }
     return false;
@@ -196,8 +196,6 @@ bool LibCheckProvider::isRightUpField()
             }
           }
         }
-
-
 
       }
       
@@ -222,6 +220,45 @@ int LibCheckProvider::isTeammateFallenNumber()
     return 0;
 }
 
+
+bool LibCheckProvider::isTeammateObstacleAvoid()
+{
+      
+      if(!theObstacleModel.obstacles.empty()){        
+      for(const auto& obstacle : theObstacleModel.obstacles){
+   
+
+
+      if (obstacle.type == Obstacle::teammate) { 
+
+          return true;
+
+      }
+
+      }
+    }
+    return false;
+}
+
+
+bool LibCheckProvider::isOpponentObstacle()
+{
+      
+      if(!theObstacleModel.obstacles.empty()){        
+      for(const auto& obstacle : theObstacleModel.obstacles){
+   
+
+
+      if (obstacle.type == Obstacle::opponent) { 
+
+          return true;
+
+      }
+
+      }
+    }
+    return false;
+}
 
 
 

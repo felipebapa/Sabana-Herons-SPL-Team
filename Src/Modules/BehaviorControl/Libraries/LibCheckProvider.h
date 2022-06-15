@@ -57,6 +57,8 @@ private:
   bool isLeftUpField();
   bool isRightUpField();
   int isTeammateFallenNumber();
+  bool isTeammateObstacleAvoid();
+  bool isOpponentObstacle();
   
   int callCounters[LibCheck::numOfCheckedOutputs]; /**< The counters for different checks */
   bool setArmsInThisFrame[Arms::numOfArms]; /**< This arm was set in this frame */

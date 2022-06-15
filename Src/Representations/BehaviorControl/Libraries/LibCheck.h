@@ -48,4 +48,6 @@ STREAMABLE(LibCheck,
   (bool)(false) LeftUpField,
   (bool)(false) RightUpField,
   (int)(0) TeammateFallenNumber,
+  (bool)(false) TeammateObstacleAvoid,
+  (bool)(false) OpponentObstacle,
 });
