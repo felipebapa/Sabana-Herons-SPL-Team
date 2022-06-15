@@ -178,13 +178,15 @@ class StrikerCard : public StrikerCardBase
 
       transition
       {
-        if(theFieldBall.positionRelative.y() > 100.f && theFieldBall.positionRelative.x() < 20.f || state_time > maxKickWaitTime)
+        if((theFieldBall.positionRelative.y() > 100.f && theFieldBall.positionRelative.x() < 20.f) || state_time > maxKickWaitTime)
           goto kickLeft;
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto searchForBall;
       }
       action
       {
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y() - 150.f));
-        if(theFieldBall.positionRelative.y() > 90)
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y() - 110.f));
+        if(theFieldBall.positionRelative.y() > 95.f)
           theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theFieldBall.positionRelative.x() - 100.f, 0.f));
       }
     }
