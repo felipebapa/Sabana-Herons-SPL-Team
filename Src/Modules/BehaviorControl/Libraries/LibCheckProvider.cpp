@@ -37,6 +37,7 @@ void LibCheckProvider::update(LibCheck& libCheck)
   libCheck.closerToTheBall= isCloserToTheBall();
   libCheck.LeftUpField= isLeftUpField();
   libCheck.RightUpField= isRightUpField();
+  libCheck.TeammateFallenNumber=isTeammateFallenNumber();
 }
 
 void LibCheckProvider::reset()
@@ -200,7 +201,6 @@ bool LibCheckProvider::isRightUpField()
 
       }
       
-      
     }
     }
 
@@ -215,8 +215,7 @@ int LibCheckProvider::isTeammateFallenNumber()
   for(auto const& teammate : theTeamData.teammates)
   {
       if(!teammate.isPenalized)
-        if(teammate.FALLEN)
-           
+        if(teammate.status==Teammate::FALLEN)
           return teammate.number;
 
     }

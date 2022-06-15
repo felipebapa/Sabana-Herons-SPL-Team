@@ -18,8 +18,8 @@
 #include "Tools/Modeling/Obstacle.h"
 #include "Representations/MotionControl/HeadMotionRequest.h"
 #include "Representations/BehaviorControl/Libraries/LibCheck.h"
-
-
+#include "Representations/Communication/TeamData.h"
+#include "Representations/Modeling/TeamBallModel.h"
 
 
 
@@ -36,13 +36,14 @@ CARD(PruebaFelipe1Card,
   CALLS(LookAtPoint),
   CALLS(LookAtAngles),
   CALLS(Say),
+  REQUIRES(TeamData),
   REQUIRES(ObstacleModel),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
   REQUIRES(LibCheck),
-  
+  REQUIRES(TeamBallModel),
 
 
   DEFINES_PARAMETERS(
@@ -64,6 +65,7 @@ CARD(PruebaFelipe1Card,
     (int)(3000) maxKickWaitTime,
     (int)(0) a,
     (Pose2f)(Pose2f(0,-2500,-1500)) Defender1Pos,
+    (std::vector<Teammate>) OpponentRobots,
   }),
 });
 
@@ -93,6 +95,31 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       }
     }
 
+
+      bool OpponentCloserOwnGoal = false;
+
+      for(auto const& oponente : theTeamData.teammates){
+
+        if(oponente.mateType==Teammate::otherTeamRobot){
+
+            OpponentRobots.push_back(oponente);  //Lista sin ordenar de oponentes.
+            //teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine
+
+            if(oponente.theRobotPose.translation.x()<=theFieldDimensions.xPosOwnGoal+200){
+
+              
+                OpponentCloserOwnGoal=true;
+
+            }
+        }
+
+      }
+
+
+
+      
+    
+
     
     initial_state(start)
     {
@@ -105,6 +132,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto ObsAvoid;
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
+
+        if(OpponentCloserOwnGoal)
+          goto CubrirOponente;
       }
 
       action
@@ -114,6 +144,12 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
         //theLookForwardSkill();
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
         theStandSkill();
+
+        if(!OpponentRobots.empty()){  
+
+            theSaySkill("Opponent");
+
+        } 
         
         
       }
@@ -132,6 +168,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto searchForBall;
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
+        if(OpponentCloserOwnGoal)
+          goto CubrirOponente;
         
       }
       action
@@ -158,6 +196,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto walkToBall;
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
+        if(OpponentCloserOwnGoal)
+          goto CubrirOponente;
 
       }
 
@@ -187,6 +227,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto ObsAvoid;
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
+        if(OpponentCloserOwnGoal)
+          goto CubrirOponente;
 
 
           
@@ -215,6 +257,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto ObsAvoid;
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
+        if(OpponentCloserOwnGoal)
+          goto CubrirOponente;
 
       }
 
@@ -246,6 +290,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto ObsAvoid;
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
+        if(OpponentCloserOwnGoal)
+          goto CubrirOponente;
 
       }
 
@@ -273,6 +319,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto ObsAvoid;
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
+        if(OpponentCloserOwnGoal)
+          goto CubrirOponente;
 
       }
 
@@ -299,6 +347,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
+
+        if(OpponentCloserOwnGoal)
+          goto CubrirOponente;
       }
 
       action
@@ -324,6 +375,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
+
+        if(OpponentCloserOwnGoal)
+          goto CubrirOponente;
 
 
 
@@ -351,6 +405,8 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto turnToBall;
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
           goto start;
+        if(OpponentCloserOwnGoal)
+          goto CubrirOponente;
       }
 
       action
@@ -384,16 +440,53 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
 
          if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(theFieldBall.ballWasSeen())
-          goto turnToBall;
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
-          goto start;
+      //  if(theFieldBall.ballWasSeen())
+        //  goto turnToBall;
+       // if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+        //  goto start;
+       // if(OpponentCloserOwnGoal)
+        //  goto CubrirOponente;
       }
 
       action
       {
         
-        theSaySkill("fell aaaaaaaaaaaaa");
+        //theSaySkill("fell");
+
+
+      //  theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theLibCheck.TeammateFallenNumber));
+
+        for(auto const& teammate : theTeamData.teammates){
+
+            if(teammate.number==theLibCheck.TeammateFallenNumber){
+
+                theSaySkill("position");
+
+
+                  theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), teammate.theBallModel.estimate.position);
+            }
+          }
+      }
+    } 
+
+            state(CubrirOponente)
+    {
+      transition
+      {
+
+         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto GiraCabezaDer; 
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+          goto start;
+          
+      }
+
+      action
+      {
+        
+        theSaySkill("Cover Cover");
 
         //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theLibCheck.TeammateFallenNumber));
       }

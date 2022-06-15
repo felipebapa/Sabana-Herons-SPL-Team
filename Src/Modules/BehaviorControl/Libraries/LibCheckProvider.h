@@ -24,6 +24,7 @@
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/Configuration/FieldDimensions.h"
 
+
 MODULE(LibCheckProvider,
 {,
   USES(ActivationGraph),
