@@ -119,6 +119,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }  
       action
       {
+        if(theLibCheck.LeftAttacking)
+          theSaySkill("left attack");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));

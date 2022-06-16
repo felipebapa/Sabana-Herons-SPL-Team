@@ -44,8 +44,9 @@ STREAMABLE(LibCheck,
   /** Performs checks for the team behavior */
   FUNCTION(void()) performTeamCheck,
   
-  (bool)(false) closerToTheBall,
-
+  (int)(0) closerToTheBall,
+  (bool)(false) LeftAttacking,
+  (bool)(false) RightAttacking,
   (bool)(false) positionToPass,
   
 });

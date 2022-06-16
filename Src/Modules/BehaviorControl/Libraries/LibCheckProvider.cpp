@@ -34,8 +34,10 @@ void LibCheckProvider::update(LibCheck& libCheck)
     checkOutputs(theTeamActivationGraph, LibCheck::firstTeamCheckedOutput, LibCheck::numOfCheckedOutputs);
   };
   
-  libCheck.closerToTheBall= isCloserToTheBall();
   libCheck.positionToPass = positionToPass();
+  libCheck.closerToTheBall= isCloserToTheBall();
+  libCheck.LeftAttacking= isLeftAttacking();
+  libCheck.RightAttacking= isRightAttacking();
 }
 
 void LibCheckProvider::reset()
@@ -126,37 +128,6 @@ std::string LibCheckProvider::getActivationGraphString(const ActivationGraph& ac
   return options;
 }
 
-bool LibCheckProvider::isCloserToTheBall()
-{
-
-  double teammateDistanceToBall = 0.0;
-
-  distanceToBall= (theRobotPose.inversePose*theTeamBallModel.position).norm();
-
-  if(theFrameInfo.getTimeSince(theBallModel.timeWhenLastSeen)<=4000){
-    distanceToBall= theBallModel.estimate.position.norm();
-  }
-
-
-  for(auto const& teammate : theTeamData.teammates)
-  {
-
-    if(!teammate.isPenalized){
-      teammateDistanceToBall = (teammate.theRobotPose.inversePose*theTeamBallModel.position).norm();
-
-      if(theFrameInfo.getTimeSince(teammate.theBallModel.timeWhenLastSeen)<=4000){
-       teammateDistanceToBall = teammate.theBallModel.estimate.position.norm();
-      }
-
-      if(distanceToBall > teammateDistanceToBall)
-      {
-        return false;
-      }
-    }
-  }
-  return true;  //Si esto es true, el local es quien va al balòn.
-}
-
 bool LibCheckProvider::positionToPass()
 {
   bool IsToPass = false;
@@ -170,6 +141,85 @@ bool LibCheckProvider::positionToPass()
 
   return IsToPass;
 }
+
+bool LibCheckProvider::isLeftAttacking()
+{
+    for(auto const& teammate : theTeamData.teammates)
+  {
+
+      if(!teammate.isPenalized){
+        if(teammate.theTeamBehaviorStatus.role.playBall){
+          if(teammate.number==3){
+            if(teammate.theRobotPose.translation.x()>= theFieldDimensions.xPosHalfWayLine){
+              if(LibCheckProvider::isCloserToTheBall()==teammate.number)
+                return true;   //El left supporter està atacando.
+            }
+          }
+        }
+
+
+
+      }
+        
+    
+    }
+    return false;
+    }
+
+int LibCheckProvider::isCloserToTheBall()
+{
+
+  double teammateDistanceToBall = 0.0;
+
+  distanceToBall= (theRobotPose.inversePose*theTeamBallModel.position).norm();
+
+  if(theFrameInfo.getTimeSince(theBallModel.timeWhenLastSeen)<=4000){
+    distanceToBall= theBallModel.estimate.position.norm();
+  }
+
+
+  for(auto const& teammate : theTeamData.teammates)
+  {
+    if(!teammate.isPenalized){
+      teammateDistanceToBall = (teammate.theRobotPose.inversePose*theTeamBallModel.position).norm();
+
+      if(theFrameInfo.getTimeSince(teammate.theBallModel.timeWhenLastSeen)<=4000){
+       teammateDistanceToBall = teammate.theBallModel.estimate.position.norm();
+      }
+
+      if(distanceToBall > teammateDistanceToBall)
+      {
+        return teammate.number;
+      }
+    }
+  }
+  return theRobotInfo.number;  //Devuelve el # de robot que està mas cerca al balòn.
+}
+
+bool LibCheckProvider::isRightAttacking()
+{
+    for(auto const& teammate : theTeamData.teammates)
+  {
+
+      if(!teammate.isPenalized){
+        if(teammate.theTeamBehaviorStatus.role.playBall){
+          if(teammate.number==5){
+            if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
+              if(LibCheckProvider::isCloserToTheBall()==teammate.number)
+
+                return true;   //El Right supporter està atacando.
+            }
+          }
+        }
+
+
+
+      }
+        
+    
+    }
+    return false;
+    }
 
 
 
