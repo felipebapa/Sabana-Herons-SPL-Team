@@ -109,7 +109,6 @@ class KeeperCard : public KeeperCardBase
           goto GoalRiskLeft;
         if(theFieldBall.positionRelative.norm() >= 2500.0f)
           goto guardGoal;
-
       }
 
       action

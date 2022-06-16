@@ -35,6 +35,11 @@ void LibCheckProvider::update(LibCheck& libCheck)
   };
   
   libCheck.closerToTheBall= isCloserToTheBall();
+  libCheck.LeftUpField= isLeftUpField();
+  libCheck.RightUpField= isRightUpField();
+  libCheck.TeammateFallenNumber=isTeammateFallenNumber();
+  libCheck.TeammateObstacleAvoid=isTeammateObstacleAvoid();
+  libCheck.OpponentObstacle=isOpponentObstacle();
 }
 
 void LibCheckProvider::reset()
@@ -148,22 +153,109 @@ bool LibCheckProvider::isCloserToTheBall()
 
       if(distanceToBall > teammateDistanceToBall)
       {
-        return false;
+        return teammate.number;
       }
     }
   }
-  return true;  //Si esto es true, el local es quien va al balòn.
+  return 0;  //Devuelve el # de robot que està mas cerca al balòn.
 }
 
-bool LibCheckProvider::positionToPass()
+bool LibCheckProvider::isLeftUpField()
 {
-  bool isInThePlace = false;
-  if(theRobotInfo.number == 4 && theRobotPose.inversePose == Pose2f(pi,500,1000))
-    isInThePlace = true;
+    for(auto const& teammate : theTeamData.teammates)
+  {
+    if(theRobotInfo.number==2){
+      if(!teammate.isPenalized){
+        if(teammate.theTeamBehaviorStatus.role.playBall){
+          if(teammate.number==3){
+            if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
+                return true;
+            }
+          }
+        }
 
-  return isInThePlace;  
 
+
+      }
+        
+    }
+    }
+    return false;
+    }
+
+bool LibCheckProvider::isRightUpField()
+{
+  for(auto const& teammate : theTeamData.teammates)
+  {
+    if(theRobotInfo.number==2){
+      if(!teammate.isPenalized){
+        if(teammate.theTeamBehaviorStatus.role.playBall){
+          if(teammate.number==5){
+            if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
+                return true;
+            }
+          }
+        }
+
+      }
+      
+    }
+    }
+
+
+
+
+    return false;
+}
+
+int LibCheckProvider::isTeammateFallenNumber()
+{
+  for(auto const& teammate : theTeamData.teammates)
+  {
+      if(!teammate.isPenalized)
+        if(teammate.status==Teammate::FALLEN)
+          return teammate.number;
+
+    }
+    return 0;
 }
 
 
+bool LibCheckProvider::isTeammateObstacleAvoid()
+{
+      
+      if(!theObstacleModel.obstacles.empty()){        
+      for(const auto& obstacle : theObstacleModel.obstacles){
+   
 
+
+      if (obstacle.type == Obstacle::teammate) { 
+
+          return true;
+
+      }
+
+      }
+    }
+    return false;
+}
+
+
+bool LibCheckProvider::isOpponentObstacle()
+{
+      
+      if(!theObstacleModel.obstacles.empty()){        
+      for(const auto& obstacle : theObstacleModel.obstacles){
+   
+
+
+      if (obstacle.type == Obstacle::opponent) { 
+
+          return true;
+
+      }
+
+      }
+    }
+    return false;
+}
