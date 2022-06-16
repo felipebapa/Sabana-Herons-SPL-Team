@@ -1,11 +1,6 @@
 /**
  * @file CentralDefenderCard.cpp
  *
- * This file implements a basic striker behavior for the code release.
- * Normally, this would be decomposed into at least
- * - a ball search behavior card
- * - a skill for getting behind the ball
- *
  * @author Dap y Mia
  */
 
@@ -117,7 +112,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer;  
-        if((std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold) || (theFieldBall.positionRelative.x() < theFieldDimensions.xPosHalfWayLine) && !hayObstaculoCerca)
+        if(((std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold) || (theFieldBall.positionRelative.x() < theFieldDimensions.xPosHalfWayLine)) && !hayObstaculoCerca)
           goto DefendBall;  
         if(hayObstaculoCerca)
           goto ObsAvoid;
@@ -270,7 +265,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(hayObstaculos)
           goto alignToGoal;
-        if(std::abs(angleToTeammate) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculos)
+        if(std::abs(angleToTeammate) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculos && theLibCheck.positionToPass)
           goto pass;
       }
       action

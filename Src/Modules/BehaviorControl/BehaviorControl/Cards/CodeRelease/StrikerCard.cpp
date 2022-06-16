@@ -30,6 +30,7 @@ CARD(StrikerCard,
   CALLS(PathToTarget),
   CALLS(Say),
   CALLS(LookAtAngles),
+  CALLS(KeyFrameArms),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
@@ -243,16 +244,15 @@ class StrikerCard : public StrikerCardBase
     {
       transition
       {
+        if(theLibCheck.positionToPass)
+          goto prueba;
         if(theFieldBall.ballWasSeen())
           goto turnToBall; 
-        if(theRobotPose.inversePose == Pose2f(pi,500,1000))
-          goto prueba;
       }
       action
       {
+        theSaySkill("Go to pass");
         thePathToTargetSkill(1.0,Pose2f(pi,500.f,1000.f));
-        
-
       }
     }
 
@@ -260,13 +260,15 @@ class StrikerCard : public StrikerCardBase
     {
       transition
       {
+        if(!theLibCheck.positionToPass)
+          goto lookLeft;
         if(theFieldBall.ballWasSeen())
           goto turnToBall; 
       }
-
       action
       {
-        theSaySkill("Yesssss");
+        theSaySkill("yeesss");
+        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
       }
     }
   }

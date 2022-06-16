@@ -35,6 +35,7 @@ void LibCheckProvider::update(LibCheck& libCheck)
   };
   
   libCheck.closerToTheBall= isCloserToTheBall();
+  libCheck.positionToPass = positionToPass();
 }
 
 void LibCheckProvider::reset()
@@ -139,6 +140,7 @@ bool LibCheckProvider::isCloserToTheBall()
 
   for(auto const& teammate : theTeamData.teammates)
   {
+
     if(!teammate.isPenalized){
       teammateDistanceToBall = (teammate.theRobotPose.inversePose*theTeamBallModel.position).norm();
 
@@ -157,12 +159,16 @@ bool LibCheckProvider::isCloserToTheBall()
 
 bool LibCheckProvider::positionToPass()
 {
-  bool isInThePlace = false;
-  if(theRobotInfo.number == 4 && theRobotPose.inversePose == Pose2f(pi,500,1000))
-    isInThePlace = true;
+  bool IsToPass = false;
+  for(auto const& teammate : theTeamData.teammates)
+  {
+    if(!teammate.isPenalized){
+      if(teammate.number == 4 && teammate.theRobotPose.translation.x() >= 400 && teammate.theRobotPose.translation.x() < 600)
+        IsToPass = true;
+    }
+  }
 
-  return isInThePlace;  
-
+  return IsToPass;
 }
 
 
