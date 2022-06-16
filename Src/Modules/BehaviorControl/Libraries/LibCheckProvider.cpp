@@ -131,7 +131,7 @@ std::string LibCheckProvider::getActivationGraphString(const ActivationGraph& ac
   return options;
 }
 
-bool LibCheckProvider::isCloserToTheBall()
+int LibCheckProvider::isCloserToTheBall()
 {
 
   double teammateDistanceToBall = 0.0;
@@ -195,6 +195,7 @@ bool LibCheckProvider::isRightAttacking()
           if(teammate.number==5){
             if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
               if(LibCheckProvider::isCloserToTheBall()==teammate.number)
+              
 
                 return true;   //El Right supporter està atacando.
             }

@@ -54,7 +54,7 @@ private:
 
   double distanceToBall;
   
-  bool isCloserToTheBall();
+  int isCloserToTheBall();
   bool isLeftAttacking();
   bool isRightAttacking();
   bool isCenterAttacking();
