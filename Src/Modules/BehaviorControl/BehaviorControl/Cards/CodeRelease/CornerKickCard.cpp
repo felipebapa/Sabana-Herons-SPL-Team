@@ -17,6 +17,7 @@
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamInfo.h"
+#include "Representations/Modeling/ObstacleModel.h"
 
 #include <string>
 
@@ -24,9 +25,11 @@ CARD(CornerKickCard,
 {,
   CALLS(Activity),
   CALLS(LookForward),
+  CALLS(LookAtAngles),
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
+  CALLS(InWalkKick),
   CALLS(Kick),
   CALLS(Say),
   
@@ -36,6 +39,7 @@ CARD(CornerKickCard,
   REQUIRES(RobotInfo),
   REQUIRES(GameInfo),
   REQUIRES(OwnTeamInfo),
+  REQUIRES(ObstacleModel),
   
   DEFINES_PARAMETERS(
   {,
@@ -161,7 +165,18 @@ class CornerKickCard : public CornerKickCardBase
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
         if(std::abs(angleToPass) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
-          goto kick;
+          {
+          if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
+            for(const auto& obstacle : theObstacleModel.obstacles){
+              if ((obstacle.center.x() < (theFieldDimensions.xPosOpponentGoal - theFieldBall.positionOnField.x())))
+                goto kick;
+              if (std::abs(obstacle.center.y()) > 150.f)
+                goto longKick;
+              }
+              }
+              else
+                goto longKick;    
+          }
       }
 
       action
@@ -190,7 +205,7 @@ class CornerKickCard : public CornerKickCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToPass, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
       }
     }
-
+    
     state(alignBehindBallFor3)
     {
       const Angle angleToPass = calcAngleToTeammate3();
@@ -200,7 +215,18 @@ class CornerKickCard : public CornerKickCardBase
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
         if(std::abs(angleToPass) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
-          goto kick;
+          {
+          if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
+            for(const auto& obstacle : theObstacleModel.obstacles){
+              if ((obstacle.center.x() < (theFieldDimensions.xPosOpponentGoal - theFieldBall.positionOnField.x())))
+                goto kick;
+              if (std::abs(obstacle.center.y()) > 150.f)
+                goto longKick;
+              }
+              }
+              else
+                goto longKick;    
+          }
       }
 
       action
@@ -212,11 +238,27 @@ class CornerKickCard : public CornerKickCardBase
 
     state(kick)
     {
-      //const Angle angleToGoal = calcAngleToGoal();
-
+      const Angle angleToGoal = calcAngleToGoal();
+      
       transition
       {
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theKickSkill.isDone()))
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+          goto start;
+      }
+
+      action
+      {
+        theLookForwardSkill();
+        theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        
+      }
+    }
+
+    state(longKick)
+    {     
+      transition
+      {
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
           goto start;
       }
 
@@ -224,7 +266,6 @@ class CornerKickCard : public CornerKickCardBase
       {
         theLookForwardSkill();
         theKickSkill((KickRequest::kickForward), true, 0.3f, false);
-        theSaySkill("Passing");
       }
     }
 
@@ -232,6 +273,8 @@ class CornerKickCard : public CornerKickCardBase
     {
       transition
       {
+        if(state_time > 1500)
+          goto lookLeft;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
       }
@@ -239,6 +282,24 @@ class CornerKickCard : public CornerKickCardBase
       action
       {
         theLookForwardSkill();
+        theLookAtAnglesSkill(-1,2);
+        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+      }
+    }
+
+    state(lookLeft)
+    {
+      transition
+      {
+        if(state_time > 1500)
+          goto searchForBall;
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+      }
+      action
+      {
+        theLookForwardSkill();
+        theLookAtAnglesSkill(1,2);
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }

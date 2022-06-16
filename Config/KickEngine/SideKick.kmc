@@ -42,16 +42,16 @@ phaseParameters = [
   },
   {
     duration = 200;
-    leftFootTra1 = {x = -5; y = 30; z = -230;};
-    leftFootTra2 = {x = -5; y = 30; z = -230;};
+    leftFootTra1 = {x = -5; y = 20; z = -230;};
+    leftFootTra2 = {x = -5; y = 20; z = -230;};
     leftFootRot1 = {x = 0.1; y = 0; z = 0;};
     leftFootRot2 = {x = 0.1; y = 0; z = 0;};
     rightFootTra1 = {x = -5; y = -50; z = -180;};
     rightFootTra2 = {x = -5; y = -50; z = -180;};
     rightFootRot1 = {x = 0; y = 0; z = -0;};
     rightFootRot2 = {x = 0; y = 0; z = -0;};
-    leftArmTra1 = {x = 0; y = 140; z = 90;};
-    leftArmTra2 = {x = 0; y = 140; z = 90;};
+    leftArmTra1 = {x = -48.6104; y = 200; z = 81.273;};
+    leftArmTra2 = {x = 27.9125; y = 200; z = 137.33;};
     leftHandRot1 = {x = 0; y = 0; z = -1.57;};
     leftHandRot2 = {x = 0; y = 0; z = -1.57;};
     rightArmTra1 = {x = 0; y = -140; z = 90;};
@@ -65,7 +65,7 @@ phaseParameters = [
     odometryOffset = {x = 0; y = 0; z = 0;};
   },
   {
-    duration = 150;
+    duration = 500;
     leftFootTra1 = {x = -5; y = 30; z = -230;};
     leftFootTra2 = {x = -5; y = 30; z = -230;};
     leftFootRot1 = {x = 0.1; y = 0; z = 0;};
