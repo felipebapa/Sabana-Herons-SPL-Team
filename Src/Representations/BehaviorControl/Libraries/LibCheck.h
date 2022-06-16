@@ -48,5 +48,7 @@ STREAMABLE(LibCheck,
   (bool)(false) LeftAttacking,
   (bool)(false) RightAttacking,
   (bool)(false) positionToPass,
-  
+  (int)(0) TeammateFallenNumber,
+  (bool)(false) TeammateObstacleAvoid,
+  (bool)(false) OpponentObstacle,
 });

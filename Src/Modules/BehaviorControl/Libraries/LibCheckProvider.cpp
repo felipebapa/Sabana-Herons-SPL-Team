@@ -38,7 +38,11 @@ void LibCheckProvider::update(LibCheck& libCheck)
   libCheck.closerToTheBall= isCloserToTheBall();
   libCheck.LeftAttacking= isLeftAttacking();
   libCheck.RightAttacking= isRightAttacking();
+  libCheck.TeammateFallenNumber=isTeammateFallenNumber();
+  libCheck.TeammateObstacleAvoid=isTeammateObstacleAvoid();
+  libCheck.OpponentObstacle=isOpponentObstacle();
 }
+
 
 void LibCheckProvider::reset()
 {
@@ -221,5 +225,54 @@ bool LibCheckProvider::isRightAttacking()
     return false;
     }
 
+int LibCheckProvider::isTeammateFallenNumber()
+{
+  for(auto const& teammate : theTeamData.teammates)
+  {
+      if(!teammate.isPenalized)
+        if(teammate.status==Teammate::FALLEN)
+          return teammate.number;
+
+    }
+    return 0;
+}
 
 
+bool LibCheckProvider::isTeammateObstacleAvoid()
+{
+
+      if(!theObstacleModel.obstacles.empty()){
+      for(const auto& obstacle : theObstacleModel.obstacles){
+
+
+
+      if (obstacle.type == Obstacle::teammate) { 
+
+          return true;
+
+      }
+
+      }
+    }
+    return false;
+}
+
+
+bool LibCheckProvider::isOpponentObstacle()
+{
+
+      if(!theObstacleModel.obstacles.empty()){
+      for(const auto& obstacle : theObstacleModel.obstacles){
+
+
+
+      if (obstacle.type == Obstacle::opponent) { 
+
+          return true;
+
+      }
+
+      }
+    }
+    return false;
+}
