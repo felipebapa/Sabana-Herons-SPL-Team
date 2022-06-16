@@ -14,10 +14,11 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
-
 #include "Representations/Communication/RobotInfo.h"
 #include "Tools/Modeling/Obstacle.h"
 #include "Representations/Modeling/ObstacleModel.h"
+#include "Representations/BehaviorControl/Libraries/LibCheck.h"
+
 
 CARD(StrikerCard,
 {,
@@ -28,14 +29,17 @@ CARD(StrikerCard,
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
   CALLS(Kick),
+  CALLS(Say),
   CALLS(PathToTarget),
   CALLS(LookAtAngles),
+  CALLS(KeyFrameArms),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
   REQUIRES(ObstacleModel),
-
+  REQUIRES(LibCheck),
+  
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
@@ -261,6 +265,8 @@ class StrikerCard : public StrikerCardBase
     {
       transition
       {
+        if(theLibCheck.positionToPass)
+          goto prueba;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
@@ -268,7 +274,24 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSaySkill("Go to pass");
         thePathToTargetSkill(1.0,Pose2f(pi,500.f,1000.f));
+      }
+    }
+
+    state(prueba)
+    {
+      transition
+      {
+        if(!theLibCheck.positionToPass)
+          goto lookLeft;
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall; 
+      }
+      action
+      {
+        theSaySkill("yeesss");
+        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
       }
     }
   }

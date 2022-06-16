@@ -34,13 +34,15 @@ void LibCheckProvider::update(LibCheck& libCheck)
     checkOutputs(theTeamActivationGraph, LibCheck::firstTeamCheckedOutput, LibCheck::numOfCheckedOutputs);
   };
   
+  libCheck.positionToPass = positionToPass();
   libCheck.closerToTheBall= isCloserToTheBall();
-  libCheck.LeftUpField= isLeftUpField();
-  libCheck.RightUpField= isRightUpField();
+  libCheck.LeftAttacking= isLeftAttacking();
+  libCheck.RightAttacking= isRightAttacking();
   libCheck.TeammateFallenNumber=isTeammateFallenNumber();
   libCheck.TeammateObstacleAvoid=isTeammateObstacleAvoid();
   libCheck.OpponentObstacle=isOpponentObstacle();
 }
+
 
 void LibCheckProvider::reset()
 {
@@ -130,7 +132,45 @@ std::string LibCheckProvider::getActivationGraphString(const ActivationGraph& ac
   return options;
 }
 
-bool LibCheckProvider::isCloserToTheBall()
+bool LibCheckProvider::positionToPass()
+{
+  bool IsToPass = false;
+  for(auto const& teammate : theTeamData.teammates)
+  {
+    if(!teammate.isPenalized){
+      if(teammate.number == 4 && teammate.theRobotPose.translation.x() >= 400 && teammate.theRobotPose.translation.x() < 600)
+        IsToPass = true;
+    }
+  }
+
+  return IsToPass;
+}
+
+bool LibCheckProvider::isLeftAttacking()
+{
+    for(auto const& teammate : theTeamData.teammates)
+  {
+
+      if(!teammate.isPenalized){
+        if(teammate.theTeamBehaviorStatus.role.playBall){
+          if(teammate.number==3){
+            if(teammate.theRobotPose.translation.x()>= theFieldDimensions.xPosHalfWayLine){
+              if(LibCheckProvider::isCloserToTheBall()==teammate.number)
+                return true;   //El left supporter està atacando.
+            }
+          }
+        }
+
+
+
+      }
+        
+    
+    }
+    return false;
+    }
+
+int LibCheckProvider::isCloserToTheBall()
 {
 
   double teammateDistanceToBall = 0.0;
@@ -157,19 +197,21 @@ bool LibCheckProvider::isCloserToTheBall()
       }
     }
   }
-  return 0;  //Devuelve el # de robot que està mas cerca al balòn.
+  return theRobotInfo.number;  //Devuelve el # de robot que està mas cerca al balòn.
 }
 
-bool LibCheckProvider::isLeftUpField()
+bool LibCheckProvider::isRightAttacking()
 {
     for(auto const& teammate : theTeamData.teammates)
   {
-    if(theRobotInfo.number==2){
+
       if(!teammate.isPenalized){
         if(teammate.theTeamBehaviorStatus.role.playBall){
-          if(teammate.number==3){
+          if(teammate.number==5){
             if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
-                return true;
+              if(LibCheckProvider::isCloserToTheBall()==teammate.number)
+
+                return true;   //El Right supporter està atacando.
             }
           }
         }
@@ -178,35 +220,10 @@ bool LibCheckProvider::isLeftUpField()
 
       }
         
-    }
+    
     }
     return false;
     }
-
-bool LibCheckProvider::isRightUpField()
-{
-  for(auto const& teammate : theTeamData.teammates)
-  {
-    if(theRobotInfo.number==2){
-      if(!teammate.isPenalized){
-        if(teammate.theTeamBehaviorStatus.role.playBall){
-          if(teammate.number==5){
-            if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
-                return true;
-            }
-          }
-        }
-
-      }
-      
-    }
-    }
-
-
-
-
-    return false;
-}
 
 int LibCheckProvider::isTeammateFallenNumber()
 {
@@ -223,10 +240,10 @@ int LibCheckProvider::isTeammateFallenNumber()
 
 bool LibCheckProvider::isTeammateObstacleAvoid()
 {
-      
-      if(!theObstacleModel.obstacles.empty()){        
+
+      if(!theObstacleModel.obstacles.empty()){
       for(const auto& obstacle : theObstacleModel.obstacles){
-   
+
 
 
       if (obstacle.type == Obstacle::teammate) { 
@@ -243,10 +260,10 @@ bool LibCheckProvider::isTeammateObstacleAvoid()
 
 bool LibCheckProvider::isOpponentObstacle()
 {
-      
-      if(!theObstacleModel.obstacles.empty()){        
+
+      if(!theObstacleModel.obstacles.empty()){
       for(const auto& obstacle : theObstacleModel.obstacles){
-   
+
 
 
       if (obstacle.type == Obstacle::opponent) { 

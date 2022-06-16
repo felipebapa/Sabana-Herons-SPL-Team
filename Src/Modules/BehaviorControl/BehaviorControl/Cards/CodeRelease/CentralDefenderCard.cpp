@@ -1,11 +1,6 @@
 /**
  * @file CentralDefenderCard.cpp
  *
- * This file implements a basic striker behavior for the code release.
- * Normally, this would be decomposed into at least
- * - a ball search behavior card
- * - a skill for getting behind the ball
- *
  * @author Dap y Mia
  */
 
@@ -141,7 +136,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer;  
-        if((std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold) || (theFieldBall.positionRelative.x() < theFieldDimensions.xPosHalfWayLine) && !hayObstaculoCerca)
+        if(((std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold) || (theFieldBall.positionRelative.x() < theFieldDimensions.xPosHalfWayLine)) && !hayObstaculoCerca)
           goto DefendBall;  
         if(hayObstaculoCerca)
           goto ObsAvoid;
@@ -152,6 +147,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }  
       action
       {
+        if(theLibCheck.LeftAttacking)
+          theSaySkill("left attack");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
@@ -289,7 +286,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(!theFieldBall.ballWasSeen(500))
+        if(!theFieldBall.ballWasSeen(300))
           goto kick;  
         if(!hayObstaculos)
           goto alignToPass;
@@ -305,7 +302,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         theLookForwardSkill();
         theSaySkill("Align Behind");
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 48.f, theFieldBall.positionRelative.y() - ballOffsetY + 200.f));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 45.f, theFieldBall.positionRelative.y() - ballOffsetY + 200.f));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
@@ -320,7 +317,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(hayObstaculos)
           goto alignToGoal;
-        if(std::abs(angleToTeammate) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculos)
+        if(std::abs(angleToTeammate) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculos && theLibCheck.positionToPass)
           goto pass;
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
@@ -378,7 +375,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         theLookForwardSkill();
         theSaySkill("kick");
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 1500));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 2000));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }

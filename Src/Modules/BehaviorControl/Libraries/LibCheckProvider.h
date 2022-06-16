@@ -24,7 +24,6 @@
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/Configuration/FieldDimensions.h"
 
-
 MODULE(LibCheckProvider,
 {,
   USES(ActivationGraph),
@@ -53,9 +52,10 @@ private:
 
   double distanceToBall;
   
-  bool isCloserToTheBall();
-  bool isLeftUpField();
-  bool isRightUpField();
+  int isCloserToTheBall();
+  bool isLeftAttacking();
+  bool isRightAttacking();
+  bool positionToPass();
   int isTeammateFallenNumber();
   bool isTeammateObstacleAvoid();
   bool isOpponentObstacle();
