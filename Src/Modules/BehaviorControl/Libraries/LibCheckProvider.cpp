@@ -35,11 +35,12 @@ void LibCheckProvider::update(LibCheck& libCheck)
   };
   
   libCheck.closerToTheBall= isCloserToTheBall();
-  libCheck.LeftUpField= isLeftUpField();
-  libCheck.RightUpField= isRightUpField();
+  libCheck.LeftAttacking= isLeftAttacking();
+  libCheck.RightAttacking= isRightAttacking();
   libCheck.TeammateFallenNumber=isTeammateFallenNumber();
   libCheck.TeammateObstacleAvoid=isTeammateObstacleAvoid();
   libCheck.OpponentObstacle=isOpponentObstacle();
+  libCheck.OpponentCloseOwnGoal=isOpponentCloseOwnGoal();
 }
 
 void LibCheckProvider::reset()
@@ -157,19 +158,20 @@ bool LibCheckProvider::isCloserToTheBall()
       }
     }
   }
-  return 0;  //Devuelve el # de robot que està mas cerca al balòn.
+  return theRobotInfo.number;  //Devuelve el # de robot que està mas cerca al balòn.
 }
 
-bool LibCheckProvider::isLeftUpField()
+bool LibCheckProvider::isLeftAttacking()
 {
     for(auto const& teammate : theTeamData.teammates)
   {
-    if(theRobotInfo.number==2){
+
       if(!teammate.isPenalized){
         if(teammate.theTeamBehaviorStatus.role.playBall){
           if(teammate.number==3){
             if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
-                return true;
+              if(LibCheckProvider::isCloserToTheBall()==teammate.number)
+                return true;   //El left supporter està atacando.
             }
           }
         }
@@ -178,35 +180,59 @@ bool LibCheckProvider::isLeftUpField()
 
       }
         
-    }
+    
     }
     return false;
     }
 
-bool LibCheckProvider::isRightUpField()
+bool LibCheckProvider::isRightAttacking()
 {
-  for(auto const& teammate : theTeamData.teammates)
+    for(auto const& teammate : theTeamData.teammates)
   {
-    if(theRobotInfo.number==2){
+
       if(!teammate.isPenalized){
         if(teammate.theTeamBehaviorStatus.role.playBall){
           if(teammate.number==5){
             if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
-                return true;
+              if(LibCheckProvider::isCloserToTheBall()==teammate.number)
+
+                return true;   //El Right supporter està atacando.
             }
           }
         }
 
+
+
       }
-      
+        
+    
     }
-    }
-
-
-
-
     return false;
-}
+    }
+
+bool LibCheckProvider::isCenterAttacking()
+{
+    for(auto const& teammate : theTeamData.teammates)
+  {
+
+      if(!teammate.isPenalized){
+        if(teammate.theTeamBehaviorStatus.role.playBall){
+          if(teammate.number==2){
+            if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
+              if(LibCheckProvider::isCloserToTheBall()==teammate.number)
+                return true;   //El Center supporter està atacando.
+            }
+          }
+        }
+
+
+
+      }
+        
+    
+    }
+    return false;
+    }
 
 int LibCheckProvider::isTeammateFallenNumber()
 {
@@ -260,5 +286,26 @@ bool LibCheckProvider::isOpponentObstacle()
     return false;
 }
 
+
+bool LibCheckProvider::isOpponentCloseOwnGoal(){
+      bool OpponentCloserOwnGoal = false;
+
+      for(auto const& oponente : theTeamData.teammates){
+
+        if(oponente.mateType==Teammate::otherTeamRobot){
+
+            OpponentRobots.push_back(oponente);  //Lista sin ordenar de oponentes.
+            //teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine
+
+            if(oponente.theRobotPose.translation.x()<=theFieldDimensions.xPosOwnGoal+200){
+
+              
+                OpponentCloserOwnGoal=true;
+
+            }
+        }
+
+      }
+}
 
 

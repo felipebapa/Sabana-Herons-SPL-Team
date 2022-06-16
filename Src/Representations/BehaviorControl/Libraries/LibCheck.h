@@ -45,9 +45,12 @@ STREAMABLE(LibCheck,
   FUNCTION(void()) performTeamCheck,
   
   (bool)(false) closerToTheBall,
-  (bool)(false) LeftUpField,
-  (bool)(false) RightUpField,
+  (bool)(false) LeftAttacking,
+  (bool)(false) RightAttacking,
+  (bool)(false) CenterAttacking,
   (int)(0) TeammateFallenNumber,
   (bool)(false) TeammateObstacleAvoid,
   (bool)(false) OpponentObstacle,
+  (bool)(false) OpponentCloseOwnGoal,
+
 });

@@ -43,7 +43,8 @@ MODULE(LibCheckProvider,
   {,
     (std::vector<int>) notSetCheck,       /** Assert that a request has been set at least once */
     (std::vector<int>) multipleSetCheck,  /** Print a warning if an assert has not been set at least once */
-    (bool) assertValidWalkRequest,        /** Asserts that there are no strange walk parameters */
+    (bool) assertValidWalkRequest, 
+    (std::vector<Teammate>) OpponentRobots,       /** Asserts that there are no strange walk parameters */
   }),
 });
 
@@ -54,11 +55,13 @@ private:
   double distanceToBall;
   
   bool isCloserToTheBall();
-  bool isLeftUpField();
-  bool isRightUpField();
+  bool isLeftAttacking();
+  bool isRightAttacking();
+  bool isCenterAttacking();
   int isTeammateFallenNumber();
   bool isTeammateObstacleAvoid();
   bool isOpponentObstacle();
+  bool isOpponentCloseOwnGoal();
   
   int callCounters[LibCheck::numOfCheckedOutputs]; /**< The counters for different checks */
   bool setArmsInThisFrame[Arms::numOfArms]; /**< This arm was set in this frame */

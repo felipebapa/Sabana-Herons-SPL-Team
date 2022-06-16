@@ -91,31 +91,17 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
 
-        Obstacle::isOpponent
+        
       if (obstacle.center.norm()<400.f)  
           hayObstaculoCerca=true;
+
+          
+
       }
     }
 
 
-      bool OpponentCloserOwnGoal = false;
 
-      for(auto const& oponente : theTeamData.teammates){
-
-        if(oponente.mateType==Teammate::otherTeamRobot){
-
-            OpponentRobots.push_back(oponente);  //Lista sin ordenar de oponentes.
-            //teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine
-
-            if(oponente.theRobotPose.translation.x()<=theFieldDimensions.xPosOwnGoal+200){
-
-              
-                OpponentCloserOwnGoal=true;
-
-            }
-        }
-
-      }
 
 
 
@@ -135,7 +121,10 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
 
-        if(OpponentCloserOwnGoal)
+        if(theLibCheck.OpponentCloseOwnGoal)
+          goto CubrirOponente;
+
+        if(theLibCheck.OpponentObstacle)
           goto CubrirOponente;
       }
 
@@ -170,7 +159,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto searchForBall;
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
-        if(OpponentCloserOwnGoal)
+        if(theLibCheck.OpponentCloseOwnGoal)
+          goto CubrirOponente;
+        if(theLibCheck.OpponentObstacle)
           goto CubrirOponente;
         
       }
@@ -198,9 +189,10 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto walkToBall;
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
-        if(OpponentCloserOwnGoal)
+        if(theLibCheck.OpponentCloseOwnGoal)
           goto CubrirOponente;
-
+        if(theLibCheck.OpponentObstacle)
+          goto CubrirOponente;
       }
 
       action
@@ -229,9 +221,10 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto ObsAvoid;
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
-        if(OpponentCloserOwnGoal)
+        if(theLibCheck.OpponentCloseOwnGoal)
           goto CubrirOponente;
-
+        if(theLibCheck.OpponentObstacle)
+          goto CubrirOponente;
 
           
 
@@ -259,9 +252,10 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto ObsAvoid;
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
-        if(OpponentCloserOwnGoal)
+        if(theLibCheck.OpponentCloseOwnGoal)
           goto CubrirOponente;
-
+        if(theLibCheck.OpponentObstacle)
+          goto CubrirOponente;
       }
 
       action
@@ -292,7 +286,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto ObsAvoid;
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
-        if(OpponentCloserOwnGoal)
+        if(theLibCheck.OpponentCloseOwnGoal)
+          goto CubrirOponente;
+        if(theLibCheck.OpponentObstacle)
           goto CubrirOponente;
 
       }
@@ -321,7 +317,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto ObsAvoid;
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
-        if(OpponentCloserOwnGoal)
+        if(theLibCheck.OpponentCloseOwnGoal)
+          goto CubrirOponente;
+        if(theLibCheck.OpponentObstacle)
           goto CubrirOponente;
 
       }
@@ -350,7 +348,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
 
-        if(OpponentCloserOwnGoal)
+        if(theLibCheck.OpponentCloseOwnGoal)
+          goto CubrirOponente;
+        if(theLibCheck.OpponentObstacle)
           goto CubrirOponente;
       }
 
@@ -378,7 +378,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
         if(theLibCheck.TeammateFallenNumber!=0)
           goto MateFallen;
 
-        if(OpponentCloserOwnGoal)
+        if(theLibCheck.OpponentCloseOwnGoal)
+          goto CubrirOponente;
+        if(theLibCheck.OpponentObstacle)
           goto CubrirOponente;
 
 
@@ -407,7 +409,9 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
           goto turnToBall;
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
           goto start;
-        if(OpponentCloserOwnGoal)
+        if(theLibCheck.OpponentCloseOwnGoal)
+          goto CubrirOponente;
+        if(theLibCheck.OpponentObstacle)
           goto CubrirOponente;
       }
 
