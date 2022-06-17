@@ -122,10 +122,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto turnToBall;
         if(hayObstaculoCerca)
           goto ObsAvoid;
-        if(theLibCheck.TeammateFallenNumber!=0)
-          goto MateFallen;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
       }
 
       action
@@ -147,20 +143,12 @@ class LeftDefenderCard : public LeftDefenderCardBase
     {
       transition
       {
-        // if(theLibCheck.iFell == 2 && (theFieldBall.positionOnField.y() < theFieldDimensions.yPosLeftGoal && theFieldBall.positionOnField.y() > theFieldDimensions.yPosRightGoal))
-        //   goto centralFallen;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold && !hayObstaculoCerca)
           goto DefendBall;
         if(hayObstaculoCerca)
           goto ObsAvoid;
-        if(theLibCheck.TeammateFallenNumber!=0)
-          goto MateFallen;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
-        // if(theFieldBall.positionRelative.y() > theFieldDimensions.yPosLeftGoal)
-        //   goto walkToBall;
       }  
       action
       {
@@ -186,10 +174,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto alignToGoal;
         if(hayObstaculoCerca)
           goto ObsAvoid;
-        if(theLibCheck.TeammateFallenNumber!=0)
-          goto MateFallen;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
           
       }
 
@@ -213,10 +197,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto turnToBall;
         if(!theFieldBall.ballWasSeen(10000))
           goto goBackHome;   
-        if(theLibCheck.TeammateFallenNumber!=0)
-          goto MateFallen;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
       }
 
       action
@@ -267,10 +247,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto alignBehindBall;
         if(hayObstaculoCerca)
           goto ObsAvoid;
-        if(theLibCheck.TeammateFallenNumber!=0)
-          goto MateFallen;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
       }
 
       action
@@ -301,10 +277,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto kick;  
         if(!hayObstaculos)
           goto alignToPass;
-        if(theLibCheck.TeammateFallenNumber!=0)
-          goto MateFallen;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
       }
 
       action
@@ -331,10 +303,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto alignToGoal;
         if(std::abs(angleToTeammate) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculos)
           goto avanceConBalon;
-        if(theLibCheck.TeammateFallenNumber!=0)
-          goto MateFallen;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
       }
       action
       {
@@ -358,10 +326,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto GiraCabezaDer; 
         if(hayObstaculoCerca)
           goto ObsAvoid;
-        if(theLibCheck.TeammateFallenNumber!=0)
-          goto MateFallen;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
       }
       action
       {
@@ -386,10 +350,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto GiraCabezaDer; 
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
           goto start;
-        if(theLibCheck.TeammateFallenNumber!=0)
-          goto MateFallen;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
       }
 
       action
@@ -417,10 +377,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto GiraCabezaDer; 
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
           goto start;
-        if(theLibCheck.TeammateFallenNumber!=0)
-          goto MateFallen;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
       }
       action
       {
@@ -449,10 +405,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto GiraCabezaDer; 
         if(std::abs(angleToTeammate) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
           goto alignBehindBallToPass;
-        if(theLibCheck.TeammateFallenNumber!=0)
-          goto MateFallen;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
       }
 
       action
@@ -476,10 +428,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto turnToBall;
         if(!theFieldBall.ballWasSeen(10000))
           goto goBackHome;  
-        if(theLibCheck.TeammateFallenNumber!=0)
-          goto MateFallen;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
       }
 
       action
@@ -500,8 +448,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto turnToBall;
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
           goto start;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
       }
       action
       {
@@ -526,10 +472,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto turnToBall;   
         if(!theFieldBall.ballWasSeen(10000))
           goto goBackHome; 
-        if(theLibCheck.TeammateFallenNumber!=0)
-          goto MateFallen;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
       }
 
       action
@@ -554,10 +496,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto searchForBall;
         if(!theFieldBall.ballWasSeen(10000))
           goto goBackHome; 
-        if(theLibCheck.TeammateFallenNumber!=0)
-          goto MateFallen;
-        if(OpponentCloserOwnGoal)
-          goto CubrirOponente;
       }
       action
       {
@@ -565,83 +503,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
           theLookAtAnglesSkill(1,2);
           //a+=1;   
       }
-    }
-
-    state(MateFallen)
-    {
-      transition
-      {
-
-         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto GiraCabezaDer; 
-      //  if(theFieldBall.ballWasSeen())
-        //  goto turnToBall;
-       // if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
-        //  goto start;
-       // if(OpponentCloserOwnGoal)
-        //  goto CubrirOponente;
-      }
-
-      action
-      {
-        
-        //theSaySkill("fell");
-
-
-      //  theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theLibCheck.TeammateFallenNumber));
-
-        for(auto const& teammate : theTeamData.teammates){
-
-            if(teammate.number==theLibCheck.TeammateFallenNumber){
-
-                theSaySkill("position");
-
-
-                  theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), teammate.theBallModel.estimate.position);
-            }
-          }
-      }
     } 
-
-    state(CubrirOponente)
-    {
-      transition
-      {
-
-         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto GiraCabezaDer; 
-        if(theFieldBall.ballWasSeen())
-          goto turnToBall;
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
-          goto start;
-          
-      }
-
-      action
-      {
-        
-        theSaySkill("Cover Cover");
-
-        //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theLibCheck.TeammateFallenNumber));
-      }
-    } 
-
-    // state(centralFallen)
-    // {
-    //   transition
-    //   {
-    //     if(theLibCheck.iFell == 0)
-    //       goto goBackHome;
-    //     if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-    //       goto searchForBall;
-    //   }
-    //   action
-    //   {
-    //     theSaySkill("Central Fell");
-    //     theLookForwardSkill();
-    //     theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
-    //   }
-    // }
   }
 
   Angle calcAngleToGoal() const
