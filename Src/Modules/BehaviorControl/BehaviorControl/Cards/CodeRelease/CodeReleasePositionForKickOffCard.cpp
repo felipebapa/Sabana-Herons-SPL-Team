@@ -38,12 +38,12 @@ class CodeReleasePositionForKickOffCard : public CodeReleasePositionForKickOffCa
 {
   bool preconditions() const override
   {
-    return (theRobotPose.translation - KeeperPos.translation).norm() > StopThreshold;
+    return true;
   }
 
   bool postconditions() const override
   {
-    return (theRobotPose.translation - KeeperPos.translation).norm() <= StopThreshold;
+    return false;  // falta a;adir condicion.
   }
 
   void execute() override
@@ -57,14 +57,15 @@ class CodeReleasePositionForKickOffCard : public CodeReleasePositionForKickOffCa
     {
       if((theRobotPose.translation - KeeperPos.translation).norm() > StopThreshold)
       {
+        theSaySkill("ONE");
         thePathToTargetSkill(1.0, KeeperPos);
       }
       else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
       {
+        theSaySkill("TWO");
         theWalkAtRelativeSpeedSkill(Pose2f(1.0f, 0.f, 0.f));
-      }
-      else 
-      {
+      }else {
+        theSaySkill("THREE");
         theStandSkill();
       }
     }

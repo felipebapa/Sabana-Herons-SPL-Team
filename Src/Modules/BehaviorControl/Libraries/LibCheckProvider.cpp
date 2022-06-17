@@ -37,7 +37,9 @@ void LibCheckProvider::update(LibCheck& libCheck)
   libCheck.positionToPass = positionToPass();
   libCheck.closerToTheBall= isCloserToTheBall();
   libCheck.LeftAttacking= isLeftAttacking();
+  libCheck.LeftDefending= isLeftDefending();
   libCheck.RightAttacking= isRightAttacking();
+  libCheck.RightDefending= isRightDefending();
   libCheck.TeammateFallenNumber=isTeammateFallenNumber();
   libCheck.TeammateObstacleAvoid=isTeammateObstacleAvoid();
   libCheck.OpponentObstacle=isOpponentObstacle();
@@ -152,23 +154,29 @@ bool LibCheckProvider::isLeftAttacking()
   {
 
       if(!teammate.isPenalized){
-        if(teammate.theTeamBehaviorStatus.role.playBall){
-          if(teammate.number==3){
-            if(teammate.theRobotPose.translation.x()>= theFieldDimensions.xPosHalfWayLine){
-              if(LibCheckProvider::isCloserToTheBall()==teammate.number)
-                return true;   //El left supporter està atacando.
-            }
-          }
+        // if(teammate.theTeamBehaviorStatus.role.playBall){
+          if(teammate.number==3 && teammate.theRobotPose.translation.x()>= theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number){
+            return true;   //El left supporter està atacando.
         }
-
-
-
-      }
-        
-    
+      } 
     }
     return false;
+}
+
+bool LibCheckProvider::isLeftDefending()
+{
+    for(auto const& teammate : theTeamData.teammates)
+  {
+
+      if(!teammate.isPenalized){
+        // if(teammate.theTeamBehaviorStatus.role.playBall){
+          if(teammate.number==3 && teammate.theRobotPose.translation.x() <= theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number){
+            return true;   //El left supporter està atacando.
+        }
+      } 
     }
+    return false;
+}
 
 int LibCheckProvider::isCloserToTheBall()
 {
@@ -206,24 +214,27 @@ bool LibCheckProvider::isRightAttacking()
   {
 
       if(!teammate.isPenalized){
-        if(teammate.theTeamBehaviorStatus.role.playBall){
-          if(teammate.number==5){
-            if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
-              if(LibCheckProvider::isCloserToTheBall()==teammate.number)
-
-                return true;   //El Right supporter està atacando.
-            }
-          }
+        // if(teammate.theTeamBehaviorStatus.role.playBall)
+          if(teammate.number==5 && teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number)
+            return true;   //El Right supporter està atacando.
         }
-
-
-
-      }
-        
-    
     }
     return false;
+}
+
+bool LibCheckProvider::isRightDefending()
+{
+    for(auto const& teammate : theTeamData.teammates)
+  {
+
+      if(!teammate.isPenalized){
+        // if(teammate.theTeamBehaviorStatus.role.playBall)
+          if(teammate.number==5 && teammate.theRobotPose.translation.x() <= theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number)
+            return true;   //El Right supporter està atacando.
+        }
     }
+    return false;
+}
 
 int LibCheckProvider::isTeammateFallenNumber()
 {

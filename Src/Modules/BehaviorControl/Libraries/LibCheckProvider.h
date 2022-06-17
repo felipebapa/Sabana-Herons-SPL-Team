@@ -54,7 +54,9 @@ private:
   
   int isCloserToTheBall();
   bool isLeftAttacking();
+  bool isLeftDefending();
   bool isRightAttacking();
+  bool isRightDefending();
   bool positionToPass();
   int isTeammateFallenNumber();
   bool isTeammateObstacleAvoid();
