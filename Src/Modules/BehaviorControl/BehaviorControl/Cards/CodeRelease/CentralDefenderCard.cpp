@@ -146,8 +146,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto alignToGoal;
         if(hayObstaculoCerca)
           goto ObsAvoid;  
-        if(!theLibCheck.LeftDefending && !theLibCheck.RightDefending)
-          goto DefendBall;
       }
 
       action
@@ -175,6 +173,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
         goto goBackHome;   
         if(hayObstaculoCerca)
           goto ObsAvoid;
+        if(theRobotPose.translation.x() < 0)
+          goto DefendBall;  
       }    
       action
       {
@@ -227,9 +227,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
-          goto alignBehindBall;
-        if(hayObstaculoCerca)
-          goto ObsAvoid; 
+          goto alignBehindBall; 
       }
 
       action
@@ -260,10 +258,10 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto GiraCabezaDer; 
         if(!theFieldBall.ballWasSeen(300))
           goto kick;  
-        if(!hayObstaculos)
+        if(!hayObstaculos && theLibCheck.positionToPass)
           goto alignToPass;
-        if(hayObstaculoCerca)
-          goto ObsAvoid; 
+        if(!hayObstaculos && !theLibCheck.positionToPass)  
+          goto alignToClearance;
       }
 
       action
@@ -283,12 +281,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       transition
       {
-        if(hayObstaculos && !theLibCheck.LeftDefending && !theLibCheck.RightDefending)
-          goto alignToGoal;
         if(std::abs(angleToTeammate) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculos)
-          goto pass;
-        else
-          goto kick;  
+          goto pass; 
       }
       action
       {
@@ -384,10 +378,57 @@ class CentralDefenderCard : public CentralDefenderCardBase
         theSaySkill("Align Pass");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
-        // if(theLibCheck.positionToPass)
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToTeammate, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
-        // if(!theLibCheck.positionToPass)
-        //   theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToClearance, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
+        if(theLibCheck.positionToPass)
+          theSaySkill("to striker");
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToTeammate, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
+        if(!theLibCheck.positionToPass)
+          theSaySkill("clearance");
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToClearance, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
+        if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
+      }
+    }
+
+    state(alignToClearance)
+    {
+      const Angle angleToClearance = calcAngleClearance();
+
+      transition
+      {
+        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
+          goto waitBall;
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto GiraCabezaDer; 
+        if(std::abs(angleToClearance) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
+          goto alignBehindBallToClearance;
+      }
+
+      action
+      {
+        theSaySkill("Align Clearance");
+        theLookForwardSkill();
+        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToClearance, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
+        if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
+      }
+    }
+    state(alignBehindBallToClearance)
+    {
+      const Angle angleToClearance = calcAngleClearance();
+      bool hayObstaculos = hayObstaculo();
+
+      transition
+      {
+        if(std::abs(angleToClearance) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculos)
+          goto pass; 
+      }
+      action
+      {
+        theLookForwardSkill();
+        theSaySkill("Behind Clearance");
+        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToClearance, theFieldBall.positionRelative.x() - ballOffsetX  - 20, theFieldBall.positionRelative.y() - ballOffsetY));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
@@ -491,13 +532,13 @@ class CentralDefenderCard : public CentralDefenderCardBase
     return (theRobotPose.inversePose * Vector2f(0.f,0.f)).angle();
   }
 
-  bool hayObstaculo() const
+  bool hayObstaculo()
   {
     bool x = false;
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if(obstacle.center.norm() < 850)
+      if(obstacle.center.norm() < 850.f && theRobotPose.translation.y() > obstacle.center.y() - 700.f && theRobotPose.translation.y() < obstacle.center.y() + 700.f)
         x = true;
       }
     }
