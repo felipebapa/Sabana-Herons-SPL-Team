@@ -40,7 +40,7 @@ void LibCheckProvider::update(LibCheck& libCheck)
   libCheck.TeammateFallenNumber=isTeammateFallenNumber();
   libCheck.TeammateObstacleAvoid=isTeammateObstacleAvoid();
   libCheck.OpponentObstacle=isOpponentObstacle();
-  libCheck.OpponentCloseOwnGoal=isOpponentCloseOwnGoal();
+  //libCheck.OpponentCloseOwnGoal=isOpponentCloseOwnGoal();
 }
 
 void LibCheckProvider::reset()
@@ -288,7 +288,7 @@ bool LibCheckProvider::isOpponentObstacle()
 }
 
 
-bool LibCheckProvider::isOpponentCloseOwnGoal(){
+/* bool LibCheckProvider::isOpponentCloseOwnGoal(){
       bool OpponentCloserOwnGoal = false;
 
       for(auto const& oponente : theTeamData.teammates){
@@ -307,6 +307,6 @@ bool LibCheckProvider::isOpponentCloseOwnGoal(){
         }
 
       }
-}
+} */
 
 

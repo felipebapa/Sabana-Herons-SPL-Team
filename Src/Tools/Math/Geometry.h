@@ -180,4 +180,6 @@ namespace Geometry
   float distance(const LineSegment3D& segment1, const LineSegment3D& segment2, LineSegment3D& connectionSegment);
 
   bool isPointLeftOfLine(const Vector2f& start, const Vector2f& end, const Vector2f& point);
+
+  Vector2f getOrthogonalProjectionOfPointOnLine(const Vector2f& base, const Vector2f& dir, const Vector2f& point);
 };

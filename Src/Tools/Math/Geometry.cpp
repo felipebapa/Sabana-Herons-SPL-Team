@@ -710,3 +710,10 @@ bool Geometry::isPointLeftOfLine(const Vector2f& start, const Vector2f& end, con
 {
   return ((end.x() - start.x()) * (point.y() - start.y()) - (end.y() - start.y()) * (point.x() - start.x())) > 0.f;
 }
+
+
+Vector2f Geometry::getOrthogonalProjectionOfPointOnLine(const Vector2f& base, const Vector2f& dir, const Vector2f& point)
+{
+  const float l = (point.x() - base.x()) * dir.x() + (point.y() - base.y()) * dir.y();
+  return base + (dir * l);
+}

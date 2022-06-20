@@ -492,7 +492,7 @@ class PruebaFelipe1Card : public PruebaFelipe1CardBase
       action
       {
         
-        theSaySkill("Cover Cover");
+        //theSaySkill("Cover Cover");
 
         //theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theLibCheck.TeammateFallenNumber));
       }
