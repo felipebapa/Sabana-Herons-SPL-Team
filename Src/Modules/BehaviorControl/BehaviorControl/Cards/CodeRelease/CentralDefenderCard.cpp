@@ -120,7 +120,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }  
       action
       {
-        theSaySkill("turn");
+        
         if(theLibCheck.LeftAttacking)
           theSaySkill("left attack");
         if(theLibCheck.LeftDefending)
@@ -151,7 +151,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       action
       {
-        theSaySkill("walk");
+        
         if(theLibCheck.LeftAttacking)
           theSaySkill("left attack");
         if(theLibCheck.LeftDefending)
@@ -180,7 +180,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }    
       action
       {
-        theSaySkill("wait");
+        
         if(theLibCheck.LeftAttacking)
           theSaySkill("left attack");
         if(theLibCheck.LeftDefending)
@@ -200,7 +200,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(theFieldBall.positionRelative.norm() < 3000.0f && theRobotPose.inversePose.translation.x() > theFieldBall.positionRelative.x()+-1 && !hayObstaculoCerca && !theLibCheck.LeftDefending && !theLibCheck.RightDefending)
+        if(theFieldBall.positionRelative.norm() < 3000.0f && !hayObstaculoCerca && !theLibCheck.LeftDefending && !theLibCheck.RightDefending)
           goto walkToBall;  
         if(hayObstaculoCerca)
           goto ObsAvoid;
@@ -208,7 +208,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       action
       {
-        theSaySkill("defend");
+        
         if(theLibCheck.LeftAttacking)
           theSaySkill("left attack");
         if(theLibCheck.LeftDefending)
@@ -223,6 +223,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     state(alignToGoal)
     {
       const Angle angleToGoal = calcAngleToGoal();
+      int random = randomNum();
 
       transition
       {
@@ -230,8 +231,10 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
-          goto alignBehindBall; 
+        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && random == 0)
+          goto alignBehindBallRight; 
+        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && random == 1)
+          goto alignBehindBallLeft; 
       }
 
       action
@@ -248,7 +251,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));      
       }
     }
-    state(alignBehindBall)
+    state(alignBehindBallRight)
     {
       const Angle angleToGoal = calcAngleToGoal();
       //const Angle angleToTeammate = calcAngleToTeammate();
@@ -261,7 +264,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(!theFieldBall.ballWasSeen(300))
-          goto kick;  
+          goto kickRight;
         if(!hayObstaculos && theLibCheck.positionToPass)
           goto alignToPass;
         if(!hayObstaculos && !theLibCheck.positionToPass)  
@@ -271,8 +274,38 @@ class CentralDefenderCard : public CentralDefenderCardBase
       action
       {
         theLookForwardSkill();
-        theSaySkill("Align Behind");
+        theSaySkill("zero");
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 45.f, theFieldBall.positionRelative.y() - ballOffsetY + 200.f));
+        if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
+      }
+    }
+
+  state(alignBehindBallLeft)
+    {
+      const Angle angleToGoal = calcAngleToGoal();
+      //const Angle angleToTeammate = calcAngleToTeammate();
+      bool hayObstaculos = hayObstaculo();
+
+      transition
+      {
+        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
+          goto waitBall;
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto GiraCabezaDer;  
+        if(!theFieldBall.ballWasSeen(300))
+          goto kickLeft;  
+        if(!hayObstaculos && theLibCheck.positionToPass)
+          goto alignToPass;
+        if(!hayObstaculos && !theLibCheck.positionToPass)  
+          goto alignToClearance;
+      }
+
+      action
+      {
+        theLookForwardSkill();
+        theSaySkill("one");
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 45.f, theFieldBall.positionRelative.y() + ballOffsetY - 200.f));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
@@ -287,6 +320,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(std::abs(angleToTeammate) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculos)
           goto pass; 
+        if(hayObstaculos)
+          goto alignToGoal;
       }
       action
       {
@@ -315,7 +350,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
         thePathToTargetSkill(1.0, Defender1Pos);
       }
     }
-    state(kick)
+
+    state(kickRight)
     {
       //const Angle angleToGoal = calcAngleToGoal();
 
@@ -332,14 +368,17 @@ class CentralDefenderCard : public CentralDefenderCardBase
       action
       {
         theLookForwardSkill();
-        theSaySkill("kick");
+        theSaySkill("kick zero");
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 2000));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
     }
-    state(pass)
+
+      state(kickLeft)
     {
+      //const Angle angleToGoal = calcAngleToGoal();
+
       transition
       {
         if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
@@ -348,6 +387,32 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto GiraCabezaDer; 
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
           goto start;
+      }
+
+      action
+      {
+        theLookForwardSkill();
+        theSaySkill("kick one");
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() + 2000));
+        if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
+      }
+    }
+
+    state(pass)
+    {
+      bool hayObstaculos = hayObstaculo();
+
+      transition
+      {
+        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
+          goto waitBall;
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto GiraCabezaDer; 
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+          goto start;
+        if(hayObstaculos)
+          goto alignToGoal;
       }
       action
       {
@@ -368,6 +433,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     {
       const Angle angleToTeammate = calcAngleToTeammate();
       const Angle angleToClearance = calcAngleClearance();
+      bool hayObstaculos = hayObstaculo();
 
       transition
       {
@@ -377,6 +443,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto GiraCabezaDer; 
         if(std::abs(angleToTeammate) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
           goto alignBehindBallToPass;
+        if(hayObstaculos)
+          goto alignToGoal;
       }
 
       action
@@ -398,6 +466,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     state(alignToClearance)
     {
       const Angle angleToClearance = calcAngleClearance();
+      bool hayObstaculos = hayObstaculo();
 
       transition
       {
@@ -407,6 +476,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto GiraCabezaDer; 
         if(std::abs(angleToClearance) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
           goto alignBehindBallToClearance;
+        if(hayObstaculos)
+          goto alignToGoal;
       }
 
       action
@@ -428,6 +499,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(std::abs(angleToClearance) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculos)
           goto pass; 
+        if(hayObstaculos)
+          goto alignToGoal;
       }
       action
       {
@@ -550,7 +623,19 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }
     }
     return x;
-  }  
+  } 
+
+  int randomNum() 
+  {
+    int random = 0;
+    random = rand()%(2 + 0);
+    if(theRobotPose.translation.y() > (theFieldDimensions.yPosLeftFieldBorder - 1500.f))
+      random = 0;
+    if(theRobotPose.translation.y() < (theFieldDimensions.yPosRightFieldBorder + 1500.f))
+      random = 1;
+
+    return random;
+  } 
 };
 
 MAKE_CARD(CentralDefenderCard);
