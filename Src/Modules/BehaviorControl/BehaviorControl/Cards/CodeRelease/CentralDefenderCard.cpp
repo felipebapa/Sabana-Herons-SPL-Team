@@ -120,6 +120,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }  
       action
       {
+        theSaySkill("turn");
         if(theLibCheck.LeftAttacking)
           theSaySkill("left attack");
         if(theLibCheck.LeftDefending)
@@ -150,6 +151,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       action
       {
+        theSaySkill("walk");
         if(theLibCheck.LeftAttacking)
           theSaySkill("left attack");
         if(theLibCheck.LeftDefending)
@@ -178,6 +180,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }    
       action
       {
+        theSaySkill("wait");
         if(theLibCheck.LeftAttacking)
           theSaySkill("left attack");
         if(theLibCheck.LeftDefending)
@@ -205,6 +208,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       action
       {
+        theSaySkill("defend");
         if(theLibCheck.LeftAttacking)
           theSaySkill("left attack");
         if(theLibCheck.LeftDefending)
@@ -305,6 +309,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }
       action
       {
+        theSaySkill("home");
         if(theLibCheck.LeftAttacking)
           theSaySkill("left attack");
         thePathToTargetSkill(1.0, Defender1Pos);
@@ -346,6 +351,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }
       action
       {
+        theSaySkill("pass");
         // if(theLibCheck.positionToPass)
         //   theSaySkill("Yes");
         // else
@@ -428,7 +434,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
         theLookForwardSkill();
         theSaySkill("Behind Clearance");
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToClearance, theFieldBall.positionRelative.x() - ballOffsetX  - 20, theFieldBall.positionRelative.y() - ballOffsetY));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToClearance, theFieldBall.positionRelative.x() - ballOffsetX  - 17, theFieldBall.positionRelative.y() - ballOffsetY));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
@@ -446,6 +452,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       action
       {
+        theSaySkill("search");
         if(theLibCheck.LeftAttacking)
           theSaySkill("left attack");
         if(theLibCheck.LeftDefending)
@@ -532,13 +539,13 @@ class CentralDefenderCard : public CentralDefenderCardBase
     return (theRobotPose.inversePose * Vector2f(0.f,0.f)).angle();
   }
 
-  bool hayObstaculo()
+  bool hayObstaculo() const
   {
     bool x = false;
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if(obstacle.center.norm() < 850.f && theRobotPose.translation.y() > obstacle.center.y() - 700.f && theRobotPose.translation.y() < obstacle.center.y() + 700.f)
+      if(obstacle.center.norm() < 850.f && (obstacle.center.y() < 400 && obstacle.center.y() > -400))
         x = true;
       }
     }
