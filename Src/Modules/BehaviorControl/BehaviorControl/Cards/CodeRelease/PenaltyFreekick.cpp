@@ -1,11 +1,12 @@
-/**
- * @file PenaltyStriker.cpp
+/*
+ * @file PenaltyFreekick.cpp
  *
- * Pruebas Striker para Penalty Shoot-out.
+ * Pruebas
  *
- * @author Jose and Santi
+ * @author Jose Pinzon and Santi
  * 
  */
+
 
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/Skills.h"
@@ -20,7 +21,7 @@
 
 #include <string>
 
-CARD(PenaltyStrikerCard,
+CARD(PenaltyFreekickCard,
 {,
   CALLS(Activity),
   CALLS(InWalkKick),
@@ -37,10 +38,9 @@ CARD(PenaltyStrikerCard,
   REQUIRES(RobotInfo),
   REQUIRES(GameInfo),
   REQUIRES(OwnTeamInfo),
-  
   DEFINES_PARAMETERS(
   {,
-    (float)(1.0f) walkSpeed,
+    (float)(0.8f) walkSpeed,
     (int)(1000) initialWaitTime,
     (int)(10) minKickWaitTime,
     (int)(3000) maxKickWaitTime,
@@ -48,21 +48,22 @@ CARD(PenaltyStrikerCard,
   }),
 });
 
-class PenaltyStrikerCard : public PenaltyStrikerCardBase
+class PenaltyFreekickCard : public PenaltyFreekickCardBase
 {
   bool preconditions() const override
   {
-    return (theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber);
+    return (theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theRobotInfo.number == 4);
+      
   }
 
   bool postconditions() const override
   {
-    return (theGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber);
+    return (theGameInfo.gamePhase != GAME_PHASE_NORMAL || theGameInfo.setPlay != SET_PLAY_PENALTY_KICK || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber || theRobotInfo.number != 4);
   }
   
   option
   {
-      theActivitySkill(BehaviorStatus::PenaltyStriker);
+      theActivitySkill(BehaviorStatus::PenaltyFreekick);
       initial_state(start)
       {
           transition
@@ -105,7 +106,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
           {
               srand((int)time(NULL));
               choice=0+rand()%(2-0);
-              //choice=1;
+              //choice=0;
           }
 
       }
@@ -116,7 +117,7 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
 
           transition
           {
-              if(theFieldBall.positionRelative.x() <180.f)
+              if(theFieldBall.positionRelative.x() < 180.f)
                   goto kick;
           }
           action
@@ -156,14 +157,16 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
       {
         theLookForwardSkill();
         //theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-        theKickSkill((KickRequest::kickForwardFastLong), false, 0.3f, false);
+        theKickSkill((KickRequest::kickForward), false, 0.3f, false);
+        
       }
     }
     state(stand)
     {
         transition
         {
-            
+            if(!theFieldBall.ballWasSeen(3000.f) || theFieldBall.positionRelative.norm() > 1000.f)
+                goto start;
         }
         action
         {
@@ -180,4 +183,4 @@ class PenaltyStrikerCard : public PenaltyStrikerCardBase
 
 };
 
-MAKE_CARD(PenaltyStrikerCard);
+MAKE_CARD(PenaltyFreekickCard);

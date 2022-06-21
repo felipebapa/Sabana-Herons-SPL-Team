@@ -22,8 +22,8 @@ bool PenaltyAreaPerceptor::searchWithIntersections(PenaltyArea& penaltyArea) con
       useFullIntersections.push_back(&(*i));
 
   const float ttDistance = 2.f * theFieldDimensions.yPosLeftPenaltyArea;
-  const float tlDistance = theFieldDimensions.xPosOpponentGroundLine - theFieldDimensions.xPosOpponentPenaltyArea;
-  const float halfPenaltyDepth = (theFieldDimensions.xPosOpponentGroundLine - theFieldDimensions.xPosOpponentPenaltyArea) / 2.f;
+  const float tlDistance = theFieldDimensions.xPosOpponentGroundline - theFieldDimensions.xPosOpponentPenaltyArea;
+  const float halfPenaltyDepth = (theFieldDimensions.xPosOpponentGroundline - theFieldDimensions.xPosOpponentPenaltyArea) / 2.f;
 
   for(auto i = useFullIntersections.begin(); i != useFullIntersections.end(); i++)
     for(auto j = i + 1; j != useFullIntersections.end(); j++)

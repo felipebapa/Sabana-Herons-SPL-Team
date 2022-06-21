@@ -14,7 +14,8 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
-
+#include "Representations/Modeling/ObstacleModel.h"
+#include "Representations/BehaviorControl/Libraries/LibCheck.h"
 #include "Representations/Communication/RobotInfo.h"
 
 CARD(KeeperCard,
@@ -29,12 +30,15 @@ CARD(KeeperCard,
   CALLS(KeyFrameSingleArm),
   CALLS(SpecialAction),
   CALLS(LookAtPoint),
+  CALLS(LookAtAngles),
   CALLS(Say),
   REQUIRES(FieldBall),
   REQUIRES(BallModel),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
+  REQUIRES(LibCheck),
+  REQUIRES(ObstacleModel),
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
@@ -75,6 +79,15 @@ class KeeperCard : public KeeperCardBase
   {
     theActivitySkill(BehaviorStatus::Keeper);
 
+    bool hayObstaculoCerca = false;
+      if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
+      for(const auto& obstacle : theObstacleModel.obstacles){
+        //See if the obstacle is first than the target   
+      if (obstacle.center.norm()<400.f)  
+          hayObstaculoCerca=true;
+      }
+    }
+
     initial_state(start)
     {
       transition
@@ -98,7 +111,7 @@ class KeeperCard : public KeeperCardBase
       transition
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto searchForBall;
+          goto GiraCabezaDer; 
 		    //if(-100 > theBallModel.estimate.position.y() && theBallModel.estimate.velocity.x() < -90)
         if(theRobotPose.translation.y() >= theFieldDimensions.yPosLeftGoal || theRobotPose.translation.y() <= theFieldDimensions.yPosRightGoal)
           goto waitBall;
@@ -109,7 +122,6 @@ class KeeperCard : public KeeperCardBase
           goto GoalRiskLeft;
         if(theFieldBall.positionRelative.norm() >= 2500.0f)
           goto guardGoal;
-
       }
 
       action
@@ -124,24 +136,6 @@ class KeeperCard : public KeeperCardBase
       }
     }
 	
-    state(searchForBall)
-    {
-      transition
-      {
-        if(theFieldBall.ballWasSeen() && theBallModel.estimate.position.x() < 3500)
-          goto coverBallTrajectory;
-        if(!theFieldBall.ballWasSeen(10000))
-          goto goBackHome;   
-      }
-
-      action
-      {
-        theLookForwardSkill();
-		
-        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
-      }
-    }
-	
 	    state(GoalRiskRight)
     {
 	  //const Angle angleToGoal = calcAngleToGoal();
@@ -149,7 +143,7 @@ class KeeperCard : public KeeperCardBase
       transition
       {
 		    if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto searchForBall; 
+          goto GiraCabezaDer; 
       }
 
       action
@@ -170,7 +164,9 @@ class KeeperCard : public KeeperCardBase
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
         if(!theFieldBall.ballWasSeen(4000))
-          goto goBackHome;   
+          goto goBackHome;
+        if(hayObstaculoCerca)
+          goto ObsAvoid;   
       }
 
       action
@@ -189,7 +185,7 @@ class KeeperCard : public KeeperCardBase
       transition
       {
 		    if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto searchForBall;
+          goto GiraCabezaDer; 
 	    
       }
 
@@ -209,9 +205,11 @@ class KeeperCard : public KeeperCardBase
       transition 
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto searchForBall;
+          goto GiraCabezaDer; 
         if(theFieldBall.positionRelative.norm() < 2500.0f)
           goto coverBallTrajectory;
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
       }
       action
       {
@@ -225,9 +223,11 @@ class KeeperCard : public KeeperCardBase
       transition
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto searchForBall;
+          goto GiraCabezaDer; 
         if(theBallModel.estimate.position.y() < theFieldDimensions.yPosLeftGoal)
-          goto coverBallTrajectory;  
+          goto coverBallTrajectory;
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
       }  
       action
       {
@@ -245,11 +245,83 @@ class KeeperCard : public KeeperCardBase
       {
         if(theFieldBall.ballWasSeen() && theBallModel.estimate.position.x() < 3500)
           goto coverBallTrajectory;
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
       }
       action
       {
         theLookForwardSkill();
         thePathToTargetSkill(1.0, KeeperPos);
+      }
+    }
+
+    state(GiraCabezaDer)
+    {
+      
+      transition
+      {
+        if(theFieldBall.ballWasSeen() && theBallModel.estimate.position.x() < 3500)
+          goto coverBallTrajectory;
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 1500)
+          goto GiraCabezaIzq;
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;   
+      }
+
+      action
+      {
+        if(theRobotPose.translation.y() > theFieldDimensions.yPosLeftGoal)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 200));
+          if(theRobotPose.translation.y() < theFieldDimensions.yPosRightGoal)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() + 200));
+        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+        theLookAtAnglesSkill(-1,2);
+      }
+    }
+
+    state(GiraCabezaIzq)
+    {
+      transition
+      {
+        if(theFieldBall.ballWasSeen() && theBallModel.estimate.position.x() < 3500)
+          goto coverBallTrajectory;
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 1500)
+          goto GiraCabezaDer;
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+      }
+      action
+      {
+          if(theRobotPose.translation.y() > theFieldDimensions.yPosLeftGoal)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 200));
+          if(theRobotPose.translation.y() < theFieldDimensions.yPosRightGoal)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() + 200));
+          theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+          theLookAtAnglesSkill(1,2);
+          //a+=1;   
+      }
+    }
+
+    state(ObsAvoid)
+    {  
+      transition 
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+          goto start;
+      }
+      action
+      {
+        for(const auto& obstacle : theObstacleModel.obstacles) {
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, obstacle.center.norm()+100)); 
+        }
+        if(theRobotPose.translation.y() > theFieldDimensions.yPosRightGoal)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldDimensions.yPosRightGoal+500));
       }
     }
 

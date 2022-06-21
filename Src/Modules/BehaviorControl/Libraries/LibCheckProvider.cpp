@@ -34,14 +34,17 @@ void LibCheckProvider::update(LibCheck& libCheck)
     checkOutputs(theTeamActivationGraph, LibCheck::firstTeamCheckedOutput, LibCheck::numOfCheckedOutputs);
   };
   
+  libCheck.positionToPass = positionToPass();
   libCheck.closerToTheBall= isCloserToTheBall();
   libCheck.LeftAttacking= isLeftAttacking();
+  libCheck.LeftDefending= isLeftDefending();
   libCheck.RightAttacking= isRightAttacking();
+  libCheck.RightDefending= isRightDefending();
   libCheck.TeammateFallenNumber=isTeammateFallenNumber();
   libCheck.TeammateObstacleAvoid=isTeammateObstacleAvoid();
   libCheck.OpponentObstacle=isOpponentObstacle();
-  //libCheck.OpponentCloseOwnGoal=isOpponentCloseOwnGoal();
 }
+
 
 void LibCheckProvider::reset()
 {
@@ -131,6 +134,50 @@ std::string LibCheckProvider::getActivationGraphString(const ActivationGraph& ac
   return options;
 }
 
+bool LibCheckProvider::positionToPass()
+{
+  bool IsToPass = false;
+  for(auto const& teammate : theTeamData.teammates)
+  {
+    if(!teammate.isPenalized){
+      if(teammate.number == 4 && teammate.theRobotPose.translation.x() >= 400 && teammate.theRobotPose.translation.x() < 600)
+        IsToPass = true;
+    }
+  }
+
+  return IsToPass;
+}
+
+bool LibCheckProvider::isLeftAttacking()
+{
+    for(auto const& teammate : theTeamData.teammates)
+  {
+
+      if(!teammate.isPenalized){
+        // if(teammate.theTeamBehaviorStatus.role.playBall){
+          if(teammate.number==3 && teammate.theRobotPose.translation.x()>= theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number){
+            return true;   //El left supporter està atacando.
+        }
+      } 
+    }
+    return false;
+}
+
+bool LibCheckProvider::isLeftDefending()
+{
+    for(auto const& teammate : theTeamData.teammates)
+  {
+
+      if(!teammate.isPenalized){
+        // if(teammate.theTeamBehaviorStatus.role.playBall){
+          if(teammate.number==3 && teammate.theRobotPose.translation.x() <= theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number){
+            return true;   //El left supporter està atacando.
+        }
+      } 
+    }
+    return false;
+}
+
 int LibCheckProvider::isCloserToTheBall()
 {
 
@@ -161,79 +208,33 @@ int LibCheckProvider::isCloserToTheBall()
   return theRobotInfo.number;  //Devuelve el # de robot que està mas cerca al balòn.
 }
 
-bool LibCheckProvider::isLeftAttacking()
-{
-    for(auto const& teammate : theTeamData.teammates)
-  {
-
-      if(!teammate.isPenalized){
-        if(teammate.theTeamBehaviorStatus.role.playBall){
-          if(teammate.number==3){
-            if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
-              if(LibCheckProvider::isCloserToTheBall()==teammate.number)
-                return true;   //El left supporter està atacando.
-            }
-          }
-        }
-
-
-
-      }
-        
-    
-    }
-    return false;
-    }
-
 bool LibCheckProvider::isRightAttacking()
 {
     for(auto const& teammate : theTeamData.teammates)
   {
 
       if(!teammate.isPenalized){
-        if(teammate.theTeamBehaviorStatus.role.playBall){
-          if(teammate.number==5){
-            if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
-              if(LibCheckProvider::isCloserToTheBall()==teammate.number)
-              
-
-                return true;   //El Right supporter està atacando.
-            }
-          }
+        // if(teammate.theTeamBehaviorStatus.role.playBall)
+          if(teammate.number==5 && teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number)
+            return true;   //El Right supporter està atacando.
         }
-
-
-
-      }
-        
-    
     }
     return false;
-    }
+}
 
-bool LibCheckProvider::isCenterAttacking()
+bool LibCheckProvider::isRightDefending()
 {
     for(auto const& teammate : theTeamData.teammates)
   {
 
       if(!teammate.isPenalized){
-        if(teammate.theTeamBehaviorStatus.role.playBall){
-          if(teammate.number==2){
-            if(teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine){
-              if(LibCheckProvider::isCloserToTheBall()==teammate.number)
-                return true;   //El Center supporter està atacando.
-            }
-          }
+        // if(teammate.theTeamBehaviorStatus.role.playBall)
+          if(teammate.number==5 && teammate.theRobotPose.translation.x() <= theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number)
+            return true;   //El Right supporter està atacando.
         }
-
-
-
-      }
-        
-    
     }
     return false;
-    }
+}
 
 int LibCheckProvider::isTeammateFallenNumber()
 {
@@ -250,10 +251,10 @@ int LibCheckProvider::isTeammateFallenNumber()
 
 bool LibCheckProvider::isTeammateObstacleAvoid()
 {
-      
-      if(!theObstacleModel.obstacles.empty()){        
+
+      if(!theObstacleModel.obstacles.empty()){
       for(const auto& obstacle : theObstacleModel.obstacles){
-   
+
 
 
       if (obstacle.type == Obstacle::teammate) { 
@@ -270,10 +271,10 @@ bool LibCheckProvider::isTeammateObstacleAvoid()
 
 bool LibCheckProvider::isOpponentObstacle()
 {
-      
-      if(!theObstacleModel.obstacles.empty()){        
+
+      if(!theObstacleModel.obstacles.empty()){
       for(const auto& obstacle : theObstacleModel.obstacles){
-   
+
 
 
       if (obstacle.type == Obstacle::opponent) { 
@@ -286,27 +287,3 @@ bool LibCheckProvider::isOpponentObstacle()
     }
     return false;
 }
-
-
-/* bool LibCheckProvider::isOpponentCloseOwnGoal(){
-      bool OpponentCloserOwnGoal = false;
-
-      for(auto const& oponente : theTeamData.teammates){
-
-        if(oponente.mateType==Teammate::otherTeamRobot){
-
-            OpponentRobots.push_back(oponente);  //Lista sin ordenar de oponentes.
-            //teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine
-
-            if(oponente.theRobotPose.translation.x()<=theFieldDimensions.xPosOwnGoal+200){
-
-              
-                OpponentCloserOwnGoal=true;
-
-            }
-        }
-
-      }
-} */
-
-

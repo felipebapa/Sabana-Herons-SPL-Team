@@ -72,8 +72,9 @@ bool GameController::handleStateCommand(const std::string& command)
       addTimeInCurrentState();
     timeWhenStateBegan = Time::getCurrentSystemTime();
     gameInfo.state = STATE_READY;
-    gameInfo.setPlay = SET_PLAY_NONE;
-
+    if(gameInfo.setPlay != SET_PLAY_PENALTY_KICK)
+      gameInfo.setPlay = SET_PLAY_NONE;
+  
     return true;
   }
   else if(command == "set")
@@ -94,8 +95,9 @@ bool GameController::handleStateCommand(const std::string& command)
         VERIFY(handleRobotCommand(i, "substitute"));
     }
     gameInfo.state = STATE_SET;
-    gameInfo.setPlay = SET_PLAY_NONE;
-
+    if(gameInfo.setPlay != SET_PLAY_PENALTY_KICK)
+      gameInfo.setPlay = SET_PLAY_NONE;
+  
     return true;
   }
   else if(command == "playing")
@@ -256,6 +258,20 @@ bool GameController::handleFreeKickCommand(const std::string& command)
     gameInfo.setPlay = SET_PLAY_KICK_IN;
     gameInfo.kickingTeam = 2;
     return true;
+  }
+  else if(command == "penaltyKickForFirstTeam")
+  {
+    timeWhenSetPlayBegan = Time::getCurrentSystemTime();
+    gameInfo.setPlay = SET_PLAY_PENALTY_KICK;
+    gameInfo.kickingTeam = 1;
+    return handleStateCommand("ready");
+  }
+  else if(command == "penaltyKickForSecondTeam")
+  {
+    timeWhenSetPlayBegan = Time::getCurrentSystemTime();
+    gameInfo.setPlay = SET_PLAY_PENALTY_KICK;
+    gameInfo.kickingTeam = 2;
+    return handleStateCommand("ready");
   }
   return false;
 }
@@ -827,6 +843,8 @@ void GameController::addCompletion(std::set<std::string>& completion) const
     "kickOffFirstTeam",
     "kickOffSecondTeam",
     "gamePenaltyShootout",
+    "penaltyKickForFirstTeam",
+    "penaltyKickForSecondTeam",
     "gameNormal"
   };
   const int num = sizeof(commands) / sizeof(commands[0]);

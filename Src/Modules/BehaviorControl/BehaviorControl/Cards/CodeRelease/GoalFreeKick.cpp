@@ -1,12 +1,10 @@
 /**
- * @file CodeReleaseKickAtGoalCard.cpp
+ * @file "GoalFreeKick".cpp
  *
- * This file implements a basic striker behavior for the code release.
- * Normally, this would be decomposed into at least
- * - a ball search behavior card
- * - a skill for getting behind the ball
+ * Pruebas saque de arco.
  *
- * @author Arne Hasselbring
+ * @author Santi and Jose
+ * 
  */
 
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -16,21 +14,29 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
-
+#include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/TeamInfo.h"
 
-CARD(CodeReleaseKickAtGoalCard,
+#include <string>
+
+CARD(GoalFreeKickCard,
 {,
   CALLS(Activity),
-  CALLS(InWalkKick),
   CALLS(LookForward),
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
+  CALLS(Kick),
+  CALLS(Say),
+  
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
+  REQUIRES(GameInfo),
+  REQUIRES(OwnTeamInfo),
+  
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
@@ -51,38 +57,36 @@ CARD(CodeReleaseKickAtGoalCard,
   }),
 });
 
-class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
+class GoalFreeKickCard : public GoalFreeKickCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == 6;
+    return ((theGameInfo.competitionPhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_GOAL_KICK) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theRobotInfo.number == 1);
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != 6;
+    return ((theGameInfo.competitionPhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_GOAL_KICK) && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber && theRobotInfo.number != 1);
   }
-
+  
   option
   {
-    theActivitySkill(BehaviorStatus::codeReleaseKickAtGoal);
-
-    initial_state(start)
-    {
-      transition
+      theActivitySkill(BehaviorStatus::GoalFreeKick);
+      initial_state(start)
       {
-        if(state_time > initialWaitTime)
-          goto turnToBall;
+          transition
+          {
+             if(state_time > initialWaitTime)
+               goto searchForBall;
+          }
+          action
+          {
+              theLookForwardSkill();
+              theStandSkill();
+          }
       }
-
-      action
-      {
-        theLookForwardSkill();
-        theStandSkill();
-      }
-    }
-
-    state(turnToBall)
+      
+      state(turnToBall)
     {
       transition
       {
@@ -156,18 +160,19 @@ class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
 
     state(kick)
     {
-      const Angle angleToGoal = calcAngleToGoal();
+      //const Angle angleToGoal = calcAngleToGoal();
 
       transition
       {
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theKickSkill.isDone()))
           goto start;
       }
 
       action
       {
         theLookForwardSkill();
-        theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        theKickSkill((KickRequest::kickForward), true, 0.3f, false);
+        theSaySkill("Go Go");
       }
     }
 
@@ -190,7 +195,8 @@ class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
   Angle calcAngleToGoal() const
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
-  }
+  }  
+
 };
 
-MAKE_CARD(CodeReleaseKickAtGoalCard);
+MAKE_CARD(GoalFreeKickCard);

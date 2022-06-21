@@ -34,7 +34,6 @@ STREAMABLE(SimpleFieldDimensions,
   (float) xPosOwnFieldBorder,
   (float) xPosOpponentGoalArea,  //New
   (float) xPosOwnGoalArea,       //New
-  
 
   (float) yPosLeftFieldBorder,
   (float) yPosLeftSideline,
@@ -45,8 +44,8 @@ STREAMABLE(SimpleFieldDimensions,
   (float) yPosRightPenaltyArea,
   (float) yPosRightSideline,
   (float) yPosRightFieldBorder,
-  (float) yPosLeftGoalArea,    //New
-  (float) yPosRightGoalArea,   //New
+  (float) yPosLeftGoalArea,      //New
+  (float) yPosRightGoalArea,     //New
 
   //other dimensions
   (float) fieldLinesWidth,

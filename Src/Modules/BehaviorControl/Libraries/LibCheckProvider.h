@@ -24,7 +24,6 @@
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/Configuration/FieldDimensions.h"
 
-
 MODULE(LibCheckProvider,
 {,
   USES(ActivationGraph),
@@ -43,8 +42,7 @@ MODULE(LibCheckProvider,
   {,
     (std::vector<int>) notSetCheck,       /** Assert that a request has been set at least once */
     (std::vector<int>) multipleSetCheck,  /** Print a warning if an assert has not been set at least once */
-    (bool) assertValidWalkRequest, 
-   // (std::vector<Teammate>) OpponentRobots,       /** Asserts that there are no strange walk parameters */
+    (bool) assertValidWalkRequest,        /** Asserts that there are no strange walk parameters */
   }),
 });
 
@@ -56,12 +54,13 @@ private:
   
   int isCloserToTheBall();
   bool isLeftAttacking();
+  bool isLeftDefending();
   bool isRightAttacking();
-  bool isCenterAttacking();
+  bool isRightDefending();
+  bool positionToPass();
   int isTeammateFallenNumber();
   bool isTeammateObstacleAvoid();
   bool isOpponentObstacle();
-  //bool isOpponentCloseOwnGoal();
   
   int callCounters[LibCheck::numOfCheckedOutputs]; /**< The counters for different checks */
   bool setArmsInThisFrame[Arms::numOfArms]; /**< This arm was set in this frame */

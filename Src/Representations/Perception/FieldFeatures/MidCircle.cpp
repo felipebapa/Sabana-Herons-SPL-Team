@@ -27,7 +27,7 @@ void MidCircle::draw() const
     if(!isValid)
       return;
 
-    COMPLEX_DRAWING("representation:MidCircle:field")
+    COMPLEX_DRAWING("representation:MidCorner:field")
     {
       if(Blackboard::getInstance().exists("FieldDimensions") && Blackboard::getInstance().exists("CameraInfo"))
       {

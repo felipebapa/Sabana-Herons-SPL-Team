@@ -131,6 +131,8 @@ std::string GameInfo::getStateAsString() const
           return "Corner Kick";
         case SET_PLAY_KICK_IN:
           return "Kick In";
+        case SET_PLAY_PENALTY_KICK:
+          return "Penalty kick";
         default:
           return "Unknown";
       }

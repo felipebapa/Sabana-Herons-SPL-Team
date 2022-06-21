@@ -1,12 +1,10 @@
 /**
- * @file CodeReleaseKickAtGoalCard.cpp
+ * @file Kick in.cpp
  *
- * This file implements a basic striker behavior for the code release.
- * Normally, this would be decomposed into at least
- * - a ball search behavior card
- * - a skill for getting behind the ball
+ * Pruebas Striker para kick in.
  *
- * @author Arne Hasselbring
+ * @author Santi and Jose
+ * 
  */
 
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -16,21 +14,33 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
-
+#include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/TeamInfo.h"
+#include "Representations/Modeling/ObstacleModel.h"
 
-CARD(CodeReleaseKickAtGoalCard,
+#include <string>
+
+CARD(KickInCard,
 {,
   CALLS(Activity),
-  CALLS(InWalkKick),
   CALLS(LookForward),
+  CALLS(LookAtAngles),
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(WalkToTarget),
+  CALLS(InWalkKick),
+  CALLS(Kick),
+  CALLS(Say),
+  
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
+  REQUIRES(GameInfo),
+  REQUIRES(OwnTeamInfo),
+  REQUIRES(ObstacleModel),
+  
   DEFINES_PARAMETERS(
   {,
     (float)(0.8f) walkSpeed,
@@ -51,38 +61,36 @@ CARD(CodeReleaseKickAtGoalCard,
   }),
 });
 
-class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
+class KickInCard : public KickInCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == 6;
+    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_KICK_IN) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theRobotInfo.number == 4);
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != 6;
+    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_KICK_IN) || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber || theRobotInfo.number != 4);
   }
-
+  
   option
   {
-    theActivitySkill(BehaviorStatus::codeReleaseKickAtGoal);
-
-    initial_state(start)
-    {
-      transition
+      theActivitySkill(BehaviorStatus::KickIn);
+      initial_state(start)
       {
-        if(state_time > initialWaitTime)
-          goto turnToBall;
+          transition
+          {
+             if(state_time > initialWaitTime)
+               goto searchForBall;
+          }
+          action
+          {
+              theLookForwardSkill();
+              theStandSkill();
+          }
       }
-
-      action
-      {
-        theLookForwardSkill();
-        theStandSkill();
-      }
-    }
-
-    state(turnToBall)
+      
+      state(turnToBall)
     {
       transition
       {
@@ -144,7 +152,18 @@ class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
         if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
-          goto kick;
+          {
+          if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
+            for(const auto& obstacle : theObstacleModel.obstacles){
+              if ((obstacle.center.x() < (theFieldDimensions.xPosOpponentGoal - theFieldBall.positionOnField.x())))
+                goto kick;
+              if (std::abs(obstacle.center.y()) > 150.f)
+                goto longKick;
+              }
+              }
+              else
+                goto longKick;    
+          }
       }
 
       action
@@ -157,7 +176,7 @@ class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
     state(kick)
     {
       const Angle angleToGoal = calcAngleToGoal();
-
+      
       transition
       {
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
@@ -168,6 +187,22 @@ class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
       {
         theLookForwardSkill();
         theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        
+      }
+    }
+
+    state(longKick)
+    {     
+      transition
+      {
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
+          goto start;
+      }
+
+      action
+      {
+        theLookForwardSkill();
+        theKickSkill((KickRequest::kickForward), true, 0.3f, false);
       }
     }
 
@@ -175,6 +210,8 @@ class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
     {
       transition
       {
+        if(state_time > 1500)
+          goto lookLeft;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
       }
@@ -182,6 +219,24 @@ class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
       action
       {
         theLookForwardSkill();
+        theLookAtAnglesSkill(-1,2);
+        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+      }
+    }
+
+    state(lookLeft)
+    {
+      transition
+      {
+        if(state_time > 1500)
+          goto searchForBall;
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+      }
+      action
+      {
+        theLookForwardSkill();
+        theLookAtAnglesSkill(1,2);
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }
@@ -190,7 +245,8 @@ class CodeReleaseKickAtGoalCard : public CodeReleaseKickAtGoalCardBase
   Angle calcAngleToGoal() const
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
-  }
+  }  
+
 };
 
-MAKE_CARD(CodeReleaseKickAtGoalCard);
+MAKE_CARD(KickInCard);
