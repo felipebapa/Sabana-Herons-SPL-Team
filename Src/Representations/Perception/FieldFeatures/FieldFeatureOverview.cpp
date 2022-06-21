@@ -21,6 +21,7 @@ void FieldFeatureOverview::draw() const
     PLOT_SINGE_TSL(midCorner);
     PLOT_SINGE_TSL(outerCorner);
     PLOT_SINGE_TSL(goalFrame);
+    PLOT_SINGE_TSL(penaltyMarkWithPenaltyAreaLine);
 
     PLOT("representation:FieldFeatureOverview:timeSinceLast", theFrameInfo.getTimeSince(combinedStatus.lastSeen));
   }

@@ -618,7 +618,11 @@ class RightDefenderCard : public RightDefenderCardBase
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
+<<<<<<< HEAD
       if(obstacle.center.norm() < 850.f && (obstacle.center.y() < 400 && obstacle.center.y() > -400))
+=======
+      if(obstacle.center.norm() < 1000.f && obstacle.center.norm() > 100.f)
+>>>>>>> PruebaFelipe
         x = true;
       }
     }

@@ -125,6 +125,7 @@ namespace Geometry
   bool checkIntersectionOfLines(const Vector2f& l1p1, const Vector2f& l1p2, const Vector2f& l2p1, const Vector2f& l2p2);
   [[nodiscard]] bool getIntersectionOfLines(const Line& line1, const Line& line2, Vector2f& intersection);
   [[nodiscard]] bool getIntersectionOfRaysFactor(const Line& ray1, const Line& ray2, float& intersection);
+  [[nodiscard]] bool getIntersectionOfLineAndConvexPolygon(const std::vector<Vector2f>& polygon, const Line& direction, Vector2f& intersection);
 
   float getDistanceToLine(const Line& line, const Vector2f& point);
   float getDistanceToEdge(const Line& line, const Vector2f& point);
@@ -180,4 +181,7 @@ namespace Geometry
   float distance(const LineSegment3D& segment1, const LineSegment3D& segment2, LineSegment3D& connectionSegment);
 
   bool isPointLeftOfLine(const Vector2f& start, const Vector2f& end, const Vector2f& point);
+
+  Vector2f getOrthogonalProjectionOfPointOnLine(const Vector2f& base, const Vector2f& dir, const Vector2f& point);
+
 };
