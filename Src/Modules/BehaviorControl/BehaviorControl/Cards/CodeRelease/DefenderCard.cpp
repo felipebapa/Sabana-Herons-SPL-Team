@@ -76,12 +76,12 @@ class DefenderCard : public DefenderCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == 6;
+    return theRobotInfo.number == (theLibCheck.centralEnter);
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != 6;
+    return theRobotInfo.number != (theLibCheck.centralEnter);
   }
 
   option
