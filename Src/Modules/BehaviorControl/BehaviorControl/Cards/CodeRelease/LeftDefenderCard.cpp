@@ -126,6 +126,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
 
       action
       {
+        theSaySkill("ONE");
         //theLookForwardSkill();
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
         theStandSkill();
@@ -485,6 +486,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
 
     state(searchForBall)
     {
+      
       transition
       {
         // if(theLibCheck.iFell == 2 && (theFieldBall.positionOnField.y() < theFieldDimensions.yPosLeftGoal && theFieldBall.positionOnField.y() > theFieldDimensions.yPosRightGoal) && theFieldBall.ballWasSeen())

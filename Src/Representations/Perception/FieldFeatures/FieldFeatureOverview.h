@@ -23,6 +23,7 @@ STREAMABLE(FieldFeatureOverview, COMMA public PureBHumanArbitraryMessageParticle
     midCorner,
     outerCorner,
     goalFrame,
+    penaltyMarkWithPenaltyAreaLine,
   });
 
   STREAMABLE_WITH_BASE(FieldFeatureStatus, Pose2f,
