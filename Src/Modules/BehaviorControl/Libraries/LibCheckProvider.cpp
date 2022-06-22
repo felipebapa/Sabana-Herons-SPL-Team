@@ -44,6 +44,10 @@ void LibCheckProvider::update(LibCheck& libCheck)
   libCheck.TeammateObstacleAvoid=isTeammateObstacleAvoid();
   libCheck.OpponentObstacle=isOpponentObstacle();
   libCheck.TeammateSeeingBall=isTeammateSeeingBall();
+  libCheck.firstPrecondition = firstPrecondition();
+  libCheck.secondPrecondition = secondPrecondition();
+  libCheck.centralLeave = centralLeave();
+  libCheck.centralEnter = centralEnter();
 }
 
 
@@ -298,3 +302,67 @@ bool LibCheckProvider::isTeammateSeeingBall()  // Para el kickoff opponent.
     }
     return false;
 }
+
+int LibCheckProvider::centralLeave()
+{
+  if(isLeftAttacking() || isRightAttacking())
+    return 6;
+  else
+    return 2;
+}
+
+int LibCheckProvider::centralEnter()
+{
+  if(isLeftAttacking() || isRightAttacking())
+    return 2;
+  else
+    return 6;
+}
+
+// int LibCheckProvider::firstPrecondition()
+// {
+//   if(theRobotInfo.number == 2) {
+//     if(isLeftAttacking || isRightAttacking)
+//     return 6;
+//     else
+//     return 2;
+//   }
+  
+//   if(theRobotInfo.number == 3) {
+//     if(isLeftAttacking)
+//       return 3;
+//     if(isRightAttacking)
+//       return 6;
+//   }
+
+//   if(theRobotInfo.number == 5) {
+//     if(isRightAttacking)
+//       return 5;
+//     if(isLeftAttacking)
+//       return 6;
+//   }
+// }
+
+// int LibCheckProvider::secondPrecondition()
+// {
+//   if(theRobotInfo.number == 2) {
+//     if(isLeftAttacking || isRightAttacking)
+//       return 2;
+//     else  
+//       return 6;
+//   }
+
+//   if(theRobotInfo.number == 3) {
+//     if(isLeftAttacking)
+//       return 6;
+//     if(isRightAttacking)
+//       return 3;
+//   }
+
+//   if(theRobotInfo.number == 5) {
+//     if(isRightAttacking)
+//       return 6;
+//     if(isLeftAttacking)
+//       return 5;
+//   }
+// }

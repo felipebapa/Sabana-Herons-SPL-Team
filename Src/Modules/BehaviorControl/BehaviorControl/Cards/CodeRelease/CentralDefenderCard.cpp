@@ -71,12 +71,12 @@ class CentralDefenderCard : public CentralDefenderCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == 2;
+    return theRobotInfo.number == (theLibCheck.centralLeave);
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != 2;
+    return theRobotInfo.number != (theLibCheck.centralLeave);
   }
 
   option
@@ -102,6 +102,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       action
       {
+        theSaySkill("Original Card");
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
         theStandSkill();
       }
