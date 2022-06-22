@@ -53,4 +53,5 @@ STREAMABLE(LibCheck,
   (int)(0) TeammateFallenNumber,
   (bool)(false) TeammateObstacleAvoid,
   (bool)(false) OpponentObstacle,
+  (bool)(false) TeammateSeeingBall,
 });

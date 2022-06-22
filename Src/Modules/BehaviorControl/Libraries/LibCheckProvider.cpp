@@ -43,6 +43,7 @@ void LibCheckProvider::update(LibCheck& libCheck)
   libCheck.TeammateFallenNumber=isTeammateFallenNumber();
   libCheck.TeammateObstacleAvoid=isTeammateObstacleAvoid();
   libCheck.OpponentObstacle=isOpponentObstacle();
+  libCheck.TeammateSeeingBall=isTeammateSeeingBall();
 }
 
 
@@ -284,6 +285,16 @@ bool LibCheckProvider::isOpponentObstacle()
       }
 
       }
+    }
+    return false;
+}
+
+
+bool LibCheckProvider::isTeammateSeeingBall()  // Para el kickoff opponent.
+{
+
+      if(theTeamBallModel.velocity.norm()!=0){
+          return true;
     }
     return false;
 }
