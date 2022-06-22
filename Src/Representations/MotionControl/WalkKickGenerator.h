@@ -22,6 +22,7 @@ namespace WalkKicks
   {,
     none,
     forward,
+    forwardOLD,
   });
 }
 
