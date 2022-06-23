@@ -1,5 +1,10 @@
 /**
- * @file CentralDefenderCard.cpp
+ * @file DefenderCard.cpp
+ *
+ * This file implements a basic striker behavior for the code release.
+ * Normally, this would be decomposed into at least
+ * - a ball search behavior card
+ * - a skill for getting behind the ball
  *
  * @author Dap y Mia
  */
@@ -21,7 +26,7 @@
 #include "Representations/Communication/TeamData.h"
 
 
-CARD(CentralDefenderCard,
+CARD(CentralRightCard,
 {,
   CALLS(Activity),
   CALLS(InWalkKick),
@@ -67,16 +72,16 @@ CARD(CentralDefenderCard,
   }),
 });
 
-class CentralDefenderCard : public CentralDefenderCardBase
+class CentralRightCard : public CentralRightCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == (theLibCheck.centralLeave);
+    return theRobotInfo.number == (theLibCheck.rightEnter);
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != (theLibCheck.centralLeave);
+    return theRobotInfo.number != (theLibCheck.rightEnter);
   }
 
   option
@@ -102,7 +107,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       action
       {
-        theSaySkill("Original Card");
+        theSaySkill("Central Defend Change card");
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
         theStandSkill();
       }
@@ -354,7 +359,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
     state(kickRight)
     {
-      //const Angle angleToGoal = calcAngleToGoal();
 
       transition
       {
@@ -378,7 +382,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       state(kickLeft)
     {
-      //const Angle angleToGoal = calcAngleToGoal();
 
       transition
       {
@@ -639,4 +642,4 @@ class CentralDefenderCard : public CentralDefenderCardBase
   } 
 };
 
-MAKE_CARD(CentralDefenderCard);
+MAKE_CARD(CentralRightCard);
