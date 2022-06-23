@@ -45,7 +45,10 @@ void LibCheckProvider::update(LibCheck& libCheck)
   libCheck.OpponentObstacle=isOpponentObstacle();
   libCheck.TeammateSeeingBall=isTeammateSeeingBall();
   libCheck.centralLeave = centralLeave();
-  libCheck.centralEnter = centralEnter();
+  libCheck.leftLeave = leftLeave();
+  libCheck.rightLeave = rightLeave();
+  libCheck.leftEnter = leftEnter();
+  libCheck.rightEnter = rightEnter();
 }
 
 
@@ -158,7 +161,7 @@ bool LibCheckProvider::isLeftAttacking()
 
       if(!teammate.isPenalized){
         // if(teammate.theTeamBehaviorStatus.role.playBall){
-          if(teammate.number==3 && teammate.theRobotPose.translation.x()>= theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number){
+          if(teammate.number==3 && teammate.theRobotPose.translation.x()>= theFieldDimensions.xPosHalfWayLine){
             return true;   //El left supporter està atacando.
         }
       } 
@@ -309,11 +312,38 @@ int LibCheckProvider::centralLeave()
     return 2;
 }
 
-int LibCheckProvider::centralEnter()
+int LibCheckProvider::rightLeave()
 {
-  if(isLeftAttacking() || isRightAttacking())
-    return 2;
+  if(isLeftAttacking())
+    return 6;
   else
+    return 5;
+}
+
+int LibCheckProvider::leftLeave()
+{
+  if(isRightAttacking())
+    return 6;
+  else
+    return 3;
+}
+
+int LibCheckProvider::leftEnter()
+{
+  if(theRobotInfo.number == 2 && isLeftAttacking())
+    return 2;
+  else if (theRobotInfo.number == 3 && isRightAttacking())
+    return 3;
+  else 
     return 6;
 }
 
+int LibCheckProvider::rightEnter()
+{
+  if(theRobotInfo.number == 2 && isRightAttacking())
+    return 2;
+  else if (theRobotInfo.number == 5 && isLeftAttacking())
+    return 5;
+  else 
+    return 6;
+}

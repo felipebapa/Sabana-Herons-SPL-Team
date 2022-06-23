@@ -26,7 +26,7 @@
 #include "Representations/Communication/TeamData.h"
 
 
-CARD(DefenderCard,
+CARD(CentralLeftCard,
 {,
   CALLS(Activity),
   CALLS(InWalkKick),
@@ -72,21 +72,21 @@ CARD(DefenderCard,
   }),
 });
 
-class DefenderCard : public DefenderCardBase
+class CentralLeftCard : public CentralLeftCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == (theLibCheck.centralEnter);
+    return theRobotInfo.number == (theLibCheck.leftEnter);
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != (theLibCheck.centralEnter);
+    return theRobotInfo.number != (theLibCheck.leftEnter);
   }
 
   option
   {
-    theActivitySkill(BehaviorStatus::CentralDefender);
+    theActivitySkill(BehaviorStatus::CentralLeft);
 
     bool hayObstaculoCerca = false;
       if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
@@ -642,4 +642,4 @@ class DefenderCard : public DefenderCardBase
   } 
 };
 
-MAKE_CARD(DefenderCard);
+MAKE_CARD(CentralLeftCard);

@@ -74,12 +74,12 @@ class LeftDefenderCard : public LeftDefenderCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == 3;
+    return theRobotInfo.number == (theLibCheck.leftLeave);
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != 3;
+    return theRobotInfo.number != (theLibCheck.leftLeave);
   }
 
   option
