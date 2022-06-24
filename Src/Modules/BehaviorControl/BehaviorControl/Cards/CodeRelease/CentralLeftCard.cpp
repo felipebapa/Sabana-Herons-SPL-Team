@@ -107,7 +107,7 @@ class CentralLeftCard : public CentralLeftCardBase
 
       action
       {
-        theSaySkill("Central Defend Change card");
+        theSaySkill("Central Left Defend Change card");
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
         theStandSkill();
       }
@@ -126,11 +126,6 @@ class CentralLeftCard : public CentralLeftCardBase
       }  
       action
       {
-        
-        if(theLibCheck.LeftAttacking)
-          theSaySkill("left attack");
-        if(theLibCheck.LeftDefending)
-          theSaySkill("SIUUUUUU");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
