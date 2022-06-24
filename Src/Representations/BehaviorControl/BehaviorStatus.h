@@ -49,7 +49,7 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanMessageParticle<idBehaviorStatus>
   LeftDefender,
   RightDefender,
   CentralLeft,
-  LookAround,
+  CentralRight,
   OpponentKickOffWait,
 	
   });
