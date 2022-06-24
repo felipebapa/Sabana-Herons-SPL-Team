@@ -221,7 +221,7 @@ class StrikerCard : public StrikerCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto giraCabezaDer;
-        if(theFieldBall.positionRelative.norm() < 200.f)
+        if(theFieldBall.positionRelative.norm() < 500.f)
           goto alignToGoal;
         if(!theLibCheck.LeftAttacking)
           goto walkToBall;
@@ -230,7 +230,7 @@ class StrikerCard : public StrikerCardBase
       {
         theLookForwardSkill();
         thePathToTargetSkill(walkSpeed, (0.f, Pose2f(3000, -1500)));
-        if(theRobotPose.translation == Pose2f(3000, -1500))
+        if(2800 < theRobotPose.translation.x() && theRobotPose.translation.x() < 3200 && -1300 > theRobotPose.translation.y() && theRobotPose.translation.y() > -1700)
           theSaySkill("Left pass");
       }
     }
@@ -241,7 +241,7 @@ class StrikerCard : public StrikerCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto giraCabezaDer;
-        if(theFieldBall.positionRelative.norm() < 200.f)
+        if(theFieldBall.positionRelative.norm() < 500.f)
           goto alignToGoal;
         if(!theLibCheck.RightAttacking)
           goto walkToBall;
@@ -250,7 +250,7 @@ class StrikerCard : public StrikerCardBase
       {
         theLookForwardSkill();
         thePathToTargetSkill(walkSpeed, (0.f, Pose2f(3000, 1500)));
-        if(theRobotPose.translation == Pose2f(3000, 1500))
+        if(2800 < theRobotPose.translation.x() && theRobotPose.translation.x() < 3200 && 1300 < theRobotPose.translation.y() && theRobotPose.translation.y() < 1700)
           theSaySkill("right pass");
       }
     }
@@ -269,7 +269,7 @@ class StrikerCard : public StrikerCardBase
       action
       {
         thePathToTargetSkill(walkSpeed,Pose2f(pi,500.f,1000.f));
-        if(theRobotPose.translation == Pose2f(500, 1000))
+        if(theLibCheck.positionToPass)
           theSaySkill("central pass");
       }
     }
