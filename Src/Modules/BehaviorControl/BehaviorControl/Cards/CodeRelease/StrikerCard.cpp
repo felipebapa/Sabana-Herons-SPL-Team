@@ -242,7 +242,7 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theSaySkill("central");
-        thePathToTargetSkill(walkSpeed,Pose2f(pi,500.f,1000.f));
+        thePathToTargetSkill(walkSpeed,Pose2f(pi,2000.f,1000.f));
       }
     }
 
@@ -283,14 +283,16 @@ class StrikerCard : public StrikerCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto giraCabezaDer;
-        if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
+        if(theRobotPose.translation.x() < 1500.f)
+          goto closerToGoal;
+        if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && theRobotPose.translation.x() > 1500.f)
           goto kickAtGoal;
       }
       action
       {
         theSaySkill("behind");
         theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX-20.f, theFieldBall.positionRelative.y() - ballOffsetY));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
         if(theRobotPose.translation.x() < theFieldDimensions.xPosHalfWayLine)
           theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() + 500, 0.f));
       }
@@ -356,6 +358,8 @@ class StrikerCard : public StrikerCardBase
           goto giraCabezaDer;
         if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine)
           goto receiveCentralPass;
+        if(theRobotPose.translation.x() < 1500.f)
+          goto closerToGoal;
       }
       action
       {
@@ -408,6 +412,30 @@ class StrikerCard : public StrikerCardBase
       }
     }
 
+    state(closerToGoal)
+    {
+      bool hayObstaculos = hayObstaculo();
+      const Angle angleToGo = calcAngleToGo();
+
+      transition
+      {
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto giraCabezaDer;
+        if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine)
+          goto receiveCentralPass;
+        if(theRobotPose.translation.x() > 1500)
+          goto alignBehindBall;
+        if(hayObstaculos)
+          goto alignToGoal;
+      }
+      action
+      {
+        theLookForwardSkill();
+        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
+        theWalkToTargetSkill(Pose2f(walkSpeed + 0.2f, walkSpeed + 0.2f, walkSpeed + 0.2f), Pose2f(angleToGo, theFieldBall.positionRelative.x() + 40 - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY/2));
+      }
+    }
+
     state(obsAvoid)
     {  
       transition 
@@ -434,6 +462,11 @@ class StrikerCard : public StrikerCardBase
   Angle calcAngleToGoal() const
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
+  }
+
+  Angle calcAngleToGo() const
+  {
+    return (theRobotPose.inversePose * Vector2f(5000.f,theFieldDimensions.yPosLeftGoal)).angle();
   }
 
   bool hayObstaculo() const
