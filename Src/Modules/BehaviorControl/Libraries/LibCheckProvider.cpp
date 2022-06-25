@@ -35,7 +35,7 @@ void LibCheckProvider::update(LibCheck& libCheck)
   };
   
   libCheck.positionToPass = positionToPass();
-  libCheck.positionToPass = positionToPassLeft();
+  libCheck.positionToPassLeft = positionToPassLeft();
   libCheck.closerToTheBall= isCloserToTheBall();
   libCheck.LeftAttacking= isLeftAttacking();
   libCheck.LeftDefending= isLeftDefending();
@@ -147,7 +147,7 @@ bool LibCheckProvider::positionToPass()
   for(auto const& teammate : theTeamData.teammates)
   {
     if(!teammate.isPenalized){
-      if(teammate.number == 4 && teammate.theRobotPose.translation.x() >= 400 && teammate.theRobotPose.translation.x() < 800)
+      if(teammate.number == 4 && teammate.theRobotPose.translation.x() >= 1500 && teammate.theRobotPose.translation.x() < 2500)
         IsToPass = true;
     }
   }
