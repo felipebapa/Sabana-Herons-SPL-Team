@@ -44,6 +44,8 @@ void LibCheckProvider::update(LibCheck& libCheck)
   libCheck.TeammateObstacleAvoid=isTeammateObstacleAvoid();
   libCheck.OpponentObstacle=isOpponentObstacle();
   libCheck.TeammateSeeingBall=isTeammateSeeingBall();
+  libCheck.TimeToSendMessage=isTimeToSendMessage();
+
 }
 
 
@@ -291,6 +293,16 @@ bool LibCheckProvider::isOpponentObstacle()
 
 
 bool LibCheckProvider::isTeammateSeeingBall()  // Para el kickoff opponent.
+{
+
+      if(theTeamBallModel.velocity.norm()!=0){
+          return true;
+    }
+    return false;
+}
+
+
+bool LibCheckProvider::isTimeToSendMessage()  // Me dice si puedo o no enviar mensajes.
 {
 
       if(theTeamBallModel.velocity.norm()!=0){

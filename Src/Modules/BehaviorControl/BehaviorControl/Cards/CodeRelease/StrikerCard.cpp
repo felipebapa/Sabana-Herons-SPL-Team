@@ -18,6 +18,11 @@
 #include "Tools/Modeling/Obstacle.h"
 #include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/BehaviorControl/Libraries/LibCheck.h"
+#include "Representations/Communication/TeamData.h"
+#include "Modules/Communication/TeamMessageHandler/TeamMessageHandler.h"
+//#include "Representations/Communication/BHumanMessage.h"
+
+
 
 
 CARD(StrikerCard,
@@ -39,6 +44,8 @@ CARD(StrikerCard,
   REQUIRES(RobotInfo),
   REQUIRES(ObstacleModel),
   REQUIRES(LibCheck),
+  REQUIRES(TeamData),
+  //REQUIRES(BHumanMessage),
   
   DEFINES_PARAMETERS(
   {,
@@ -57,6 +64,7 @@ CARD(StrikerCard,
     (Rangef)({20.f, 50.f}) ballOffsetYRange,
     (int)(10) minKickWaitTime,
     (int)(3000) maxKickWaitTime,
+
   }),
 });
 
@@ -107,6 +115,10 @@ class StrikerCard : public StrikerCardBase
       {
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
+       // TeamMessageHandler::sendInterval;
+        
+       
+        
       }
     }
 
@@ -259,6 +271,7 @@ class StrikerCard : public StrikerCardBase
         theLookForwardSkill();
         theLookAtAnglesSkill(1,2);
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+
       }
     }
     state(goToPass)

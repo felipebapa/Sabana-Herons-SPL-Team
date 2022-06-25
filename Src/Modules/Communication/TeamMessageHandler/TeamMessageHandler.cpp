@@ -1,3 +1,4 @@
+
 /**
  * @file TeamMessageHandler.cpp
  *
@@ -7,7 +8,7 @@
 #include "TeamMessageHandler.h"
 #include "Tools/MessageQueue/OutMessage.h"
 #include "Tools/Global.h"
-#include "Platform/Time.h"
+
 
 //#define SITTING_TEST
 //#define SELF_TEST
@@ -16,7 +17,24 @@ MAKE_MODULE(TeamMessageHandler, communication)
 
 void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
 {
+
+
+if(theBallModel.estimate.velocity.norm()!=0){
+
+  TeamMessageHandler::MandarMensaje();
+
+}
+
+if(theBallModel.estimate.velocity.norm()==0){
+
+  TeamMessageHandler::NoMandarMensaje();
+
+}
+  //ASSERT(!(theBallModel.estimate.velocity.norm()!=0));  //Va a dejar mandar mensajes si la velocidad del balòn es igual a 0.
   outputGenerator.theBHumanArbitraryMessage.queue.clear();
+
+
+
 
   outputGenerator.sendThisFrame =
 #ifndef SITTING_TEST
@@ -25,17 +43,30 @@ void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
     !(theMotionInfo.motion == MotionRequest::specialAction && theMotionInfo.specialActionRequest.specialAction == SpecialActionRequest::playDead) &&
 #endif
 #endif // !SITTING_TEST
+
+
     (theFrameInfo.getTimeSince(timeLastSent) >= sendInterval || theFrameInfo.time < timeLastSent);
 
   outputGenerator.generate = [this, &outputGenerator](RoboCup::SPLStandardMessage* const m)
   {
+
     generateMessage(outputGenerator);
     writeMessage(outputGenerator, m);
+      
+
   };
+
+
+
 }
+
 
 void TeamMessageHandler::generateMessage(BHumanMessageOutputGenerator& outputGenerator) const
 {
+
+
+
+  //ASSERT(!(theBallModel.estimate.velocity.norm()!=0));  //Va a dejar mandar mensajes si la velocidad del balòn es igual a 0.
 #define SEND_PARTICLE(particle) \
   the##particle >> outputGenerator
 
@@ -59,6 +90,7 @@ void TeamMessageHandler::generateMessage(BHumanMessageOutputGenerator& outputGen
   SEND_PARTICLE(BNTP);
 
   SEND_PARTICLE(BallModel);
+  
 
   if(sendMirroredRobotPose)
   {
@@ -68,7 +100,7 @@ void TeamMessageHandler::generateMessage(BHumanMessageOutputGenerator& outputGen
     SEND_PARTICLE(MirroredRobotPose);
   }
   else
-    SEND_PARTICLE(RobotPose);
+  SEND_PARTICLE(RobotPose);
 
   SEND_PARTICLE(SideConfidence);
   SEND_PARTICLE(BehaviorStatus);
@@ -88,12 +120,17 @@ void TeamMessageHandler::generateMessage(BHumanMessageOutputGenerator& outputGen
   outputGenerator.theBSPLStandardMessage.numOfDataBytes =
     static_cast<uint16_t>(outputGenerator.theBHumanStandardMessage.sizeOfBHumanMessage()
                           + outputGenerator.theBHumanArbitraryMessage.sizeOfArbitraryMessage());
+
+
 }
 
 void TeamMessageHandler::writeMessage(BHumanMessageOutputGenerator& outputGenerator, RoboCup::SPLStandardMessage* const m) const
 {
-  ASSERT(outputGenerator.sendThisFrame);
 
+
+  //ASSERT(!(theBallModel.estimate.velocity.norm()!=0));  //Va a dejar mandar mensajes si la velocidad del balòn es igual a 0.
+  ASSERT(outputGenerator.sendThisFrame);
+  
   outputGenerator.theMixedTeamHeader.write(reinterpret_cast<void*>(m->data));
   int offset = MixedTeamHeader::sizeOfMixedTeamHeader();
   outputGenerator.theBHumanStandardMessage.write(reinterpret_cast<void*>(m->data + offset));
@@ -117,19 +154,29 @@ void TeamMessageHandler::writeMessage(BHumanMessageOutputGenerator& outputGenera
   ASSERT(sizeOfArbitraryMessage < restBytes);
 
   outputGenerator.theBHumanArbitraryMessage.write(reinterpret_cast<void*>(m->data + offset));
-
+//if((theBallModel.estimate.velocity.norm()!=0)) {
   outputGenerator.theBSPLStandardMessage.numOfDataBytes = static_cast<uint16_t>(offset + sizeOfArbitraryMessage);
   outputGenerator.theBSPLStandardMessage.write(reinterpret_cast<void*>(&m->header[0]));
 
   outputGenerator.sentMessages++;
+
+  //if((theBallModel.estimate.velocity.norm()==0 || theBallModel.timeWhenLastSeen>1)) {
   if(theFrameInfo.getTimeSince(timeLastSent) >= 2 * sendInterval)
     timeLastSent = theFrameInfo.time;
   else
     timeLastSent += sendInterval;
+
+
+    
 }
+//}
+
 
 void TeamMessageHandler::update(TeamData& teamData)
 {
+
+
+ // ASSERT(!(theBallModel.estimate.velocity.norm()!=0));  //Va a dejar mandar mensajes si la velocidad del balòn es igual a 0.
   teamData.generate = [this, &teamData](const RoboCup::SPLStandardMessage* const m)
   {
     if(readSPLStandardMessage(m))
@@ -311,4 +358,19 @@ void TeamMessageHandler::parseMessageIntoBMate(Teammate& currentTeammate)
 
   if(receivedMessageContainer.hasBHumanParts)
     receivedMessageContainer.theBHumanArbitraryMessage.queue.handleAllMessages(currentTeammate);
+  }
+
+
+  void TeamMessageHandler::MandarMensaje()
+  {
+
+    sendInterval = 1000;
+
+  }
+
+    void TeamMessageHandler::NoMandarMensaje()
+  {
+
+    sendInterval = 100000;
+
   }

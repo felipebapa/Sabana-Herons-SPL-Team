@@ -81,6 +81,9 @@ STREAMABLE(Teammate, COMMA public MessageHandler
 
   (RobotHealth) theRobotHealth,
   (TeamTalk) theTeamTalk,
+
+
+    
 });
 
 /**
