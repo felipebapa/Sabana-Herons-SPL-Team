@@ -107,9 +107,9 @@ class StrikerCard : public StrikerCardBase
       {
         if(hayObstaculoCerca)
           goto obsAvoid;
-        if(theLibCheck.LeftAttacking)
+        if(theLibCheck.LeftAttacking && theLibCheck.closerToTheBall != 2)
           goto receiveLeftPass;
-        if(theLibCheck.RightAttacking)
+        if(theLibCheck.RightAttacking && theLibCheck.closerToTheBall != 2)
           goto receiveRightPass;
         if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine)
           goto receiveCentralPass;
@@ -167,9 +167,9 @@ class StrikerCard : public StrikerCardBase
       {
         if(hayObstaculoCerca)
           goto obsAvoid;
-        if(theLibCheck.LeftAttacking)
+        if(theLibCheck.LeftAttacking && theLibCheck.closerToTheBall != 2)
           goto receiveLeftPass;
-        if(theLibCheck.RightAttacking)
+        if(theLibCheck.RightAttacking && theLibCheck.closerToTheBall != 2)
           goto receiveRightPass;
         if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine)
           goto receiveCentralPass;
@@ -194,7 +194,7 @@ class StrikerCard : public StrikerCardBase
           goto obsAvoid;
         if(theFieldBall.positionRelative.norm() < 500.f)
           goto alignToGoal;
-        if(!theLibCheck.LeftAttacking)
+        if(!theLibCheck.LeftAttacking || theLibCheck.closerToTheBall == 4)
           goto walkToBall;
       }
       action
@@ -213,7 +213,7 @@ class StrikerCard : public StrikerCardBase
           goto obsAvoid;
         if(theFieldBall.positionRelative.norm() < 500.f)
           goto alignToGoal;
-        if(!theLibCheck.RightAttacking)
+        if(!theLibCheck.RightAttacking || theLibCheck.closerToTheBall == 4)
           goto walkToBall;
       }
       action
