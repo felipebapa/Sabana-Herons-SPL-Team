@@ -42,7 +42,7 @@ CARD(StrikerCard,
   
   DEFINES_PARAMETERS(
   {,
-    (float)(0.9f) walkSpeed,
+    (float)(0.8f) walkSpeed,
     (int)(1000) initialWaitTime,
     (int)(7000) ballNotSeenTimeout,
     (Angle)(5_deg) ballAlignThreshold,
@@ -111,7 +111,9 @@ class StrikerCard : public StrikerCardBase
           goto receiveLeftPass;
         if(theLibCheck.RightAttacking)
           goto receiveRightPass;
-        if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine)
+        if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine && !theLibCheck.LeftAttacking && !theLibCheck.RightAttacking && theLibCheck.closerToTheBall != 2 )
+          goto goToCenter;
+        if(theLibCheck.closerToTheBall == 2)
           goto receiveCentralPass;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto giraCabezaDer;
@@ -171,8 +173,10 @@ class StrikerCard : public StrikerCardBase
           goto receiveLeftPass;
         if(theLibCheck.RightAttacking)
           goto receiveRightPass;
-        if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine)
+        if(theLibCheck.closerToTheBall == 2)
           goto receiveCentralPass;
+        if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine && !theLibCheck.LeftAttacking && !theLibCheck.RightAttacking && theLibCheck.closerToTheBall != 2 )
+          goto goToCenter;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto giraCabezaDer;
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
@@ -180,9 +184,31 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
-        theSaySkill("walk");
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
+      }
+    }
+
+    state(goToCenter)
+    {
+      transition
+      {
+        if(hayObstaculoCerca)
+          goto obsAvoid;
+        if(theLibCheck.LeftAttacking)
+          goto receiveLeftPass;
+        if(theLibCheck.RightAttacking)
+          goto receiveRightPass;
+        if(theLibCheck.closerToTheBall == 2)
+          goto receiveCentralPass;
+        if(theFieldBall.positionOnField.x() > theFieldDimensions.xPosHalfWayLine && !theLibCheck.LeftAttacking && !theLibCheck.RightAttacking)
+          goto walkToBall;
+      }
+      action
+      {
+        theLookForwardSkill();
+        theSaySkill("middle");
+        thePathToTargetSkill(walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), 2000, 0));
       }
     }
 
@@ -192,16 +218,15 @@ class StrikerCard : public StrikerCardBase
       {
         if(hayObstaculoCerca)
           goto obsAvoid;
-        if(theFieldBall.positionRelative.norm() < 500.f)
+        if(theFieldBall.positionRelative.norm() < 600.f)
           goto alignToGoal;
-        if(!theLibCheck.LeftAttacking)
+        if(!theLibCheck.LeftAttacking || theLibCheck.closerToTheBall == 4)
           goto walkToBall;
       }
       action
       {
-        theSaySkill("left");
         theLookForwardSkill();
-        thePathToTargetSkill(walkSpeed, Pose2f(pi/2, 3000, -1500));
+        thePathToTargetSkill(walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), 3000, -1500));
       }
     }
 
@@ -213,12 +238,11 @@ class StrikerCard : public StrikerCardBase
           goto obsAvoid;
         if(theFieldBall.positionRelative.norm() < 500.f)
           goto alignToGoal;
-        if(!theLibCheck.RightAttacking)
+        if(!theLibCheck.RightAttacking || theLibCheck.closerToTheBall == 4)
           goto walkToBall;
       }
       action
       {
-        theSaySkill("right");
         theLookForwardSkill();
         thePathToTargetSkill(walkSpeed, Pose2f(3*pi/2, 3000, 1500));
       }
@@ -230,19 +254,21 @@ class StrikerCard : public StrikerCardBase
       {
         if(hayObstaculoCerca)
           goto obsAvoid;
-        if(theLibCheck.LeftAttacking && theLibCheck.closerToTheBall != 2)
+        if(theLibCheck.LeftAttacking)
           goto receiveLeftPass;
-        if(theLibCheck.RightAttacking && theLibCheck.closerToTheBall != 2)
+        if(theLibCheck.RightAttacking)
           goto receiveRightPass;
         if(theLibCheck.positionToPass && theFieldBall.positionRelative.norm() < 500.f)
           goto alignToGoal;
         if(theFieldBall.positionRelative.norm() > 500.f && theFieldBall.positionOnField.x() > theFieldDimensions.xPosHalfWayLine)
           goto walkToBall;
+        if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine && !theLibCheck.LeftAttacking && !theLibCheck.RightAttacking && theLibCheck.closerToTheBall != 2 )
+          goto goToCenter;
       }
       action
       {
-        theSaySkill("central");
-        thePathToTargetSkill(walkSpeed,Pose2f(pi,500.f,1000.f));
+        theLookForwardSkill();
+        thePathToTargetSkill(walkSpeed,Pose2f(pi,2000.f,1000.f));
       }
     }
 
@@ -256,14 +282,12 @@ class StrikerCard : public StrikerCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto giraCabezaDer;
-        if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine)
-          goto receiveCentralPass;
-        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && !hayObstaculos)
-          goto alignBehindBall;
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && hayObstaculos && random == 0)
           goto alignRight;
-        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && hayObstaculos && random == 0)
+        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && hayObstaculos && random == 1)
           goto alignLeft;
+        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
+          goto alignBehindBall;
       }
       action
       {
