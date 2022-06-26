@@ -126,7 +126,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
 
       action
       {
-        theSaySkill("ONE");
+        theSaySkill("the left card");
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
         theStandSkill();
 
@@ -624,7 +624,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
     return (theRobotPose.inversePose * Vector2f(5000.f,theFieldDimensions.yPosLeftGoal)).angle();
   }
 
-  bool hayObstaculo() const
+  bool hayObstaculo() 
   {
     bool x = false;
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   

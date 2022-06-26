@@ -137,8 +137,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        // if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold) && !hayObstaculoCerca && !hayObstaculoLejos)
-        //   goto alignToPass;
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold) && !theLibCheck.LeftDefending && !theLibCheck.RightDefending)
           goto alignToGoal;
         if(hayObstaculoCerca)
@@ -583,7 +581,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     return (theRobotPose.inversePose * Vector2f(0.f,0.f)).angle();
   }
 
-  bool hayObstaculo() const
+  bool hayObstaculo()
   {
     bool x = false;
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   

@@ -460,7 +460,7 @@ class StrikerCard : public StrikerCardBase
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
   }
 
-  bool hayObstaculo() const
+  bool hayObstaculo()
   {
     bool x = false;
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
