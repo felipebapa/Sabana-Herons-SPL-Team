@@ -208,7 +208,7 @@ class StrikerCard : public StrikerCardBase
       {
         theLookForwardSkill();
         theSaySkill("middle");
-        thePathToTargetSkill(walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), 2000, 0));
+        thePathToTargetSkill(walkSpeed, Pose2f(pi, 2000, 0));
       }
     }
 
@@ -225,8 +225,9 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSaySkill("left");
         theLookForwardSkill();
-        thePathToTargetSkill(walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), 3000, -1500));
+        thePathToTargetSkill(walkSpeed, Pose2f(pi/2, 3000, -1500));
       }
     }
 
@@ -243,6 +244,7 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSaySkill("right");
         theLookForwardSkill();
         thePathToTargetSkill(walkSpeed, Pose2f(3*pi/2, 3000, 1500));
       }
@@ -267,6 +269,7 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSaySkill("center");
         theLookForwardSkill();
         thePathToTargetSkill(walkSpeed,Pose2f(pi,2000.f,1000.f));
       }
