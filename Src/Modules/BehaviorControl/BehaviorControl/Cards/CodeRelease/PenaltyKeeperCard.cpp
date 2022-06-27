@@ -28,7 +28,7 @@ CARD(PenaltyKeeperCard,
   CALLS(Stand),
   CALLS(Say),
   CALLS(SpecialAction),
-  
+  CALLS(LookAtAngles),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
@@ -88,8 +88,12 @@ class PenaltyKeeperCard : public PenaltyKeeperCardBase
           action
           {
               theSaySkill("Vengase");
-              theLookForwardSkill();
-              //theSpecialActionSkill(SpecialActionRequest::sitDown);
+              //theLookForwardSkill();
+              //theSpecialActionSkill(SpecialActionRequest::standHigh);
+              theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
+
+               
+
           }
       }
       
