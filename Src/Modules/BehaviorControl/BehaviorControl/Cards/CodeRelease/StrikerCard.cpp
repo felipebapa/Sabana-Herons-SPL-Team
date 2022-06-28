@@ -420,6 +420,8 @@ class StrikerCard : public StrikerCardBase
           goto giraCabezaDer;
         if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine)
           goto goToCenter;
+        if(theFieldBall.positionRelative.norm() > 1000.f)
+          goto walkToBall;
       }
       action
       {
