@@ -17,18 +17,18 @@ MAKE_MODULE(TeamMessageHandler, communication)
 void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
 {
 
-if(theBallModel.estimate.velocity.norm()!=0){
+
+
+
+if(theMotionInfo.motion == MotionInfo::kick || theMotionInfo.motion == MotionInfo::specialAction || theBehaviorStatus.activity== BehaviorStatus::initial || theBehaviorStatus.activity== BehaviorStatus::finished || theBehaviorStatus.activity== BehaviorStatus::codeReleasePositionForKickOff){
+
+    TeamMessageHandler::NoMandarMensaje();
+
+}else{
+
+    TeamMessageHandler::MandarMensaje();
 
   
-
-  TeamMessageHandler::MandarMensaje();
-
-}
-
-if(theBallModel.estimate.velocity.norm()==0){
-
-  TeamMessageHandler::NoMandarMensaje();
-
 }
 
 
@@ -332,7 +332,7 @@ void TeamMessageHandler::parseMessageIntoBMate(Teammate& currentTeammate)
     void TeamMessageHandler::MandarMensaje()
   {
 
-    sendInterval = 1000;
+    sendInterval = 5000;
 
   }
 
