@@ -16,6 +16,22 @@ MAKE_MODULE(TeamMessageHandler, communication)
 
 void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
 {
+
+if(theBallModel.estimate.velocity.norm()!=0){
+
+  
+
+  TeamMessageHandler::MandarMensaje();
+
+}
+
+if(theBallModel.estimate.velocity.norm()==0){
+
+  TeamMessageHandler::NoMandarMensaje();
+
+}
+
+
   outputGenerator.theBHumanArbitraryMessage.queue.clear();
 
   outputGenerator.sendThisFrame =
@@ -311,4 +327,18 @@ void TeamMessageHandler::parseMessageIntoBMate(Teammate& currentTeammate)
 
   if(receivedMessageContainer.hasBHumanParts)
     receivedMessageContainer.theBHumanArbitraryMessage.queue.handleAllMessages(currentTeammate);
+  }
+
+    void TeamMessageHandler::MandarMensaje()
+  {
+
+    sendInterval = 1000;
+
+  }
+
+    void TeamMessageHandler::NoMandarMensaje()
+  {
+
+    sendInterval = 100000;
+
   }
