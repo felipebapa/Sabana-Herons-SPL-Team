@@ -95,6 +95,8 @@ class CentralLeftCard : public CentralLeftCardBase
       if (obstacle.center.norm()<400.f)  
           hayObstaculoCerca=true;
       }
+      if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
     }
     initial_state(start)
     {
@@ -595,7 +597,7 @@ class CentralLeftCard : public CentralLeftCardBase
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if(obstacle.center.norm() < 850.f && (obstacle.center.y() < 400 && obstacle.center.y() > -400))
+      if(obstacle.center.norm() < 700.f && (obstacle.center.y() < 400 && obstacle.center.y() > -400))
         x = true;
       }
     }
