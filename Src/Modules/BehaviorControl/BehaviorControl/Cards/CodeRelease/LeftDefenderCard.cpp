@@ -351,6 +351,8 @@ class LeftDefenderCard : public LeftDefenderCardBase
 
       transition
       {
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto GiraCabezaDer; 
         if(theRobotPose.translation.x() >= 2000 || theLibCheck.positionToPassLeft || hayObstaculos)
           goto alignToGoal;          
       }

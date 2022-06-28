@@ -59,6 +59,7 @@ private:
   bool isRightDefending();
   bool positionToPass();
   bool positionToPassLeft();
+  bool positionToPassRight();
   int isTeammateFallenNumber();
   bool isTeammateObstacleAvoid();
   bool isOpponentObstacle();

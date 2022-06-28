@@ -90,6 +90,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
       if (obstacle.center.norm()<400.f)  
           hayObstaculoCerca=true;
       }
+      if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
     }
     initial_state(start)
     {
@@ -230,7 +232,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
-            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));      
+          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));      
       }
     }
     state(alignBehindBallRight)
@@ -278,8 +280,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
       action
       {
         theLookForwardSkill();
-        if(theLibCheck.positionToPass)
-          theSaySkill("avaliable to pass");
         theSaySkill("one");
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 45.f, theFieldBall.positionRelative.y() + ballOffsetY - 200.f));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
@@ -321,8 +321,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
       action
       {
         theSaySkill("home");
-        if(theLibCheck.LeftAttacking)
-          theSaySkill("left attack");
         thePathToTargetSkill(1.0, Defender1Pos);
       }
     }
@@ -495,10 +493,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
       action
       {
         theSaySkill("search");
-        if(theLibCheck.LeftAttacking)
-          theSaySkill("left attack");
-        if(theLibCheck.LeftDefending)
-          theSaySkill("SIUUUUUU");
         theLookForwardSkill();
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
@@ -541,6 +535,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
         
           theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
           theLookAtAnglesSkill(1,2);
+          if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
           //a+=1;   
       }
     } 
@@ -563,6 +559,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
         
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
         theLookAtAnglesSkill(-1,2);
+        if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
     } 
   }
@@ -587,7 +585,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if(obstacle.center.norm() < 850.f && (obstacle.center.y() < 400 && obstacle.center.y() > -400))
+      if(obstacle.center.norm() < 600.f && (obstacle.center.y() < 400 && obstacle.center.y() > -400))
         x = true;
       }
     }
