@@ -121,11 +121,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }  
       action
       {
-        
-        if(theLibCheck.LeftAttacking)
-          theSaySkill("left attack");
-        if(theLibCheck.LeftDefending)
-          theSaySkill("SIUUUUUU");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
@@ -142,8 +137,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        // if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold) && !hayObstaculoCerca && !hayObstaculoLejos)
-        //   goto alignToPass;
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold) && !theLibCheck.LeftDefending && !theLibCheck.RightDefending)
           goto alignToGoal;
         if(hayObstaculoCerca)
@@ -153,10 +146,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
       action
       {
         
-        if(theLibCheck.LeftAttacking)
-          theSaySkill("left attack");
-        if(theLibCheck.LeftDefending)
-          theSaySkill("SIUUUUUU");
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
@@ -181,11 +170,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }    
       action
       {
-        
-        if(theLibCheck.LeftAttacking)
-          theSaySkill("left attack");
-        if(theLibCheck.LeftDefending)
-          theSaySkill("SIUUUUUU");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
@@ -209,11 +193,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       action
       {
-        
-        if(theLibCheck.LeftAttacking)
-          theSaySkill("left attack");
-        if(theLibCheck.LeftDefending)
-          theSaySkill("SIUUUUUU");
+
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
@@ -223,6 +203,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
     state(alignToGoal)
     {
+      bool hayObstaculos = hayObstaculo();
       const Angle angleToGoal = calcAngleToGoal();
       int random = randomNum();
 
@@ -232,18 +213,18 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && random == 0)
+        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && random == 0 && hayObstaculos)
           goto alignBehindBallRight; 
-        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && random == 1)
+        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && random == 1 && hayObstaculos)
           goto alignBehindBallLeft; 
+        if(!hayObstaculos && theLibCheck.positionToPass)
+          goto alignToPass; 
+        if(!hayObstaculos && !theLibCheck.positionToPass)
+          goto alignToClearance;  
       }
 
       action
       {
-        if(theLibCheck.LeftAttacking)
-          theSaySkill("left attack");
-        if(theLibCheck.LeftDefending)
-          theSaySkill("SIUUUUUU");
         theSaySkill("Align Goal");
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
@@ -266,10 +247,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto GiraCabezaDer; 
         if(!theFieldBall.ballWasSeen(300))
           goto kickRight;
-        if(!hayObstaculos && theLibCheck.positionToPass)
-          goto alignToPass;
-        if(!hayObstaculos && !theLibCheck.positionToPass)  
-          goto alignToClearance;
       }
 
       action
@@ -296,15 +273,13 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto GiraCabezaDer;  
         if(!theFieldBall.ballWasSeen(300))
           goto kickLeft;  
-        if(!hayObstaculos && theLibCheck.positionToPass)
-          goto alignToPass;
-        if(!hayObstaculos && !theLibCheck.positionToPass)  
-          goto alignToClearance;
-      }
+        }
 
       action
       {
         theLookForwardSkill();
+        if(theLibCheck.positionToPass)
+          theSaySkill("avaliable to pass");
         theSaySkill("one");
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 45.f, theFieldBall.positionRelative.y() + ballOffsetY - 200.f));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
@@ -418,10 +393,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
       action
       {
         theSaySkill("pass");
-        // if(theLibCheck.positionToPass)
-        //   theSaySkill("Yes");
-        // else
-        //   theSaySkill("No");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theKickSkill((KickRequest::kickForward), true,0.2f, false);
@@ -443,7 +414,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(std::abs(angleToTeammate) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
-          goto alignBehindBallToPass;
+          goto alignBehindBallToPass; 
         if(hayObstaculos)
           goto alignToGoal;
       }
@@ -451,14 +422,9 @@ class CentralDefenderCard : public CentralDefenderCardBase
       action
       {
         theSaySkill("Align Pass");
-        theLookForwardSkill();
+        theLookForwardSkill();  
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
-        if(theLibCheck.positionToPass)
-          theSaySkill("to striker");
-          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToTeammate, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
-        if(!theLibCheck.positionToPass)
-          theSaySkill("clearance");
-          theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToClearance, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToTeammate, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
@@ -477,6 +443,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto GiraCabezaDer; 
         if(std::abs(angleToClearance) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
           goto alignBehindBallToClearance;
+        if(!hayObstaculos && theLibCheck.positionToPass)
+          goto alignToPass;  
         if(hayObstaculos)
           goto alignToGoal;
       }
@@ -605,7 +573,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
   Angle calcAngleToTeammate() const
   {
-    return (theRobotPose.inversePose * Vector2f(500.f,1000.f)).angle();
+    return (theRobotPose.inversePose * Vector2f(2000.f,1000.f)).angle();
   }
 
   Angle calcAngleClearance() const
@@ -613,7 +581,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     return (theRobotPose.inversePose * Vector2f(0.f,0.f)).angle();
   }
 
-  bool hayObstaculo() const
+  bool hayObstaculo()
   {
     bool x = false;
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   

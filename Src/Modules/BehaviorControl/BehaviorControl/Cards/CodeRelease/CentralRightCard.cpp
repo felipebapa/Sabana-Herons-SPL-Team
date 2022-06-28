@@ -54,7 +54,7 @@ CARD(CentralRightCard,
     (float)(0.8f) walkSpeed,
     (int)(500) initialWaitTime,
     (int)(4000) ballNotSeenTimeout,
-    (Pose2f)(Pose2f(0,-3000,0)) Defender1Pos,
+    (Pose2f)(Pose2f(0,-3000,-1000)) Defender1Pos,
     (Angle)(5_deg) ballAlignThreshold,
     (float)(500.f) ballNearThreshold,
     (Angle)(10_deg) angleToGoalThreshold,
@@ -101,13 +101,12 @@ class CentralRightCard : public CentralRightCardBase
       transition
       {
         if(state_time > initialWaitTime)
-          goto turnToBall;
-
+          goto goBackHome;
       }
 
       action
       {
-        theSaySkill("Central Defend Change card");
+        theSaySkill("Central Defend Right Change card");
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
         theStandSkill();
       }
@@ -126,11 +125,6 @@ class CentralRightCard : public CentralRightCardBase
       }  
       action
       {
-        
-        if(theLibCheck.LeftAttacking)
-          theSaySkill("left attack");
-        if(theLibCheck.LeftDefending)
-          theSaySkill("SIUUUUUU");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
@@ -350,9 +344,6 @@ class CentralRightCard : public CentralRightCardBase
       }
       action
       {
-        theSaySkill("home");
-        if(theLibCheck.LeftAttacking)
-          theSaySkill("left attack");
         thePathToTargetSkill(1.0, Defender1Pos);
       }
     }
@@ -529,11 +520,6 @@ class CentralRightCard : public CentralRightCardBase
 
       action
       {
-        theSaySkill("search");
-        if(theLibCheck.LeftAttacking)
-          theSaySkill("left attack");
-        if(theLibCheck.LeftDefending)
-          theSaySkill("SIUUUUUU");
         theLookForwardSkill();
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
@@ -616,7 +602,7 @@ class CentralRightCard : public CentralRightCardBase
     return (theRobotPose.inversePose * Vector2f(0.f,0.f)).angle();
   }
 
-  bool hayObstaculo() const
+  bool hayObstaculo() 
   {
     bool x = false;
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   

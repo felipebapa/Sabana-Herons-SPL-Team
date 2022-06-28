@@ -35,6 +35,7 @@ void LibCheckProvider::update(LibCheck& libCheck)
   };
   
   libCheck.positionToPass = positionToPass();
+  libCheck.positionToPassLeft = positionToPassLeft();
   libCheck.closerToTheBall= isCloserToTheBall();
   libCheck.LeftAttacking= isLeftAttacking();
   libCheck.LeftDefending= isLeftDefending();
@@ -146,7 +147,20 @@ bool LibCheckProvider::positionToPass()
   for(auto const& teammate : theTeamData.teammates)
   {
     if(!teammate.isPenalized){
-      if(teammate.number == 4 && teammate.theRobotPose.translation.x() >= 400 && teammate.theRobotPose.translation.x() < 600)
+      if(teammate.number == 4 && teammate.theRobotPose.translation.x() >= 1500 && teammate.theRobotPose.translation.x() < 2500)
+        IsToPass = true;
+    }
+  }
+
+  return IsToPass;
+}
+bool LibCheckProvider::positionToPassLeft()
+{
+  bool IsToPass = false;
+  for(auto const& teammate : theTeamData.teammates)
+  {
+    if(!teammate.isPenalized){
+      if(teammate.number == 4 && teammate.theRobotPose.translation.x() >= 2500 && teammate.theRobotPose.translation.x() < 3500)
         IsToPass = true;
     }
   }
@@ -221,7 +235,7 @@ bool LibCheckProvider::isRightAttacking()
 
       if(!teammate.isPenalized){
         // if(teammate.theTeamBehaviorStatus.role.playBall)
-          if(teammate.number==5 && teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number)
+          if(teammate.number==5 && teammate.theRobotPose.translation.x()>=theFieldDimensions.xPosHalfWayLine)
             return true;   //El Right supporter està atacando.
         }
     }
