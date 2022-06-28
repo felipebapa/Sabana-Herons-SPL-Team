@@ -239,7 +239,7 @@ class RightDefenderCard : public RightDefenderCardBase
           goto alignBehindBallRight;  
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && hayObstaculos && random == 1) 
           goto alignBehindBallLeft;
-        if(!hayObstaculos && !theLibCheck.positionToPassLeft && theRobotPose.translation.x() < 2000)
+        if(!hayObstaculos && !theLibCheck.positionToPassRight && theRobotPose.translation.x() < 2000)
           goto alignToPass;  
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && !hayObstaculoCerca)
           goto alignBehindBall;
@@ -342,7 +342,7 @@ class RightDefenderCard : public RightDefenderCardBase
 
       transition
       {
-        if(theRobotPose.translation.x() >= 2000 || theLibCheck.positionToPassLeft || hayObstaculos)
+        if(theRobotPose.translation.x() >= 2000 || theLibCheck.positionToPassRight || hayObstaculos)
           goto alignToGoal;
       }
       action
