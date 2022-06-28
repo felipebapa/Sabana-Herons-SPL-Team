@@ -27,7 +27,7 @@ if(theBallModel.estimate.velocity.norm()!=0){
 
 if(theBallModel.estimate.velocity.norm()==0){
 
-  TeamMessageHandler::NoMandarMensaje();
+  TeamMessageHandler::MandarMensaje();
 
 }
 

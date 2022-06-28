@@ -250,8 +250,6 @@ class StrikerCard : public StrikerCardBase
           goto walkToBall;
         if(theFieldBall.positionRelative.norm() < 500.f)
           goto alignToGoal;
-        if(theRobotPose.translation.x() > 2700 && theRobotPose.translation.x() < 3300 && theRobotPose.translation.y() > -1800 && theRobotPose.translation.y() < -1200)
-          goto giraCabezaDer;
         if(theLibCheck.closerToTheBall == 2 && !theLibCheck.LeftAttacking)
           goto receiveCentralPass;
       }
@@ -272,8 +270,6 @@ class StrikerCard : public StrikerCardBase
           goto walkToBall;
         if(theFieldBall.positionRelative.norm() < 500.f)
           goto alignToGoal;
-        if(theRobotPose.translation.x() > 2700 && theRobotPose.translation.x() < 3300 && theRobotPose.translation.y() > 1200 && theRobotPose.translation.y() < 1800)
-          goto turnToBall;
         if(theLibCheck.closerToTheBall == 2 && !theLibCheck.RightAttacking)
           goto receiveCentralPass;
       }
@@ -294,8 +290,6 @@ class StrikerCard : public StrikerCardBase
           goto receiveLeftPass;
         if(theLibCheck.closerToTheBall == 5)
           goto receiveRightPass;
-        if(theLibCheck.positionToPass)  
-          goto turnToBall;
         if(theFieldBall.positionRelative.norm() < 500.f)
           goto alignToGoal;
         if(theFieldBall.positionRelative.norm() > 500.f && theFieldBall.positionOnField.x() > theFieldDimensions.xPosHalfWayLine)
