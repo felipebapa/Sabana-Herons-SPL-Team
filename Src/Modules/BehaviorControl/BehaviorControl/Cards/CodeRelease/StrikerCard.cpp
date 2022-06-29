@@ -33,6 +33,7 @@ CARD(StrikerCard,
   CALLS(PathToTarget),
   CALLS(LookAtAngles),
   CALLS(KeyFrameArms),
+  CALLS(SpecialAction),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
@@ -266,6 +267,7 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theLookForwardSkill();
         thePathToTargetSkill(walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), 3000, -1500));
       }
@@ -286,6 +288,7 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theLookForwardSkill();
         thePathToTargetSkill(walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), 3000, 1500));
       }
@@ -310,6 +313,7 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theLookForwardSkill();
         thePathToTargetSkill(walkSpeed,Pose2f(theFieldBall.positionRelative.angle(),2000.f,1000.f));
       }

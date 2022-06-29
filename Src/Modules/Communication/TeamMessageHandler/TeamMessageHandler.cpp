@@ -17,20 +17,16 @@ MAKE_MODULE(TeamMessageHandler, communication)
 void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
 {
 
-if(theMotionInfo.motion == MotionInfo::kick || 
-theBehaviorStatus.activity== BehaviorStatus::initial || theBehaviorStatus.activity== BehaviorStatus::finished || 
-theBehaviorStatus.activity== BehaviorStatus::codeReleasePositionForKickOff || theBehaviorStatus.activity== BehaviorStatus::set){
-
-
-    TeamMessageHandler::NoMandarMensaje();
+if(theMotionInfo.motion == MotionInfo::specialAction){
+    TeamMessageHandler::MandarMensaje();
 
 }else if(theRawGameInfo.setPlay == SET_PLAY_KICK_IN){
 
     TeamMessageHandler::MensajeSporadico();
 
-}else if(theMotionInfo.motion == MotionInfo::specialAction){
+}else{
 
-    TeamMessageHandler::MandarMensaje();
+    TeamMessageHandler::NoMandarMensaje();
  
 }
 
