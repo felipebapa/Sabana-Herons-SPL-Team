@@ -61,4 +61,8 @@ STREAMABLE(LibCheck,
   (int)(5) rightLeave,
   (int)(6) leftEnter,
   (int)(6) rightEnter,
+  (bool)(false) centralPenalized,
+  (bool)(false) leftPenalized,
+  (bool)(false) rightPenalized,
+  (int)(0) howManyPenalized,
 });
