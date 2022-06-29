@@ -14,7 +14,6 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
-
 #include "Representations/Communication/RobotInfo.h"
 
 CARD(KeeperCard,
@@ -80,9 +79,6 @@ class KeeperCard : public KeeperCardBase
   option
   {
     theActivitySkill(BehaviorStatus::Keeper);
-    
-
-
     initial_state(start)
     {
       transition

@@ -351,7 +351,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(theRobotPose.translation.x() >= 2000 || theLibCheck.positionToPassRight || hayObstaculos)
+        if(theRobotPose.translation.x() >= 2500 || theLibCheck.positionToPassRight || hayObstaculos)
           goto alignToGoal;          
       }
       action
