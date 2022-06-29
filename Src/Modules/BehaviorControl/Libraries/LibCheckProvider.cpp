@@ -178,7 +178,7 @@ bool LibCheckProvider::positionToPassRight()
   for(auto const& teammate : theTeamData.teammates)
   {
     if(!teammate.isPenalized){
-      if(teammate.number == 4 && teammate.theRobotPose.translation.x() >= 2500 && teammate.theRobotPose.translation.x() < 3500 && teammate.theRobotPose.translation.y() >= -1000 && teammate.theRobotPose.translation.y() < -2000)
+      if(teammate.number == 4 && teammate.theRobotPose.translation.x() >= 2500 && teammate.theRobotPose.translation.x() < 3500 && teammate.theRobotPose.translation.y() <= -1000 && teammate.theRobotPose.translation.y() > -2000)
         IsToPass = true;
     }
   }
