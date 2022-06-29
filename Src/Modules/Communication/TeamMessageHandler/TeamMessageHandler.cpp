@@ -17,9 +17,7 @@ MAKE_MODULE(TeamMessageHandler, communication)
 void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
 {
 
-
-
-if(theMotionInfo.motion == MotionInfo::kick || theMotionInfo.motion == MotionInfo::specialAction || 
+if(theMotionInfo.motion == MotionInfo::kick || 
 theBehaviorStatus.activity== BehaviorStatus::initial || theBehaviorStatus.activity== BehaviorStatus::finished || 
 theBehaviorStatus.activity== BehaviorStatus::codeReleasePositionForKickOff || theBehaviorStatus.activity== BehaviorStatus::set){
 
@@ -30,7 +28,7 @@ theBehaviorStatus.activity== BehaviorStatus::codeReleasePositionForKickOff || th
 
     TeamMessageHandler::MensajeSporadico();
 
-}else{
+}else if(theMotionInfo.motion == MotionInfo::specialAction){
 
     TeamMessageHandler::MandarMensaje();
  

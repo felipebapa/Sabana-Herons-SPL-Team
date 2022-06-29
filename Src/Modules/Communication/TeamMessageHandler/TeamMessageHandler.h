@@ -31,16 +31,18 @@
 #include "Representations/Communication/BHumanMessage.h"
 #include "Representations/Communication/TeamData.h"
 #include "Tools/Communication/BNTP.h"
-//#include "Representations/Communication/GameInfo.h"
+
 
 MODULE(TeamMessageHandler,
 {,
   // v- using for calculations
   REQUIRES(FrameInfo),
   REQUIRES(MotionInfo),
+
   USES(OwnTeamInfo),
   USES(MotionRequest),
-  //REQUIRES(GameInfo),
+
+
 
   // v- using for teamout
   REQUIRES(FallDownState),
