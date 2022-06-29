@@ -148,7 +148,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       action
       {
         
-        theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
+        theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
@@ -187,7 +187,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(theFieldBall.positionRelative.norm() < 3000.0f && !hayObstaculoCerca && !theLibCheck.LeftDefending && !theLibCheck.RightDefending)
+        if(theFieldBall.positionRelative.norm() < 3000.0f && !hayObstaculoCerca && !theLibCheck.LeftDefending && !theLibCheck.RightDefending && theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine)
           goto walkToBall;  
         if(hayObstaculoCerca)
           goto ObsAvoid;
@@ -585,7 +585,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if(obstacle.center.norm() < 600.f && (obstacle.center.y() < 400 && obstacle.center.y() > -400))
+      if(obstacle.center.norm() < 600.f && (obstacle.center.y() < 100 && obstacle.center.y() > -100))
         x = true;
       }
     }
