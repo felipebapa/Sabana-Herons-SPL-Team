@@ -49,7 +49,7 @@ CARD(LeftDefenderCard,
   REQUIRES(LibCheck),
   DEFINES_PARAMETERS(
   {,
-    (float)(0.8f) walkSpeed,
+    (float)(1.0f) walkSpeed,
     (int)(500) initialWaitTime,
     (int)(4000) ballNotSeenTimeout,
     (Pose2f)(Pose2f(0,-2500,1500)) Defender1Pos,

@@ -42,7 +42,7 @@ CARD(StrikerCard,
   
   DEFINES_PARAMETERS(
   {,
-    (float)(0.8f) walkSpeed,
+    (float)(1.0f) walkSpeed,
     (int)(1000) initialWaitTime,
     (int)(7000) ballNotSeenTimeout,
     (Angle)(5_deg) ballAlignThreshold,
@@ -177,7 +177,7 @@ class StrikerCard : public StrikerCardBase
           goto receiveCentralPass;
         if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine - 300 && !theLibCheck.LeftAttacking && !theLibCheck.RightAttacking && theLibCheck.closerToTheBall != 2 )
           goto goToCenter;
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+        if(!theFieldBall.ballWasSeen(6000))
           goto giraCabezaDer;
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
           goto alignToGoal;
@@ -248,7 +248,7 @@ class StrikerCard : public StrikerCardBase
           goto obsAvoid;
         if(!theLibCheck.LeftAttacking || theLibCheck.closerToTheBall == 4)
           goto walkToBall;
-        if(theFieldBall.positionRelative.norm() < 500.f)
+        if(theFieldBall.positionRelative.norm() < 400.f)
           goto alignToGoal;
         if(theLibCheck.closerToTheBall == 2 && !theLibCheck.LeftAttacking)
           goto receiveCentralPass;
@@ -268,7 +268,7 @@ class StrikerCard : public StrikerCardBase
           goto obsAvoid;
         if(!theLibCheck.RightAttacking || theLibCheck.closerToTheBall == 4)
           goto walkToBall;
-        if(theFieldBall.positionRelative.norm() < 500.f)
+        if(theFieldBall.positionRelative.norm() < 400.f)
           goto alignToGoal;
         if(theLibCheck.closerToTheBall == 2 && !theLibCheck.RightAttacking)
           goto receiveCentralPass;
@@ -290,9 +290,9 @@ class StrikerCard : public StrikerCardBase
           goto receiveLeftPass;
         if(theLibCheck.closerToTheBall == 5)
           goto receiveRightPass;
-        if(theFieldBall.positionRelative.norm() < 500.f)
+        if(theFieldBall.positionRelative.norm() < 400.f)
           goto alignToGoal;
-        if(theFieldBall.positionRelative.norm() > 500.f && theFieldBall.positionOnField.x() > theFieldDimensions.xPosHalfWayLine)
+        if(theFieldBall.positionRelative.norm() >= 400.f && theFieldBall.positionOnField.x() > theFieldDimensions.xPosHalfWayLine)
           goto walkToBall;
         if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine - 300 && !theLibCheck.LeftAttacking && !theLibCheck.RightAttacking && theLibCheck.closerToTheBall != 2 )
           goto goToCenter;
