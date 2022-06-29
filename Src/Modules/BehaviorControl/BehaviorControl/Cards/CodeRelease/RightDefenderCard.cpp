@@ -373,7 +373,9 @@ class RightDefenderCard : public RightDefenderCardBase
       }
     }
     state(kick)
-    {     
+    {
+      const Angle angleToGoal = calcAngleToGoal();  
+
       transition
       {
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
@@ -385,6 +387,10 @@ class RightDefenderCard : public RightDefenderCardBase
         theSaySkill("kick");
         theLookForwardSkill();
         theKickSkill((KickRequest::kickForward), true, 0.3f, false);
+        if(theRobotPose.translation.x() >= 2500 && theRobotPose.translation.x() < theFieldDimensions.xPosOpponentPenaltyMark - 500.f)
+          theKickSkill((KickRequest::kickForward), true, 0.3f, false);
+        if(theRobotPose.translation.x() >= theFieldDimensions.xPosOpponentPenaltyMark -500.f)  
+          theInWalkKickSkill(WalkKickVariant(WalkKicks::forwardOLD, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
     state(kickRight)
@@ -609,7 +615,7 @@ class RightDefenderCard : public RightDefenderCardBase
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if(obstacle.center.norm() < 700.f && (obstacle.center.y() < 400 && obstacle.center.y() > -400))
+      if(obstacle.center.norm() < 700.f && (obstacle.center.y() < 100 && obstacle.center.y() > -100))
         x = true;
       }
     }
