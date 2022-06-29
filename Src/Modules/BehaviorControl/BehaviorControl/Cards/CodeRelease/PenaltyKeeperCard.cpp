@@ -72,8 +72,7 @@ class PenaltyKeeperCard : public PenaltyKeeperCardBase
           {
               theLookForwardSkill();
           }
-      }
-      
+      }    
       state(searchForBall)
       {
           transition
@@ -90,13 +89,10 @@ class PenaltyKeeperCard : public PenaltyKeeperCardBase
               theSaySkill("Vengase");
               //theLookForwardSkill();
               //theSpecialActionSkill(SpecialActionRequest::standHigh);
+              theSpecialActionSkill(SpecialActionRequest::sitDownNew);
               theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
-
-               
-
           }
-      }
-      
+      }     
       state(rightDive)
       {
           transition
@@ -109,7 +105,6 @@ class PenaltyKeeperCard : public PenaltyKeeperCardBase
           }
 
       }
-
       state(leftDive)
       {
           transition
@@ -134,9 +129,7 @@ class PenaltyKeeperCard : public PenaltyKeeperCardBase
           }
 
       }
-
-    }
-    
+    }  
     Angle calcAngleToGoal() const
     {
         return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();

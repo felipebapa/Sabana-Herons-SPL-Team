@@ -51,6 +51,10 @@ void LibCheckProvider::update(LibCheck& libCheck)
   libCheck.rightLeave = rightLeave();
   libCheck.leftEnter = leftEnter();
   libCheck.rightEnter = rightEnter();
+  libCheck.centralPenalized = isCentralPenalized();
+  libCheck.rightPenalized = isRightPenalized();
+  libCheck.leftPenalized = isLeftPenalized();
+  libCheck.howManyPenalized = howManyPenalized();
 }
 
 
@@ -323,30 +327,62 @@ bool LibCheckProvider::isTeammateSeeingBall()  // Para el kickoff opponent.
     return false;
 }
 
-int LibCheckProvider::centralLeave()
+bool LibCheckProvider::isCentralPenalized()
 {
-  int howManyPenalized = 0;
-  bool isCentralPenalized = false;
-  bool isLeftPenalized = false;
-  bool isRightPenalized = false;
+  bool isPenalized = false;
+
+  for(auto const& teammate : theTeamData.teammates)
+  {
+    if(teammate.isPenalized && teammate.number == 2)
+      isPenalized = true;
+  }
+  return isPenalized;
+}
+
+bool LibCheckProvider::isLeftPenalized()
+{
+  bool isPenalized = false;
+
+  for(auto const& teammate : theTeamData.teammates)
+  {
+    if(teammate.isPenalized && teammate.number == 3)
+      isPenalized = true;
+  }
+  return isPenalized;
+}
+
+bool LibCheckProvider::isRightPenalized()
+{
+  bool isPenalized = false;
+
+  for(auto const& teammate : theTeamData.teammates)
+  {
+    if(teammate.isPenalized && teammate.number == 5)
+      isPenalized = true;
+  }
+  return isPenalized;
+}
+
+int LibCheckProvider::howManyPenalized()
+{
+  int counter = 0;
 
   for(auto const& teammate : theTeamData.teammates)
   {
     if(teammate.isPenalized)
-      howManyPenalized += 1;
-    if(teammate.isPenalized && teammate.number == 2)
-      isCentralPenalized = true;
-    if(teammate.isPenalized && teammate.number == 3)
-      isLeftPenalized = true;
-    if(teammate.isPenalized && teammate.number == 5)
-      isRightPenalized = true;
+      counter += 1;
   }
 
-  if(isLeftAttacking() || isRightAttacking() || howManyPenalized == 1)
+  return counter;
+}
+
+int LibCheckProvider::centralLeave()
+{
+  if(isLeftAttacking() || isRightAttacking() || (howManyPenalized() == 1 && !isCentralPenalized()))
     return 6;
-  else if(isCentralPenalized && isLeftPenalized)
+  else if(isCentralPenalized() && isLeftPenalized())
     return 5;
-  else if(isCentralPenalized && isRightPenalized)
+  else if(isCentralPenalized() && isRightPenalized())
     return 3;
   else
     return 2;
@@ -354,15 +390,7 @@ int LibCheckProvider::centralLeave()
 
 int LibCheckProvider::rightLeave()
 {
-  bool someonePenalized = false;
-
-  for(auto const& teammate : theTeamData.teammates)
-  {
-    if(teammate.isPenalized)
-      someonePenalized = true;
-  }
-
-  if(isLeftAttacking() || someonePenalized)
+  if(isLeftAttacking() || (howManyPenalized() != 0 && !isRightPenalized()))
     return 6;
   else
     return 5;
@@ -370,37 +398,17 @@ int LibCheckProvider::rightLeave()
 
 int LibCheckProvider::leftLeave()
 {
-  bool someonePenalized = false;
-
-  for(auto const& teammate : theTeamData.teammates)
-  {
-    if(teammate.isPenalized)
-      someonePenalized = true;
-  }
-
-  if(isRightAttacking() || someonePenalized)
+  if(isRightAttacking() || (howManyPenalized() != 0 && !isLeftPenalized()))
     return 6;
-  else
+  else 
     return 3;
-  
 }
 
 int LibCheckProvider::leftEnter()
 {
-  int teammatePenalized = 0;
-  int howManyPenalized = 0;
-
-  for(auto const& teammate : theTeamData.teammates)
-  {
-    if(teammate.isPenalized)
-      howManyPenalized += 1;
-    if(howManyPenalized == 1)
-      teammatePenalized = teammate.number;
-  }
-
-    if((teammatePenalized == 3) || (theRobotInfo.number == 2 && isLeftAttacking()))
+    if((theRobotInfo.number == 2 && isLeftPenalized()) || (theRobotInfo.number == 2 && isLeftAttacking()))
       return 2;
-    else if ((teammatePenalized == 2) || (teammatePenalized == 5) || (theRobotInfo.number == 3 && isRightAttacking()))
+    else if ((theRobotInfo.number == 3 && isCentralPenalized()) || (theRobotInfo.number == 3 && isRightPenalized()) || (theRobotInfo.number == 3 && isRightAttacking()))
       return 3;
     else 
       return 6;
@@ -408,20 +416,9 @@ int LibCheckProvider::leftEnter()
 
 int LibCheckProvider::rightEnter()
 {
-  int teammatePenalized = 0;
-  int howManyPenalized = 0;
-
-  for(auto const& teammate : theTeamData.teammates)
-  {
-    if(teammate.isPenalized)
-      howManyPenalized += 1;
-    if(howManyPenalized == 1)
-      teammatePenalized = teammate.number;
-  }
-
-    if((teammatePenalized == 5) || (theRobotInfo.number == 2 && isRightAttacking()))
+    if((theRobotInfo.number == 2 && isRightPenalized()) || (theRobotInfo.number == 2 && isRightAttacking()))
       return 2;
-    else if ((teammatePenalized == 2) || (teammatePenalized == 3) || (theRobotInfo.number == 5 && isLeftAttacking()))
+    else if ((theRobotInfo.number == 5 && isCentralPenalized()) || (theRobotInfo.number == 5 && isLeftPenalized()) || (theRobotInfo.number == 5 && isLeftAttacking()))
       return 5;
     else 
       return 6;

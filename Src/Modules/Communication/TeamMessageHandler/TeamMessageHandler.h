@@ -119,6 +119,7 @@ private:
   void maintainBMateList(TeamData& teamData) const;
   void MandarMensaje();
   void NoMandarMensaje();
+  void MensajeSporadico();
 
   unsigned timeWhenLastMimimi = 0;
   bool readSPLStandardMessage(const RoboCup::SPLStandardMessage* const m);

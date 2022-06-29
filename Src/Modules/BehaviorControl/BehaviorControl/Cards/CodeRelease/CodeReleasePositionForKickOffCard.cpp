@@ -58,7 +58,7 @@ class CodeReleasePositionForKickOffCard : public CodeReleasePositionForKickOffCa
       if((theRobotPose.translation - KeeperPos.translation).norm() > StopThreshold)
       {
         theSaySkill("ONE");
-        thePathToTargetSkill(0.6f, KeeperPos);
+        thePathToTargetSkill(0.9f, KeeperPos);
       }
       else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
       {
@@ -73,7 +73,7 @@ class CodeReleasePositionForKickOffCard : public CodeReleasePositionForKickOffCa
     {
       if((theRobotPose.translation - Defender1Pos.translation).norm() > StopThreshold)
       {
-        thePathToTargetSkill(0.6f, Defender1Pos);
+        thePathToTargetSkill(0.9f, Defender1Pos);
       }
       else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
       {
@@ -88,7 +88,7 @@ class CodeReleasePositionForKickOffCard : public CodeReleasePositionForKickOffCa
     {
       if((theRobotPose.translation - Defender2Pos.translation).norm() > StopThreshold)
       {
-        thePathToTargetSkill(0.6f, Defender2Pos);
+        thePathToTargetSkill(0.9f, Defender2Pos);
       }
       else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
       {
@@ -103,7 +103,7 @@ class CodeReleasePositionForKickOffCard : public CodeReleasePositionForKickOffCa
     {
       if((theRobotPose.translation - Defender3Pos.translation).norm() > StopThreshold)
       {
-        thePathToTargetSkill(0.6f, Defender3Pos);
+        thePathToTargetSkill(0.9f, Defender3Pos);
       }
       else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
       {
@@ -118,7 +118,7 @@ class CodeReleasePositionForKickOffCard : public CodeReleasePositionForKickOffCa
     {
       if((theRobotPose.translation - StrikerPos.translation).norm() > StopThreshold)
       {
-        thePathToTargetSkill(0.6f, StrikerPos);
+        thePathToTargetSkill(0.9f, StrikerPos);
       }
       else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
       {
