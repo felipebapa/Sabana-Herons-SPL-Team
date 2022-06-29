@@ -18,6 +18,8 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Modeling/ObstacleModel.h"
+#include "Representations/Modeling/TeamBallModel.h"
+
 
 #include <string>
 
@@ -40,6 +42,7 @@ CARD(KickInCard,
   REQUIRES(GameInfo),
   REQUIRES(OwnTeamInfo),
   REQUIRES(ObstacleModel),
+  REQUIRES(TeamBallModel),
   
   DEFINES_PARAMETERS(
   {,
@@ -87,6 +90,7 @@ class KickInCard : public KickInCardBase
           {
               theLookForwardSkill();
               theStandSkill();
+              
           }
       }
       

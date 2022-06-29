@@ -80,6 +80,9 @@ class KeeperCard : public KeeperCardBase
   option
   {
     theActivitySkill(BehaviorStatus::Keeper);
+    
+
+
     initial_state(start)
     {
       transition

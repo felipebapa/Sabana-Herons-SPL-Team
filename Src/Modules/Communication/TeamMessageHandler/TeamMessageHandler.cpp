@@ -19,8 +19,10 @@ void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
 
 
 
+if(theMotionInfo.motion == MotionInfo::kick || theMotionInfo.motion == MotionInfo::specialAction || 
+theBehaviorStatus.activity== BehaviorStatus::initial || theBehaviorStatus.activity== BehaviorStatus::finished || 
+theBehaviorStatus.activity== BehaviorStatus::codeReleasePositionForKickOff || theBehaviorStatus.activity== BehaviorStatus::set){
 
-if(theMotionInfo.motion == MotionInfo::kick || theMotionInfo.motion == MotionInfo::specialAction || theBehaviorStatus.activity== BehaviorStatus::initial || theBehaviorStatus.activity== BehaviorStatus::finished || theBehaviorStatus.activity== BehaviorStatus::codeReleasePositionForKickOff){
 
     TeamMessageHandler::NoMandarMensaje();
 
@@ -332,7 +334,7 @@ void TeamMessageHandler::parseMessageIntoBMate(Teammate& currentTeammate)
     void TeamMessageHandler::MandarMensaje()
   {
 
-    sendInterval = 5000;
+    sendInterval = 1000;
 
   }
 
