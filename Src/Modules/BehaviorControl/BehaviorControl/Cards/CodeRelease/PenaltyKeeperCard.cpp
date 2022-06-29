@@ -71,6 +71,7 @@ class PenaltyKeeperCard : public PenaltyKeeperCardBase
           action
           {
               theLookForwardSkill();
+              theSpecialActionSkill(SpecialActionRequest::sitDownNew);
           }
       }    
       state(searchForBall)
@@ -87,9 +88,6 @@ class PenaltyKeeperCard : public PenaltyKeeperCardBase
           action
           {
               theSaySkill("Vengase");
-              //theLookForwardSkill();
-              //theSpecialActionSkill(SpecialActionRequest::standHigh);
-              theSpecialActionSkill(SpecialActionRequest::sitDownNew);
               theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
           }
       }     
