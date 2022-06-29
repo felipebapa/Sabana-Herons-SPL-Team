@@ -40,7 +40,7 @@ CARD(OpponentKickOffWaitCard,
   
   DEFINES_PARAMETERS(
   {,
-    (int)(10000)kickofftime,
+    (int)(11000)kickofftime,
     (float)(0.f)initialballpos,
     (bool)(false)exit,
   }),

@@ -19,18 +19,22 @@ void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
 
 
 
+if(theMotionInfo.motion == MotionInfo::kick || theMotionInfo.motion == MotionInfo::specialAction || 
+theBehaviorStatus.activity== BehaviorStatus::initial || theBehaviorStatus.activity== BehaviorStatus::finished || 
+theBehaviorStatus.activity== BehaviorStatus::codeReleasePositionForKickOff || theBehaviorStatus.activity== BehaviorStatus::set){
 
-if(theMotionInfo.motion == MotionInfo::kick || theMotionInfo.motion == MotionInfo::specialAction || theBehaviorStatus.activity== BehaviorStatus::initial || theBehaviorStatus.activity== BehaviorStatus::finished || theBehaviorStatus.activity== BehaviorStatus::codeReleasePositionForKickOff){
 
     TeamMessageHandler::NoMandarMensaje();
+
+}else if(theRawGameInfo.setPlay == SET_PLAY_KICK_IN){
+
+    TeamMessageHandler::MensajeSporadico();
 
 }else{
 
     TeamMessageHandler::MandarMensaje();
-
-  
+ 
 }
-
 
   outputGenerator.theBHumanArbitraryMessage.queue.clear();
 
@@ -341,4 +345,9 @@ void TeamMessageHandler::parseMessageIntoBMate(Teammate& currentTeammate)
 
     sendInterval = 100000;
 
+  }
+
+    void TeamMessageHandler::MensajeSporadico()
+  {
+    sendInterval = 2000;
   }

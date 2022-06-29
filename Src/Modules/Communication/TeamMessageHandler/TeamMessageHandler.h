@@ -66,7 +66,7 @@ MODULE(TeamMessageHandler,
 
   DEFINES_PARAMETERS(
   {,
-    (int) (5000) sendInterval, /**<  Time in ms between two messages that are sent to the teammates */
+    (int) (1000) sendInterval, /**<  Time in ms between two messages that are sent to the teammates */
     (int) (4000) networkTimeout, /**< Time in ms after which teammates are considered as unconnected */
     (int) (5000) minTimeBetween2RejectSounds, /**< Time in ms after which another sound output is allowed */
     (bool) (false) sendMirroredRobotPose, /**< Whether to send the robot pose mirrored (useful for one vs one demos such that keeper and striker can share their ball positions). */
@@ -119,6 +119,7 @@ private:
   void maintainBMateList(TeamData& teamData) const;
   void MandarMensaje();
   void NoMandarMensaje();
+  void MensajeSporadico();
 
   unsigned timeWhenLastMimimi = 0;
   bool readSPLStandardMessage(const RoboCup::SPLStandardMessage* const m);

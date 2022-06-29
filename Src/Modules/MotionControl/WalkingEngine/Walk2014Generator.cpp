@@ -171,7 +171,7 @@ void Walk2014Generator::reset(WalkGenerator& generator)
   turnRL = turnRL0 = 0_deg;
   swingAngle = 0_deg;
   switchPhase = 0.f;
-  maxFootHeight = maxFootHeight0 = 0.0f;
+  maxFootHeight = maxFootHeight0 = 0.f;
   weightShiftStatus = weightDidNotShift;
   prevForwardL = prevForwardR = 0.f;
   prevLeftL = prevLeftR = 0_deg;
