@@ -408,7 +408,7 @@ int LibCheckProvider::leftEnter()
 {
     if((theRobotInfo.number == 2 && isLeftPenalized()) || (theRobotInfo.number == 2 && isLeftAttacking() && !isRightAttacking()))
       return 2;
-    else if ((theRobotInfo.number == 3 && isCentralPenalized()) || (theRobotInfo.number == 3 && isRightPenalized()) || (theRobotInfo.number == 3 && isRightAttacking() && !isRightAttacking()))
+    else if ((theRobotInfo.number == 3 && isCentralPenalized()) || (theRobotInfo.number == 3 && isRightPenalized()) || (theRobotInfo.number == 3 && isRightAttacking()))
       return 3;
     else 
       return 6;

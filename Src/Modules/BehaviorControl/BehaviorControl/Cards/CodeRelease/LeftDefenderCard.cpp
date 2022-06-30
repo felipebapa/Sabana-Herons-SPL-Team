@@ -396,10 +396,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         theSaySkill("kick");
         theLookForwardSkill();
-        if(theRobotPose.translation.x() >= 2000 && theRobotPose.translation.x() < (theFieldDimensions.xPosOpponentPenaltyMark - 500.f))
-          theKickSkill((KickRequest::kickForward), true, 0.3f, false);
-        if(theRobotPose.translation.x() >= theFieldDimensions.xPosOpponentPenaltyMark -500.f)  
-          theInWalkKickSkill(WalkKickVariant(WalkKicks::forwardOLD, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        theKickSkill((KickRequest::kickForward), true, 0.3f, false);
       }
     }
     state(kickRight)
