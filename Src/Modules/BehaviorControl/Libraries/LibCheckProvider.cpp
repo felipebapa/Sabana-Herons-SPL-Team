@@ -178,7 +178,7 @@ bool LibCheckProvider::positionToPassRight()
   for(auto const& teammate : theTeamData.teammates)
   {
     if(!teammate.isPenalized){
-      if(teammate.number == 4 && teammate.theRobotPose.translation.x() >= 2500 && teammate.theRobotPose.translation.x() < 3500 && teammate.theRobotPose.translation.y() >= -1000 && teammate.theRobotPose.translation.y() < -2000)
+      if(teammate.number == 4 && teammate.theRobotPose.translation.x() >= 2500 && teammate.theRobotPose.translation.x() < 3500 && teammate.theRobotPose.translation.y() <= -1000 && teammate.theRobotPose.translation.y() > -2000)
         IsToPass = true;
     }
   }
@@ -408,7 +408,7 @@ int LibCheckProvider::leftEnter()
 {
     if((theRobotInfo.number == 2 && isLeftPenalized()) || (theRobotInfo.number == 2 && isLeftAttacking() && !isRightAttacking()))
       return 2;
-    else if ((theRobotInfo.number == 3 && isCentralPenalized()) || (theRobotInfo.number == 3 && isRightPenalized()) || (theRobotInfo.number == 3 && isRightAttacking() && !isRightAttacking()))
+    else if ((theRobotInfo.number == 3 && isCentralPenalized()) || (theRobotInfo.number == 3 && isRightPenalized()) || (theRobotInfo.number == 3 && isRightAttacking()))
       return 3;
     else 
       return 6;
