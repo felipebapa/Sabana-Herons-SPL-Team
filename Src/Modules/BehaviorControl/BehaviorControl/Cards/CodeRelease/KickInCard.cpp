@@ -71,7 +71,7 @@ class KickInCard : public KickInCardBase
 {
   bool preconditions() const override
   {
-    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_KICK_IN) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theLibCheck.closerToTheBall == theRobotInfo.number);
+    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_KICK_IN) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theLibCheck.closerToTheBall == theRobotInfo.number && theTeamBallModel.isValid != true);
   }
 
   bool postconditions() const override
@@ -81,8 +81,8 @@ class KickInCard : public KickInCardBase
   
   option
   {
-      theActivitySkill(BehaviorStatus::KickIn);
-      initial_state(start)
+    theActivitySkill(BehaviorStatus::KickIn);
+    initial_state(start)
       {
           transition
           {
@@ -96,9 +96,8 @@ class KickInCard : public KickInCardBase
               theSaySkill("Kick In Card");
               
           }
-      }
-      
-      state(turnToBall)
+      }    
+    state(turnToBall)
     {
       transition
       {
@@ -115,7 +114,6 @@ class KickInCard : public KickInCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
       }
     }
-
     state(walkToBall)
     {
       transition
@@ -132,7 +130,6 @@ class KickInCard : public KickInCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
       }
     }
-
     state(alignToGoal)
     {
       const Angle angleToGoal = calcAngleToGoal();
@@ -151,7 +148,6 @@ class KickInCard : public KickInCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
       }
     }
-
     state(alignBehindBall)
     {
       const Angle angleToGoal = calcAngleToGoal();
@@ -181,7 +177,6 @@ class KickInCard : public KickInCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
-
     state(kick)
     {
       const Angle angleToGoal = calcAngleToGoal();
@@ -199,7 +194,6 @@ class KickInCard : public KickInCardBase
         
       }
     }
-
     state(longKick)
     {     
       transition
@@ -214,7 +208,6 @@ class KickInCard : public KickInCardBase
         theKickSkill((KickRequest::kickForward), true, 0.3f, false);
       }
     }
-
     state(searchForBall)
     {
       transition
@@ -223,6 +216,7 @@ class KickInCard : public KickInCardBase
           goto lookLeft;
         if(theTeamBallModel.isValid)
         {
+          theSaySkill("Valid");
           if(theFieldBall.ballWasSeen())
             goto turnToBall;
           else
@@ -240,7 +234,6 @@ class KickInCard : public KickInCardBase
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }
-
     state(lookLeft)
     {
       transition
@@ -263,12 +256,10 @@ class KickInCard : public KickInCardBase
       }
     }
   }
-
   Angle calcAngleToGoal() const
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
   }  
-
 };
 
 MAKE_CARD(KickInCard);

@@ -118,6 +118,7 @@ class WaitForKickInCard : public WaitForKickInCardBase
       if((theRobotPose.translation - Defender2Pos.translation).norm() > StopThreshold)
       {
         thePathToTargetSkill(1.0, Defender2Pos);
+        theSaySkill("Waiting");
       }
       else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
       {
