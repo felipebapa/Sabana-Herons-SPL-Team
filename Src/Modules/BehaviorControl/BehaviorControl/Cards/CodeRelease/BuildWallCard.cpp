@@ -76,18 +76,18 @@ class BuildWallCard : public BuildWallCardBase
 {
   bool preconditions() const override
   {
-    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK) && (theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber));
+    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && (theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK || theGameInfo.setPlay == SET_PLAY_KICK_IN || theGameInfo.setPlay == SET_PLAY_GOAL_KICK || theGameInfo.setPlay == SET_PLAY_CORNER_KICK )) && (theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber));
   }
 
   bool postconditions() const override
   {
-    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_PUSHING_FREE_KICK) || (theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber));
+    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_PUSHING_FREE_KICK && theGameInfo.setPlay != SET_PLAY_KICK_IN && theGameInfo.setPlay != SET_PLAY_GOAL_KICK && theGameInfo.setPlay != SET_PLAY_CORNER_KICK  ) || (theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber));
   }
   
   option
   {
-      theActivitySkill(BehaviorStatus::BuildWall);
-      initial_state(start)
+    theActivitySkill(BehaviorStatus::BuildWall);
+    initial_state(start)
       {
           transition
           {
@@ -101,7 +101,7 @@ class BuildWallCard : public BuildWallCardBase
               theSaySkill("Helllouuuu");
           }
       }
-      state(exclusion)
+    state(exclusion)
     {
       transition
       {
@@ -122,7 +122,7 @@ class BuildWallCard : public BuildWallCardBase
         theLookForwardSkill();
       }
     }
-      state(turnToBall)
+    state(turnToBall)
     {
       transition
       {
@@ -139,7 +139,6 @@ class BuildWallCard : public BuildWallCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
       }
     }
-
     state(walkToPos)
     {
       const Angle angleOwnGoal = calcAngleOwnGoal();
@@ -160,7 +159,6 @@ class BuildWallCard : public BuildWallCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleOwnGoal + OwnGoalOffset , theFieldBall.positionRelative.x() - 900.f ,theFieldBall.positionRelative.y()));
       }
     }
-
     state(buildWall)
     {
       //const Angle angleOwnGoal = calcAngleOwnGoal();
@@ -180,8 +178,6 @@ class BuildWallCard : public BuildWallCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), theFieldBall.positionRelative.x() - 800.f, 0.0f ));
       }
     }
-
-
     state(searchForBall)
     {
       transition
@@ -199,7 +195,7 @@ class BuildWallCard : public BuildWallCardBase
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }
-     state(lookLeft)
+    state(lookLeft)
     {
       transition
       {
@@ -296,8 +292,7 @@ class BuildWallCard : public BuildWallCardBase
         }
       }
     }
-  }  
-  
+  }   
   Angle calcAngleOwnGoal() const
   {
     return(theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOwnGroundline, 0.f)).angle();
