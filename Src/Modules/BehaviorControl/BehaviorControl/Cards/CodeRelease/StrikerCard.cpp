@@ -33,6 +33,7 @@ CARD(StrikerCard,
   CALLS(PathToTarget),
   CALLS(LookAtAngles),
   CALLS(KeyFrameArms),
+  CALLS(SpecialAction),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(RobotPose),
@@ -123,6 +124,7 @@ class StrikerCard : public StrikerCardBase
       action 
       {
         theLookForwardSkill();
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
       }
     }
@@ -146,6 +148,7 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
         theLookAtAnglesSkill(-1,2);
       }
@@ -196,6 +199,7 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
       }
@@ -222,6 +226,7 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theLookForwardSkill();
         theSaySkill("go go go");
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
@@ -246,6 +251,7 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theLookForwardSkill();
         thePathToTargetSkill(walkSpeed + 0.3f, Pose2f(theFieldBall.positionRelative.angle(), 2000, 0));
       }
@@ -253,6 +259,8 @@ class StrikerCard : public StrikerCardBase
 
     state(receiveLeftPass)
     {
+      const Angle angleToPass = calcAngleToPass();
+
       transition
       {
         if(hayObstaculoCerca)
@@ -266,13 +274,16 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theLookForwardSkill();
-        thePathToTargetSkill(walkSpeed + 0.3f, Pose2f(theFieldBall.positionRelative.angle(), 3000, -1500));
+        thePathToTargetSkill(walkSpeed + 0.3f, Pose2f(angleToPass, 3000, -1500));
       }
     }
 
     state(receiveRightPass)
     {
+      const Angle angleToPass = calcAngleToPass();
+
       transition
       {
         if(hayObstaculoCerca)
@@ -286,13 +297,16 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theLookForwardSkill();
-        thePathToTargetSkill(walkSpeed + 0.3f, Pose2f(theFieldBall.positionRelative.angle(), 3000, 1500));
+        thePathToTargetSkill(walkSpeed + 0.3f, Pose2f(angleToPass, 3000, 1500));
       }
     }
 
     state(receiveCentralPass)
     {
+      const Angle angleToPass = calcAngleToCentralPass();
+
       transition
       {
         if(hayObstaculoCerca)
@@ -308,8 +322,9 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theLookForwardSkill();
-        thePathToTargetSkill(walkSpeed + 0.3f,Pose2f(theFieldBall.positionRelative.angle(),2000.f,1000.f));
+        thePathToTargetSkill(walkSpeed + 0.3f,Pose2f(angleToPass, 2000.f, 1000.f));
       }
     }
 
@@ -328,7 +343,7 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
-        theSaySkill("waiting");
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
       }
@@ -454,9 +469,9 @@ class StrikerCard : public StrikerCardBase
         theSaySkill("kick");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
-        if(theRobotPose.translation.x() < theFieldDimensions.xPosOpponentPenaltyMark - 500)
+        if(theRobotPose.translation.x() < theFieldDimensions.xPosOpponentPenaltyMark + 500)
           theKickSkill((KickRequest::kickForward), true,0.2f, false);
-        if(theRobotPose.translation.x() >= theFieldDimensions.xPosOpponentPenaltyMark - 500)
+        if(theRobotPose.translation.x() >= theFieldDimensions.xPosOpponentPenaltyMark + 500)
           theInWalkKickSkill(WalkKickVariant(WalkKicks::forwardOLD, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
@@ -531,13 +546,23 @@ class StrikerCard : public StrikerCardBase
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
   }
 
+  Angle calcAngleToPass() const
+  {
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentPenaltyMark, 0.f)).angle();
+  }
+
+  Angle calcAngleToCentralPass() const
+  {
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosHalfWayLine, theFieldDimensions.yPosCenterGoal)).angle();
+  }
+
   bool hayObstaculo()
   {
     bool x = false;
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if(obstacle.center.norm() < 850.f && (obstacle.center.y() < 400 && obstacle.center.y() > -400))
+      if(obstacle.center.norm() < 600.f && (obstacle.center.y() < 100 && obstacle.center.y() > -100))
         x = true;
       }
     }

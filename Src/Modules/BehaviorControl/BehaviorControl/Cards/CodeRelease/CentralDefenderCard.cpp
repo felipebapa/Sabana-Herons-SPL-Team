@@ -402,7 +402,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
     state(alignToPass)
     {
       const Angle angleToTeammate = calcAngleToTeammate();
-      const Angle angleToClearance = calcAngleClearance();
       bool hayObstaculos = hayObstaculo();
 
       transition

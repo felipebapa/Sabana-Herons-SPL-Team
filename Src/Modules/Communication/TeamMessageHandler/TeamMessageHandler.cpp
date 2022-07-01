@@ -17,14 +17,8 @@ MAKE_MODULE(TeamMessageHandler, communication)
 void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
 {
 
-
-
-if(theMotionInfo.motion == MotionInfo::kick || theMotionInfo.motion == MotionInfo::specialAction || 
-theBehaviorStatus.activity== BehaviorStatus::initial || theBehaviorStatus.activity== BehaviorStatus::finished || 
-theBehaviorStatus.activity== BehaviorStatus::codeReleasePositionForKickOff || theBehaviorStatus.activity== BehaviorStatus::set){
-
-
-    TeamMessageHandler::NoMandarMensaje();
+if(theMotionInfo.motion == MotionInfo::specialAction){
+    TeamMessageHandler::MandarMensaje();
 
 }else if(theRawGameInfo.setPlay == SET_PLAY_KICK_IN){
 
@@ -32,7 +26,7 @@ theBehaviorStatus.activity== BehaviorStatus::codeReleasePositionForKickOff || th
 
 }else{
 
-    TeamMessageHandler::MandarMensaje();
+    TeamMessageHandler::NoMandarMensaje();
  
 }
 
