@@ -64,6 +64,7 @@ CARD(WaitForKickInCard,
     (Pose2f)(Pose2f(0,-2000,0)) StrikerPos,
     (int)(100) StopThreshold,
     (float)(15_deg) AngleThreshold,
+    (bool)(false) exit,
   }),
 });
 
@@ -76,7 +77,7 @@ class WaitForKickInCard : public WaitForKickInCardBase
 
   bool postconditions() const override
   {
-    return (theGameInfo.setPlay != SET_PLAY_KICK_IN || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber);
+    return ((theGameInfo.setPlay != SET_PLAY_KICK_IN && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber) || exit);
   }
   
   void execute() override
@@ -103,6 +104,7 @@ class WaitForKickInCard : public WaitForKickInCardBase
       if((theRobotPose.translation - Defender1Pos.translation).norm() > StopThreshold)
       {
         thePathToTargetSkill(1.0, Defender1Pos);
+        theSaySkill("Waiting");
       }
       else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
       {
@@ -134,6 +136,16 @@ class WaitForKickInCard : public WaitForKickInCardBase
       if((theRobotPose.translation.x() != 0) && (theRobotPose.translation.y() != 0)){
         thePathToTargetSkill(1.0, KickInWaitPos);
         theSaySkill("Going to center");
+      }else{
+        theStandSkill();
+        theSaySkill("In position");
+      }
+    }
+    else if(theRobotInfo.number == 4)
+    {
+      if((theRobotPose.translation.x() != 0) && (theRobotPose.translation.y() != 0)){
+        thePathToTargetSkill(1.0, StrikerPos);
+        theSaySkill("Waiting");
       }else{
         theStandSkill();
         theSaySkill("In position");
