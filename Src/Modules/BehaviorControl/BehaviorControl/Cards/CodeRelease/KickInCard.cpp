@@ -35,6 +35,7 @@ CARD(KickInCard,
   CALLS(InWalkKick),
   CALLS(Kick),
   CALLS(Say),
+  CALLS(PathToTarget),
   
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
@@ -63,7 +64,14 @@ CARD(KickInCard,
     (Rangef)({20.f, 50.f}) ballOffsetYRange,
     (int)(10) minKickWaitTime,
     (int)(3000) maxKickWaitTime,
-    (bool)(false) exit,
+    
+    (Pose2f)(Pose2f(0,-4450,0)) KeeperPos,
+    (Pose2f)(Pose2f(0,-3000,0)) Defender1Pos,
+    (Pose2f)(Pose2f(0,-2500,1500)) Defender2Pos,
+    (Pose2f)(Pose2f(0,-2000,0)) StrikerPos,
+    (Pose2f)(Pose2f(0,0,0)) KickInWaitPos,
+    (int)(100) StopThreshold,
+    (float)(15_deg) AngleThreshold,
   }),
 });
 
@@ -71,12 +79,12 @@ class KickInCard : public KickInCardBase
 {
   bool preconditions() const override
   {
-    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_KICK_IN) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theLibCheck.closerToTheBall == theRobotInfo.number /* && (theTeamBallModel.isValid != true || theFieldBall.ballWasSeen()) */ && theRobotInfo.number != 1);
+    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_KICK_IN) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber);
   }
 
   bool postconditions() const override
   {
-    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_KICK_IN && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber) || exit);
+    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_KICK_IN && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber));
   }
   
   option
@@ -86,6 +94,8 @@ class KickInCard : public KickInCardBase
       {
           transition
           {
+             if(theRobotInfo.number == 1)
+              goto positions;
              if(state_time > initialWaitTime)
                goto searchForBallInit;
           }
@@ -142,8 +152,8 @@ class KickInCard : public KickInCardBase
             goto turnToBall;
           else
           {
-            theSaySkill("exit");
-            exit = true;
+            theSaySkill("Got to Pos");
+            goto positions;
           }
         }
       }
@@ -180,10 +190,9 @@ class KickInCard : public KickInCardBase
         if(theLibCheck.closerToTheBall != theRobotInfo.number)
         {
           theSaySkill("No longer Closest");
-          exit = true;    
+          goto positions;    
         }
       }
-
       action
       {
         theLookForwardSkill();
@@ -193,7 +202,6 @@ class KickInCard : public KickInCardBase
     state(alignToGoal)
     {
       const Angle angleToGoal = calcAngleToGoal();
-
       transition
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
@@ -201,7 +209,6 @@ class KickInCard : public KickInCardBase
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
           goto alignBehindBall;
       }
-
       action
       {
         theLookForwardSkill();
@@ -211,7 +218,6 @@ class KickInCard : public KickInCardBase
     state(alignBehindBall)
     {
       const Angle angleToGoal = calcAngleToGoal();
-
       transition
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
@@ -230,7 +236,6 @@ class KickInCard : public KickInCardBase
                 goto longKick;    
           }
       }
-
       action
       {
         theLookForwardSkill();
@@ -238,21 +243,16 @@ class KickInCard : public KickInCardBase
       }
     }
     state(kick)
-    {
-      const Angle angleToGoal = calcAngleToGoal();
-      
+    {    
       transition
       {
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
           goto start;
       }
-
       action
       {
         theLookForwardSkill();
         theKickSkill((KickRequest::kickForward), true,0.2f, false);
-        //theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-        
       }
     }
     state(longKick)
@@ -262,7 +262,6 @@ class KickInCard : public KickInCardBase
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
           goto start;
       }
-
       action
       {
         theLookForwardSkill();
@@ -297,6 +296,83 @@ class KickInCard : public KickInCardBase
         theLookForwardSkill();
         theLookAtAnglesSkill(1,2);
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+      }
+    }
+    state(positions)
+    {
+      transition
+      {
+
+      }
+      action
+      {
+        if(theRobotInfo.number == 1)
+        {
+          if((theRobotPose.translation - KeeperPos.translation).norm() > StopThreshold)
+          {
+            thePathToTargetSkill(1.0, KeeperPos);
+          }
+          else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
+          {
+            theWalkAtRelativeSpeedSkill(Pose2f(1.0f, 0.f, 0.f));
+          }
+          else 
+          {
+            theStandSkill();
+          }
+        }
+        else if(theRobotInfo.number == 2)
+        {
+          if((theRobotPose.translation - Defender1Pos.translation).norm() > StopThreshold)
+          {
+            thePathToTargetSkill(1.0, Defender1Pos);
+            theSaySkill("Waiting");
+          }
+          else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
+          {
+            theWalkAtRelativeSpeedSkill(Pose2f(1.0f, 0.f, 0.f));
+          }
+          else 
+          {
+            theStandSkill();
+          }
+        }
+        else if(theRobotInfo.number == 3)
+        {
+          if((theRobotPose.translation - Defender2Pos.translation).norm() > StopThreshold)
+          {
+            thePathToTargetSkill(1.0, Defender2Pos);
+            theSaySkill("Waiting");
+          }
+          else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
+          {
+            theWalkAtRelativeSpeedSkill(Pose2f(1.0f, 0.f, 0.f));
+          }
+          else 
+          {
+            theStandSkill();
+          }
+        }
+        else if(theRobotInfo.number == 5)
+        {
+          if((theRobotPose.translation.x() != 0) && (theRobotPose.translation.y() != 0)){
+            thePathToTargetSkill(1.0, KickInWaitPos);
+            theSaySkill("Going to center");
+          }else{
+            theStandSkill();
+            theSaySkill("In position");
+          }
+        }
+        else if(theRobotInfo.number == 4)
+        {
+          if((theRobotPose.translation.x() != 0) && (theRobotPose.translation.y() != 0)){
+            thePathToTargetSkill(1.0, StrikerPos);
+            theSaySkill("Waiting");
+          }else{
+            theStandSkill();
+            theSaySkill("In position");
+          }
+        }
       }
     }
   }
