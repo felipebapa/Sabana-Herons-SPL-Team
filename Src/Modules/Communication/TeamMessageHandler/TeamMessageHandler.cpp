@@ -26,7 +26,7 @@ theBehaviorStatus.activity== BehaviorStatus::codeReleasePositionForKickOff || th
 
     TeamMessageHandler::NoMandarMensaje();
 
-}else if(theRawGameInfo.setPlay == SET_PLAY_KICK_IN){
+}else if(theRawGameInfo.setPlay == SET_PLAY_KICK_IN || theRawGameInfo.setPlay == SET_PLAY_CORNER_KICK){
 
     TeamMessageHandler::MensajeSporadico();
 

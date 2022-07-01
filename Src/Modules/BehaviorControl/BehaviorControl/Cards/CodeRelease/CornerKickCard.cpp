@@ -78,17 +78,17 @@ class CornerKickCard : public CornerKickCardBase
 {
   bool preconditions() const override
   {
-    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_CORNER_KICK) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theRobotInfo.number == 4);
+    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_CORNER_KICK) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber);
   }
 
   bool postconditions() const override
   {
-    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_CORNER_KICK) || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber || theRobotInfo.number != 4);
+    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_CORNER_KICK) || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber);
   }
   
   option
   {
-      theActivitySkill(BehaviorStatus::CornerKick);
+    theActivitySkill(BehaviorStatus::CornerKick);
     initial_state(start)
       {
           transition
@@ -100,6 +100,7 @@ class CornerKickCard : public CornerKickCardBase
           }
           action
           {
+              theSaySkill("Corner Kick");
               theLookForwardSkill();
               theStandSkill();
           }
@@ -111,10 +112,8 @@ class CornerKickCard : public CornerKickCardBase
         if(state_time > 1500)
           goto lookLeftInit;
         if(theFieldBall.ballWasSeen() || theTeamBallModel.isValid)
-          goto check;
-        
+          goto check;    
       }
-
       action
       {
         //theLookForwardSkill();
@@ -204,20 +203,10 @@ class CornerKickCard : public CornerKickCardBase
       const Angle angleToPass = calcAngleToPoint();
       transition
       {
-          if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
-            for(const auto& obstacle : theObstacleModel.obstacles){
-            if(obstacle.center.norm() < 1000.f && obstacle.center.y() > 400 )
-              goto alignToPassTo3;
-            else if( obstacle.center.norm() < 1000.f && obstacle.center.y() < -400)
-              goto alignToPassTo3;
-            }
-          }else 
-          {
             if(theRobotPose.translation.y() < 0)
               goto alignToPassTo5;
             if(theRobotPose.translation.y() > 0)
               goto alignToPassTo3;
-          }
       }
       action
       {
