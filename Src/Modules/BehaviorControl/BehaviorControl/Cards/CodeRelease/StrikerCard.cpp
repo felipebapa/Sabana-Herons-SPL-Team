@@ -371,6 +371,7 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theSaySkill("align goal");
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.4f, walkSpeed + 0.4f, walkSpeed + 0.4f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
         if(theRobotPose.translation.x() < theFieldDimensions.xPosHalfWayLine - 300)
@@ -392,6 +393,7 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theSaySkill("behind");
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.4f, walkSpeed + 0.4f, walkSpeed + 0.4f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX-20.f, theFieldBall.positionRelative.y() - ballOffsetY));
         if(theRobotPose.translation.x() < theFieldDimensions.xPosHalfWayLine - 300)
@@ -418,6 +420,7 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theSaySkill("align right");
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.4f, walkSpeed + 0.4f, walkSpeed + 0.4f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 45.f, theFieldBall.positionRelative.y() - ballOffsetY + 200.f));
         if(theRobotPose.translation.x() < theFieldDimensions.xPosHalfWayLine - 300)
@@ -443,6 +446,7 @@ class StrikerCard : public StrikerCardBase
       }
       action
       {
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theSaySkill("align left");
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.4f, walkSpeed + 0.4f, walkSpeed + 0.4f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 45.f, theFieldBall.positionRelative.y() - ballOffsetY - 200.f));
@@ -467,6 +471,7 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theSaySkill("kick");
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         if(theRobotPose.translation.x() < theFieldDimensions.xPosOpponentPenaltyMark + 500)
@@ -492,6 +497,7 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theLookForwardSkill();
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theSaySkill("kick right");
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.4f, walkSpeed + 0.4f, walkSpeed + 0.4f), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 2000));
       }
@@ -513,6 +519,7 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theLookForwardSkill();
+        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theSaySkill("kick left");
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.4f, walkSpeed + 0.4f, walkSpeed + 0.4f), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() + 2000));
       }

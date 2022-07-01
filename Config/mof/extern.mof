@@ -15,7 +15,7 @@ transition getUpEngineDummy getUpEngineDummy start
 transition rightDive rightDive start
 transition leftDive leftDive start
 transition sitDownNew sitDownNew start
-transition MandarMensaje sitDownNew start
+transition MandarMensaje MandarMensaje start
 
 "This line must be the last one
 transition extern extern start

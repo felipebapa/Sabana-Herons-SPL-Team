@@ -257,7 +257,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         theSaySkill("Align Goal");
         theLookForwardSkill();
-        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
         if(theRobotPose.translation.y() < theFieldDimensions.yPosLeftGoal && theRobotPose.translation.x() < theFieldDimensions.xPosHalfWayLine)
@@ -350,17 +349,31 @@ class LeftDefenderCard : public LeftDefenderCardBase
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(theRobotPose.translation.x() >= 3000 || theLibCheck.positionToPassRight || hayObstaculos)
-          goto alignToGoal;          
+          goto alignToGoal;
+        if(theRobotPose.translation.x() == 0 || theRobotPose.translation.x() == 500 || theRobotPose.translation.x() == 1000 || theRobotPose.translation.x() == 1500 || theRobotPose.translation.x() == 2000 || theRobotPose.translation.x() == 2500) 
+          goto sendMessage;    
       }
       action
       {
         theLookForwardSkill();
         theSaySkill("go go go");
-        theSpecialActionSkill(SpecialActionRequest::MandarMensaje);
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGo, theFieldBall.positionRelative.x() + 40 - ballOffsetX, theFieldBall.positionRelative.y() + ballOffsetY/2));
         if(theRobotPose.translation.y() < theFieldDimensions.yPosLeftGoal && theRobotPose.translation.x() < theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldDimensions.yPosLeftGoal-500));
+      }
+    }
+
+    state(sendMessage)
+    {
+      transition
+      {
+        if(true)
+          goto alignBehindBallToPass;
+      }
+      action
+      {
+        theSaySkill("AAA");
       }
     }
 
@@ -579,7 +592,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
 
       action
       {
-
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
         theLookAtAnglesSkill(-1,2);
       }
