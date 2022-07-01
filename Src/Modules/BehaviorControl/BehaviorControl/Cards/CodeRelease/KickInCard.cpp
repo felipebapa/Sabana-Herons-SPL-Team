@@ -71,12 +71,12 @@ class KickInCard : public KickInCardBase
 {
   bool preconditions() const override
   {
-    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_KICK_IN) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theLibCheck.closerToTheBall == theRobotInfo.number && theTeamBallModel.isValid != true);
+    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_KICK_IN) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theLibCheck.closerToTheBall == theRobotInfo.number /* && (theTeamBallModel.isValid != true || theFieldBall.ballWasSeen()) */ && theRobotInfo.number != 1);
   }
 
   bool postconditions() const override
   {
-    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_KICK_IN) || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber || exit);
+    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_KICK_IN && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber) || exit);
   }
   
   option
@@ -87,7 +87,7 @@ class KickInCard : public KickInCardBase
           transition
           {
              if(state_time > initialWaitTime)
-               goto searchForBall;
+               goto searchForBallInit;
           }
           action
           {
@@ -97,6 +97,61 @@ class KickInCard : public KickInCardBase
               
           }
       }    
+    state(searchForBallInit)
+    {
+      transition
+      {
+        if(state_time > 1500)
+          goto lookLeftInit;
+        if(theFieldBall.ballWasSeen() || theTeamBallModel.isValid)
+          goto check;
+        
+      }
+
+      action
+      {
+        //theLookForwardSkill();
+        theLookAtAnglesSkill(-1,2, 0.6f);
+        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+      }
+    }
+    state(lookLeftInit)
+    {
+      transition
+      {
+        if(state_time > 1500)
+          goto searchForBallInit;
+        if(theFieldBall.ballWasSeen() || theTeamBallModel.isValid)
+          goto check;
+      }
+      action
+      {
+        //theLookForwardSkill();
+        theLookAtAnglesSkill(1,2,0.6f);
+        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+      }
+    }
+    state(check)
+    {
+      transition
+      {
+        if(theTeamBallModel.isValid)
+        {
+          theSaySkill("Valid");
+          if(theFieldBall.ballWasSeen())
+            goto turnToBall;
+          else
+          {
+            theSaySkill("exit");
+            exit = true;
+          }
+        }
+      }
+      action
+      {
+        theLookAtAnglesSkill(theFieldBall.positionRelative.angle() , 2);
+      }
+    }
     state(turnToBall)
     {
       transition
@@ -122,6 +177,11 @@ class KickInCard : public KickInCardBase
           goto searchForBall;
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
           goto alignToGoal;
+        if(theLibCheck.closerToTheBall != theRobotInfo.number)
+        {
+          theSaySkill("No longer Closest");
+          exit = true;    
+        }
       }
 
       action
@@ -190,7 +250,8 @@ class KickInCard : public KickInCardBase
       action
       {
         theLookForwardSkill();
-        theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        theKickSkill((KickRequest::kickForward), true,0.2f, false);
+        //theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
         
       }
     }
@@ -214,17 +275,7 @@ class KickInCard : public KickInCardBase
       {
         if(state_time > 1500)
           goto lookLeft;
-        if(theTeamBallModel.isValid)
-        {
-          theSaySkill("Valid");
-          if(theFieldBall.ballWasSeen())
-            goto turnToBall;
-          else
-          {
-            theSaySkill("exit");
-            exit = true;
-          }
-        }
+        
       }
 
       action
@@ -240,13 +291,6 @@ class KickInCard : public KickInCardBase
       {
         if(state_time > 1500)
           goto searchForBall;
-        if(theTeamBallModel.isValid)
-        {
-          if(theFieldBall.ballWasSeen())
-            goto turnToBall;
-          else
-            exit = true;
-        }
       }
       action
       {
