@@ -74,6 +74,7 @@ class GoalFreeKickCard : public GoalFreeKickCardBase
       theActivitySkill(BehaviorStatus::GoalFreeKick);
       initial_state(start)
       {
+        
           transition
           {
              if(state_time > initialWaitTime)
@@ -83,6 +84,7 @@ class GoalFreeKickCard : public GoalFreeKickCardBase
           {
               theLookForwardSkill();
               theStandSkill();
+              theSaySkill("Clear!");
           }
       }
       
@@ -98,6 +100,7 @@ class GoalFreeKickCard : public GoalFreeKickCardBase
 
       action
       {
+        theSaySkill("T");
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
       }
@@ -115,6 +118,7 @@ class GoalFreeKickCard : public GoalFreeKickCardBase
 
       action
       {
+        theSaySkill("W");
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
       }

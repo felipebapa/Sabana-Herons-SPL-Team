@@ -360,7 +360,7 @@ class KeeperCard : public KeeperCardBase
       action
       {
         theStandSkill();
-        theLookAtAnglesSkill(-1, 1.3f, 0.6f);
+        theLookAtAnglesSkill(-1, 1.3f, 0.8f);
       }
     }
     state(lookoutRight)
@@ -379,7 +379,7 @@ class KeeperCard : public KeeperCardBase
       action
       {
         theStandSkill();
-        theLookAtAnglesSkill(1, 1.3f, 0.6f);
+        theLookAtAnglesSkill(1, 1.3f, 0.8f);
       }
     }
     state(stare)
