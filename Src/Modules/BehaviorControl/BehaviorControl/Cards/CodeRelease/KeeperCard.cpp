@@ -286,7 +286,7 @@ class KeeperCard : public KeeperCardBase
     {
       transition
       {
-        if (!theFieldBall.ballWasSeen(ballNotSeenTimeout) || theSaySkill.isDone())
+        if (!theFieldBall.ballWasSeen(ballNotSeenTimeout) || theSaySkill.isDone() || state_time > 5000)
           goto searchForBall;
         // CAMBIAR POR SPECIAL ACTION
       }
@@ -301,7 +301,7 @@ class KeeperCard : public KeeperCardBase
     {
       transition
       {
-        if (!theFieldBall.ballWasSeen(ballNotSeenTimeout) || theSaySkill.isDone())
+        if (!theFieldBall.ballWasSeen(ballNotSeenTimeout) || theSaySkill.isDone() || state_time > 5000)
           goto searchForBall;
         // CAMBIAR POR SPECIAL ACTION
       }
@@ -317,8 +317,9 @@ class KeeperCard : public KeeperCardBase
     {
       transition
       {
-        if (!theFieldBall.ballWasSeen(ballNotSeenTimeout) || theSaySkill.isDone())
+        if (!theFieldBall.ballWasSeen(ballNotSeenTimeout) || theSaySkill.isDone() || state_time > 5000)
           goto searchForBall;
+
         // CAMBIAR POR SPECIAL ACTION
       }
       action
