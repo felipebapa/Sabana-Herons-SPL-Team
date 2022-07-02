@@ -186,7 +186,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto GiraCabezaDer; 
         if(hayObstaculoCerca)
           goto ObsAvoid;  
-        if(theFieldBall.positionRelative.norm() < 4000.0f && !theLibCheck.CentralDefending && !theLibCheck.StrikerAttacking && !theLibCheck.RightDefending)
+        if(theFieldBall.positionRelative.norm() < 4000.0f && !theLibCheck.CentralDefending && !theLibCheck.StrikerAttacking && !theLibCheck.RightDefending && theLibCheck.closerToTheBall != 4)
           goto walkToBall;  
       }
 
@@ -303,7 +303,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
 
     state(alignBehindBallToPass)
     {
-      const Angle angleToTeammate = calcAngleToTeammate();
       const bool hayObstaculos = hayObstaculo();
       const Angle angleToGo = calcAngleToGo();
 
@@ -342,7 +341,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
     }
     state(kick)
     {     
-      const Angle angleToGoal = calcAngleToGoal();
       transition
       {
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
@@ -357,7 +355,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
     }
     state(kickRight)
     {
-      const Angle angleToGoal = calcAngleToGoal();
       bool hayObstaculos = hayObstaculo();
 
       transition
@@ -378,7 +375,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
 
     state(kickLeft)
     {
-      const Angle angleToGoal = calcAngleToGoal();
       bool hayObstaculos = hayObstaculo();
 
       transition
