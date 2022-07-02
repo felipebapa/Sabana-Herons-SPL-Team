@@ -76,12 +76,12 @@ class CentralRightCard : public CentralRightCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == (theLibCheck.rightEnter);
+    return theRobotInfo.number == 6;
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != (theLibCheck.rightEnter);
+    return theRobotInfo.number != 6;
   }
 
   option
@@ -177,11 +177,6 @@ class CentralRightCard : public CentralRightCardBase
       }    
       action
       {
-        
-        if(theLibCheck.LeftAttacking)
-          theSaySkill("left attack");
-        if(theLibCheck.LeftDefending)
-          theSaySkill("SIUUUUUU");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
@@ -205,11 +200,6 @@ class CentralRightCard : public CentralRightCardBase
 
       action
       {
-        
-        if(theLibCheck.LeftAttacking)
-          theSaySkill("left attack");
-        if(theLibCheck.LeftDefending)
-          theSaySkill("SIUUUUUU");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
@@ -236,11 +226,6 @@ class CentralRightCard : public CentralRightCardBase
 
       action
       {
-        if(theLibCheck.LeftAttacking)
-          theSaySkill("left attack");
-        if(theLibCheck.LeftDefending)
-          theSaySkill("SIUUUUUU");
-        theSaySkill("Align Goal");
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
@@ -271,7 +256,6 @@ class CentralRightCard : public CentralRightCardBase
       action
       {
         theLookForwardSkill();
-        theSaySkill("zero");
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 45.f, theFieldBall.positionRelative.y() - ballOffsetY + 200.f));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
@@ -301,7 +285,6 @@ class CentralRightCard : public CentralRightCardBase
       action
       {
         theLookForwardSkill();
-        theSaySkill("one");
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 45.f, theFieldBall.positionRelative.y() + ballOffsetY - 200.f));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
@@ -323,7 +306,6 @@ class CentralRightCard : public CentralRightCardBase
       action
       {
         theLookForwardSkill();
-        theSaySkill("Behind Pass");
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToTeammate, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
@@ -361,7 +343,6 @@ class CentralRightCard : public CentralRightCardBase
       action
       {
         theLookForwardSkill();
-        theSaySkill("kick zero");
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() - 2000));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
@@ -384,7 +365,6 @@ class CentralRightCard : public CentralRightCardBase
       action
       {
         theLookForwardSkill();
-        theSaySkill("kick one");
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() + 2000));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
@@ -408,7 +388,6 @@ class CentralRightCard : public CentralRightCardBase
       }
       action
       {
-        theSaySkill("pass");
         // if(theLibCheck.positionToPass)
         //   theSaySkill("Yes");
         // else
@@ -441,14 +420,11 @@ class CentralRightCard : public CentralRightCardBase
 
       action
       {
-        theSaySkill("Align Pass");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         if(theLibCheck.positionToPass)
-          theSaySkill("to striker");
           theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToTeammate, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
         if(!theLibCheck.positionToPass)
-          theSaySkill("clearance");
           theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToClearance, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
@@ -474,7 +450,6 @@ class CentralRightCard : public CentralRightCardBase
 
       action
       {
-        theSaySkill("Align Clearance");
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToClearance, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
@@ -497,7 +472,6 @@ class CentralRightCard : public CentralRightCardBase
       action
       {
         theLookForwardSkill();
-        theSaySkill("Behind Clearance");
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToClearance, theFieldBall.positionRelative.x() - ballOffsetX  - 17, theFieldBall.positionRelative.y() - ballOffsetY));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)

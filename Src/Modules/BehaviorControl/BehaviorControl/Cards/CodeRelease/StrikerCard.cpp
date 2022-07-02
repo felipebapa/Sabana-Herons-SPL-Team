@@ -555,7 +555,7 @@ class StrikerCard : public StrikerCardBase
 
   Angle calcAngleToPass() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentPenaltyMark, 0.f)).angle();
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentPenaltyMark, theFieldDimensions.yPosCenterGoal)).angle();
   }
 
   Angle calcAngleToCentralPass() const
