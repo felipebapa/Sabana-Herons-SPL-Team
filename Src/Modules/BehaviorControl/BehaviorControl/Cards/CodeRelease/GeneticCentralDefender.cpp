@@ -1,5 +1,5 @@
 /**
- * @file CentralDefenderCard.cpp
+ * @file GeneticCentralDefenderCard.cpp
  *
  * @author Dap y Mia
  */
@@ -19,9 +19,14 @@
 #include "Representations/BehaviorControl/Libraries/LibCheck.h"
 #include "Tools/Modeling/Obstacle.h"
 #include "Representations/Communication/TeamData.h"
+#include "Representations/Modeling/TeamBallModel.h"
+#include "Representations/Infrastructure/FrameInfo.h"
+#include "Representations/Communication/TeamInfo.h"
+#include "Representations/Modeling/GeneticLocator.h"
 
 
-CARD(CentralDefenderCard,
+
+CARD(GeneticCentralDefenderCard,
 {,
   CALLS(Activity),
   CALLS(InWalkKick),
@@ -44,6 +49,14 @@ CARD(CentralDefenderCard,
   REQUIRES(BallModel),
   REQUIRES(RobotInfo),
   REQUIRES(LibCheck),
+  REQUIRES(TeamBallModel),
+  REQUIRES(FrameInfo),
+  REQUIRES(TeamInfo),
+  REQUIRES(GeneticLocator),
+
+
+
+
   DEFINES_PARAMETERS(
   {,
     (float)(1.0f) walkSpeed,
@@ -67,7 +80,7 @@ CARD(CentralDefenderCard,
   }),
 });
 
-class CentralDefenderCard : public CentralDefenderCardBase
+class GeneticCentralDefenderCard : public GeneticCentralDefenderCardBase
 {
   bool preconditions() const override
   {
@@ -87,7 +100,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if (obstacle.center.norm()<400.f)  
+      if (obstacle.center.norm()<400.f && obstacle.isOpponent())  
           hayObstaculoCerca=true;
       }
       if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
@@ -99,7 +112,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(state_time > initialWaitTime)
           goto turnToBall;
-
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto geneticDefense;  
       }
 
       action
@@ -107,8 +121,34 @@ class CentralDefenderCard : public CentralDefenderCardBase
         theSaySkill("Original Card");
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
         theStandSkill();
+        
       }
     }
+
+      state(geneticDefense)
+  {
+    transition
+    {
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto GiraCabezaDer;  
+        if(((std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold) || (theFieldBall.positionRelative.x() < theFieldDimensions.xPosHalfWayLine)) && !hayObstaculoCerca)
+          goto DefendBall;  
+        if(hayObstaculoCerca)
+          goto ObsAvoid;
+
+    }
+    action
+    {
+
+        theSaySkill("genetic");
+      float ballWeight = 1.2f;
+
+      theGeneticLocator.activation(true, (int)theFrameInfo.time,ballWeight);
+
+        thePathToTargetSkill(0.85f,theGeneticLocator.activation(true, (int)theFrameInfo.time,ballWeight));
+    }
+  }
+
 
     state(turnToBall)
     {
@@ -605,4 +645,4 @@ class CentralDefenderCard : public CentralDefenderCardBase
   } 
 };
 
-MAKE_CARD(CentralDefenderCard);
+MAKE_CARD(GeneticCentralDefenderCard);

@@ -17,7 +17,7 @@ MAKE_MODULE(TeamMessageHandler, communication)
 void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
 {
 
-if(theMotionInfo.motion == MotionInfo::specialAction){
+/* if(theMotionInfo.motion == MotionInfo::specialAction){
     TeamMessageHandler::MandarMensaje();
 
 }else if(theRawGameInfo.setPlay == SET_PLAY_KICK_IN){
@@ -28,7 +28,7 @@ if(theMotionInfo.motion == MotionInfo::specialAction){
 
     TeamMessageHandler::NoMandarMensaje();
  
-}
+} */
 
   outputGenerator.theBHumanArbitraryMessage.queue.clear();
 

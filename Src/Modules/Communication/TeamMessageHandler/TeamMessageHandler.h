@@ -38,11 +38,9 @@ MODULE(TeamMessageHandler,
   // v- using for calculations
   REQUIRES(FrameInfo),
   REQUIRES(MotionInfo),
-
   USES(OwnTeamInfo),
   USES(MotionRequest),
-
-
+  //REQUIRES(GameInfo),
 
   // v- using for teamout
   REQUIRES(FallDownState),
