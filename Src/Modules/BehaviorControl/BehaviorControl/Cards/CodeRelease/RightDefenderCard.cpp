@@ -151,6 +151,7 @@ class RightDefenderCard : public RightDefenderCardBase
       action
       {
         theLookForwardSkill();
+        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
       }
     }  
@@ -184,7 +185,7 @@ class RightDefenderCard : public RightDefenderCardBase
           goto GiraCabezaDer;
         if(hayObstaculoCerca)
           goto ObsAvoid;   
-        if(theFieldBall.positionRelative.norm() < 3000.0f && !hayObstaculoCerca)
+        if(theFieldBall.positionRelative.norm() < 4000.0f && !theLibCheck.CentralDefending && !theLibCheck.StrikerAttacking && !theLibCheck.LeftDefending && theLibCheck.closerToTheBall != 4)
           goto walkToBall;  
       }
 
@@ -192,6 +193,19 @@ class RightDefenderCard : public RightDefenderCardBase
       {
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
+      }
+    }
+
+    state(goBackToOwnField)
+    {
+      transition
+      {
+        if(theFieldBall.positionRelative.norm() < 2000)
+          goto DefendBall;
+      }
+      action
+      {
+        thePathToTargetSkill(1.0, Pose2f(0.f, -500.f, -1500.f));
       }
     }
 
@@ -247,8 +261,6 @@ class RightDefenderCard : public RightDefenderCardBase
     state(alignBehindBallRight)
     {
       const Angle angleToGoal = calcAngleToGoal();
-      const Angle angleToTeammate = calcAngleToTeammate();
-      const bool hayObstaculos = hayObstaculo();
 
       transition
       {
@@ -268,8 +280,6 @@ class RightDefenderCard : public RightDefenderCardBase
     state(alignBehindBallLeft)
     {
       const Angle angleToGoal = calcAngleToGoal();
-      const Angle angleToTeammate = calcAngleToTeammate();
-      const bool hayObstaculos = hayObstaculo();
 
       transition
       {
@@ -287,12 +297,13 @@ class RightDefenderCard : public RightDefenderCardBase
     }  
     state(alignBehindBallToPass)
     {
-      const Angle angleToTeammate = calcAngleToTeammate();
       const bool hayObstaculos = hayObstaculo();
       const Angle angleToGo = calcAngleToGo();
 
       transition
       {
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto GiraCabezaDer; 
         if(theRobotPose.translation.x() >= 2500 || theLibCheck.positionToPassLeft || hayObstaculos)
           goto alignToGoal;
       }
@@ -322,8 +333,6 @@ class RightDefenderCard : public RightDefenderCardBase
     }
     state(kick)
     {
-      const Angle angleToGoal = calcAngleToGoal();  
-
       transition
       {
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
@@ -340,14 +349,14 @@ class RightDefenderCard : public RightDefenderCardBase
     }
     state(kickRight)
     {
-      const Angle angleToGoal = calcAngleToGoal();
+      bool hayObstaculos = hayObstaculo();
 
       transition
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
-          goto start;
+        if(!hayObstaculos)
+          goto alignToGoal;
       }
 
       action
@@ -359,14 +368,14 @@ class RightDefenderCard : public RightDefenderCardBase
     }
     state(kickLeft)
     {
-      const Angle angleToGoal = calcAngleToGoal();
+      bool hayObstaculos = hayObstaculo();
 
       transition
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
-          goto start;
+        if(!hayObstaculos)
+          goto alignToGoal;
       }
 
       action
@@ -474,6 +483,8 @@ class RightDefenderCard : public RightDefenderCardBase
           goto GiraCabezaIzq;
         if(hayObstaculoCerca)
           goto ObsAvoid;
+        if(theFieldBall.positionOnField.x() < 0)
+          goto goBackToOwnField;  
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
           if(!theFieldBall.ballWasSeen(10000))
@@ -496,6 +507,8 @@ class RightDefenderCard : public RightDefenderCardBase
           goto GiraCabezaDer;
         if(hayObstaculoCerca)
           goto ObsAvoid;
+        if(theFieldBall.positionOnField.x() < 0)
+          goto goBackToOwnField;  
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
         if(a > 2)

@@ -439,7 +439,7 @@ class StrikerCard : public StrikerCardBase
       {
         theLookForwardSkill();
         if(theRobotPose.translation.x() < theFieldDimensions.xPosOpponentPenaltyMark + 500)
-          theKickSkill((KickRequest::kickForward), true,0.2f, false);
+          theKickSkill((KickRequest::kickForwardFastLong), true,0.2f, false);
         if(theRobotPose.translation.x() >= theFieldDimensions.xPosOpponentPenaltyMark + 500)
           theInWalkKickSkill(WalkKickVariant(WalkKicks::forwardOLD, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
       }

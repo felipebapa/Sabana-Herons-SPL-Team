@@ -350,7 +350,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theLookForwardSkill();
-        theKickSkill((KickRequest::kickForward), true, 0.3f, false);
+        theKickSkill((KickRequest::kickForwardFastLong), true, 0.3f, false);
       }
     }
     state(kickRight)
