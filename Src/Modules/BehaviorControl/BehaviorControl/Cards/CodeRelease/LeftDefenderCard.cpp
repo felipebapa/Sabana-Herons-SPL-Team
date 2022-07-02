@@ -168,7 +168,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto alignToGoal;
         if(hayObstaculoCerca)
           goto ObsAvoid;
-          
       }
 
       action
@@ -187,15 +186,27 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto GiraCabezaDer; 
         if(hayObstaculoCerca)
           goto ObsAvoid;  
-        if(theFieldBall.positionRelative.norm() < 3000.0f)
+        if(theFieldBall.positionRelative.norm() < 4000.0f && !theLibCheck.CentralDefending)
           goto walkToBall;  
-       
       }
 
       action
       {
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
+      }
+    }
+
+    state(goBackToOwnField)
+    {
+      transition
+      {
+        if(theFieldBall.positionRelative.norm() < 2000)
+          goto DefendBall;
+      }
+      action
+      {
+        thePathToTargetSkill(1.0, Pose2f(0.f, -500.f, 1500.f));
       }
     }
 
@@ -443,26 +454,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToTeammate, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
-    state(searchForBall)
-    {
-      
-      transition
-      {
-        // if(theLibCheck.iFell == 2 && (theFieldBall.positionOnField.y() < theFieldDimensions.yPosLeftGoal && theFieldBall.positionOnField.y() > theFieldDimensions.yPosRightGoal) && theFieldBall.ballWasSeen())
-        //   goto centralFallen;
-        if(theFieldBall.ballWasSeen())
-          goto turnToBall;
-        if(!theFieldBall.ballWasSeen(10000))
-          goto goBackHome;  
-      }
-
-      action
-      {
-        theLookForwardSkill();
-        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
-        
-      }
-    }
 
     state(ObsAvoid)
     {  
@@ -490,6 +481,8 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto GiraCabezaIzq;
         if(hayObstaculoCerca)
           goto ObsAvoid;
+        if(theFieldBall.positionOnField.x() < 0)
+          goto goBackToOwnField;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;   
         if(!theFieldBall.ballWasSeen(10000))
@@ -511,10 +504,10 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto GiraCabezaDer;
         if(hayObstaculoCerca)
           goto ObsAvoid;
+        if(theFieldBall.positionOnField.x() < 0)
+          goto goBackToOwnField;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(a > 2)
-          goto searchForBall;
         if(!theFieldBall.ballWasSeen(10000))
           goto goBackHome; 
       }

@@ -334,7 +334,7 @@ void TeamMessageHandler::parseMessageIntoBMate(Teammate& currentTeammate)
     void TeamMessageHandler::MandarMensaje()
   {
 
-    sendInterval = 2000;
+    sendInterval = 5000;
 
   }
 

@@ -57,6 +57,7 @@ private:
   bool isLeftDefending();
   bool isRightAttacking();
   bool isRightDefending();
+  bool isCentralDefending();
   bool positionToPass();
   bool positionToPassLeft();
   bool positionToPassRight();
