@@ -257,7 +257,7 @@ class StrikerCard : public StrikerCardBase
         if(theLibCheck.closerToTheBall == 2 && !theLibCheck.LeftAttacking)
           goto receiveCentralPass;
         if(theRobotPose.translation.x() >= 2500 && theRobotPose.translation.x() < 3500 && theRobotPose.translation.y() >= -2000 && theRobotPose.translation.y() < -1000)
-          goto waitAtPass;
+          goto waitAtSidePass;
       }
       action
       {
@@ -279,7 +279,7 @@ class StrikerCard : public StrikerCardBase
         if(theLibCheck.closerToTheBall == 2 && !theLibCheck.RightAttacking)
           goto receiveCentralPass;
         if(theRobotPose.translation.x() >= 2500 && theRobotPose.translation.x() < 3500 && theRobotPose.translation.y() >= 1000 && theRobotPose.translation.y() < 2000)
-          goto waitAtPass;
+          goto waitAtSidePass;
       }
       action
       {
@@ -301,7 +301,7 @@ class StrikerCard : public StrikerCardBase
         if(theLibCheck.closerToTheBall == 5)
           goto receiveRightPass;
         if(theRobotPose.translation.x() >= 1500 && theRobotPose.translation.x() < 2000 && theRobotPose.translation.y() >= 500 && theRobotPose.translation.y() < 1500)
-          goto waitAtPass;
+          goto waitAtCentralPass;
         if(theFieldBall.positionRelative.norm() > 500.f && theFieldBall.positionOnField.x() > theFieldDimensions.xPosHalfWayLine)
           goto walkToBall;
       }
@@ -312,8 +312,10 @@ class StrikerCard : public StrikerCardBase
       }
     }
 
-    state(waitAtPass)
+    state(waitAtSidePass)
     {
+      const Angle angleToPass = calcAngleToPass();
+
       transition
       {
         if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine && !theLibCheck.LeftAttacking && !theLibCheck.RightAttacking && theLibCheck.closerToTheBall != 2 )
@@ -326,7 +328,27 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToPass, 0.f, 0.f));
+      }
+    }
+
+    state(waitAtCentralPass)
+    {
+      const Angle angleToPass = calcAngleToCentralPass();
+
+      transition
+      {
+        if(theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine && !theLibCheck.LeftAttacking && !theLibCheck.RightAttacking && theLibCheck.closerToTheBall != 2 )
+          goto goToCenter;
+        if(theFieldBall.positionRelative.norm() < 1500.f && theFieldBall.positionOnField.x() > theFieldDimensions.xPosHalfWayLine && ((!theLibCheck.LeftAttacking && !theLibCheck.RightAttacking)))
+          goto walkToBall;
+        if(!theFieldBall.ballWasSeen(8000))
+          goto giraCabezaDer;
+      }
+      action
+      {
+        theLookForwardSkill();
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToPass, 0.f, 0.f));
       }
     }
 

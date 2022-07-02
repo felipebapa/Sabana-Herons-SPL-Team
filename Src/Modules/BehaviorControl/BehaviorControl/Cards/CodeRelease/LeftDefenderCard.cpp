@@ -264,8 +264,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
 
       transition
       {
-        // if(theLibCheck.iFell == 2 && (theFieldBall.positionOnField.y() < theFieldDimensions.yPosLeftGoal && theFieldBall.positionOnField.y() > theFieldDimensions.yPosRightGoal))
-        //   goto centralFallen;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(!theFieldBall.ballWasSeen())
@@ -285,8 +283,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
 
       transition
       {
-        // if(theLibCheck.iFell == 2 && (theFieldBall.positionOnField.y() < theFieldDimensions.yPosLeftGoal && theFieldBall.positionOnField.y() > theFieldDimensions.yPosRightGoal))
-        //   goto centralFallen;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(!theFieldBall.ballWasSeen())
@@ -324,8 +320,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
     state(goBackHome){
       transition
       {
-        // if(theLibCheck.iFell == 2 && (theFieldBall.positionOnField.y() < theFieldDimensions.yPosLeftGoal && theFieldBall.positionOnField.y() > theFieldDimensions.yPosRightGoal))
-        //   goto centralFallen;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
