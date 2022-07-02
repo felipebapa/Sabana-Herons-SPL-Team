@@ -18,7 +18,8 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Modeling/ObstacleModel.h"
-
+#include "Representations/Modeling/TeamBallModel.h"
+#include "Representations/BehaviorControl/Libraries/LibCheck.h"
 #include <string>
 
 CARD(CornerKickCard,
@@ -32,6 +33,7 @@ CARD(CornerKickCard,
   CALLS(InWalkKick),
   CALLS(Kick),
   CALLS(Say),
+  CALLS(PathToTarget),
   
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
@@ -40,6 +42,8 @@ CARD(CornerKickCard,
   REQUIRES(GameInfo),
   REQUIRES(OwnTeamInfo),
   REQUIRES(ObstacleModel),
+  REQUIRES(TeamBallModel),
+  REQUIRES(LibCheck),
   
   DEFINES_PARAMETERS(
   {,
@@ -59,6 +63,14 @@ CARD(CornerKickCard,
     (int)(10) minKickWaitTime,
     (int)(3000) maxKickWaitTime,
     (int) choice,
+
+    (Pose2f)(Pose2f(0,-4450,0)) KeeperPos,
+    (Pose2f)(Pose2f(0,-3000,0)) Defender1Pos,
+    (Pose2f)(Pose2f(0,-2500,1500)) Defender2Pos,
+    (Pose2f)(Pose2f(0,-2000,0)) StrikerPos,
+    (Pose2f)(Pose2f(0,0,0)) KickInWaitPos,
+    (int)(100) StopThreshold,
+    (float)(15_deg) AngleThreshold,
   }),
 });
 
@@ -66,32 +78,87 @@ class CornerKickCard : public CornerKickCardBase
 {
   bool preconditions() const override
   {
-    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_CORNER_KICK) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theRobotInfo.number == 4);
+    return ((theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_CORNER_KICK) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber);
   }
 
   bool postconditions() const override
   {
-    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_CORNER_KICK) || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber || theRobotInfo.number != 4);
+    return ((theGameInfo.gamePhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_CORNER_KICK) || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber);
   }
   
   option
   {
-      theActivitySkill(BehaviorStatus::CornerKick);
-      initial_state(start)
+    theActivitySkill(BehaviorStatus::CornerKick);
+    initial_state(start)
       {
           transition
           {
-             if(state_time > initialWaitTime)
-               goto searchForBall;
+            if(theRobotInfo.number == 1)
+              goto positions;
+            if(state_time > initialWaitTime)
+              goto searchForBallInit;
           }
           action
           {
+              theSaySkill("Corner Kick");
               theLookForwardSkill();
               theStandSkill();
           }
+      }   
+    state(searchForBallInit)
+    {
+      transition
+      {
+        if(state_time > 1500)
+          goto lookLeftInit;
+        if(theFieldBall.ballWasSeen() || theTeamBallModel.isValid)
+          goto check;    
       }
-      
-      state(turnToBall)
+      action
+      {
+        //theLookForwardSkill();
+        theLookAtAnglesSkill(-1,2, 0.6f);
+        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+      }
+    }
+    state(lookLeftInit)
+    {
+      transition
+      {
+        if(state_time > 1500)
+          goto searchForBallInit;
+        if(theFieldBall.ballWasSeen() || theTeamBallModel.isValid)
+          goto check;
+      }
+      action
+      {
+        //theLookForwardSkill();
+        theLookAtAnglesSkill(1,2,0.6f);
+        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+      }
+    }
+    state(check)
+    {
+      transition
+      {
+        if(theTeamBallModel.isValid)
+        {
+          theSaySkill("Valid");
+          if(theFieldBall.ballWasSeen())
+            goto turnToBall;
+          else
+          {
+            theSaySkill("Got to Pos");
+            goto positions;
+          }
+        }
+      }
+      action
+      {
+        theLookAtAnglesSkill(theFieldBall.positionRelative.angle() , 2);
+      }
+    }
+    state(turnToBall)
     {
       transition
       {
@@ -107,35 +174,46 @@ class CornerKickCard : public CornerKickCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
       }
     }
-
     state(walkToBall)
     {
       transition
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto searchForBall;
+        if(theLibCheck.closerToTheBall != theRobotInfo.number)
+        {
+          theSaySkill("No longer Closest");
+          goto positions;    
+        }
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
         {
-          if (choice==1){
-            goto alignToPassTo5;   
-          }
-          if (choice==0){
-            goto alignToPassTo3;
-          }
+          goto makeChoice;
         }
-        //Aqui deberia decidir segun si el 5 o 3 pueden llegar a su posicion, por ahora
-        //se hara un random choice.
       }
 
       action
       {
-        srand((int)time(NULL));
-        choice=0+rand()%(2-0);
+        
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
       }
     }
-
+    state(makeChoice)
+    {
+      const Angle angleToPass = calcAngleToPoint();
+      transition
+      {
+            if(theRobotPose.translation.y() < 0)
+              goto alignToPassTo5;
+            if(theRobotPose.translation.y() > 0)
+              goto alignToPassTo3;
+      }
+      action
+      {
+        theLookForwardSkill();
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToPass, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
+      }
+    }
     state(alignToPassTo5)
     {
       const Angle angleToPass = calcAngleToTeammate5();
@@ -155,7 +233,6 @@ class CornerKickCard : public CornerKickCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToPass, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
       }
     }
-
     state(alignBehindBallFor5)
     {
       const Angle angleToPass = calcAngleToTeammate5();
@@ -185,7 +262,6 @@ class CornerKickCard : public CornerKickCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToPass, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
-
     state(alignToPassTo3) 
     {
       const Angle angleToPass = calcAngleToTeammate3();
@@ -204,8 +280,7 @@ class CornerKickCard : public CornerKickCardBase
         theSaySkill("Three");
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToPass, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
       }
-    }
-    
+    }   
     state(alignBehindBallFor3)
     {
       const Angle angleToPass = calcAngleToTeammate3();
@@ -235,7 +310,6 @@ class CornerKickCard : public CornerKickCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToPass, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
-
     state(kick)
     {
       const Angle angleToGoal = calcAngleToGoal();
@@ -253,7 +327,6 @@ class CornerKickCard : public CornerKickCardBase
         
       }
     }
-
     state(longKick)
     {     
       transition
@@ -268,7 +341,6 @@ class CornerKickCard : public CornerKickCardBase
         theKickSkill((KickRequest::kickForward), true, 0.3f, false);
       }
     }
-
     state(searchForBall)
     {
       transition
@@ -286,7 +358,6 @@ class CornerKickCard : public CornerKickCardBase
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }
-
     state(lookLeft)
     {
       transition
@@ -303,19 +374,99 @@ class CornerKickCard : public CornerKickCardBase
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }
-  }
+    state(positions)
+    {
+      transition
+      {
 
+      }
+      action
+      {
+        if(theRobotInfo.number == 1)
+        {
+          if((theRobotPose.translation - KeeperPos.translation).norm() > StopThreshold)
+          {
+            thePathToTargetSkill(1.0, KeeperPos);
+          }
+          else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
+          {
+            theWalkAtRelativeSpeedSkill(Pose2f(1.0f, 0.f, 0.f));
+          }
+          else 
+          {
+            theStandSkill();
+          }
+        }
+        else if(theRobotInfo.number == 2)
+        {
+          if((theRobotPose.translation - Defender1Pos.translation).norm() > StopThreshold)
+          {
+            thePathToTargetSkill(1.0, Defender1Pos);
+            theSaySkill("Waiting");
+          }
+          else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
+          {
+            theWalkAtRelativeSpeedSkill(Pose2f(1.0f, 0.f, 0.f));
+          }
+          else 
+          {
+            theStandSkill();
+          }
+        }
+        else if(theRobotInfo.number == 3)
+        {
+          if((theRobotPose.translation - Defender2Pos.translation).norm() > StopThreshold)
+          {
+            thePathToTargetSkill(1.0, Defender2Pos);
+            theSaySkill("Waiting");
+          }
+          else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
+          {
+            theWalkAtRelativeSpeedSkill(Pose2f(1.0f, 0.f, 0.f));
+          }
+          else 
+          {
+            theStandSkill();
+          }
+        }
+        else if(theRobotInfo.number == 5)
+        {
+          if((theRobotPose.translation.x() != 0) && (theRobotPose.translation.y() != 0)){
+            thePathToTargetSkill(1.0, KickInWaitPos);
+            theSaySkill("Going to center");
+          }else{
+            theStandSkill();
+            theSaySkill("In position");
+          }
+        }
+        else if(theRobotInfo.number == 4)
+        {
+          if((theRobotPose.translation.x() != 0) && (theRobotPose.translation.y() != 0)){
+            thePathToTargetSkill(1.0, StrikerPos);
+            theSaySkill("Waiting");
+          }else{
+            theStandSkill();
+            theSaySkill("In position");
+          }
+        }
+      }
+    }
+  }
   Angle calcAngleToGoal() const
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundline, 0.f)).angle();
   }  
   Angle calcAngleToTeammate5() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentPenaltyMark,0.f)).angle();
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentPenaltyMark, -500.f)).angle();
   }
   Angle calcAngleToTeammate3() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentPenaltyMark,500.f)).angle();
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentPenaltyMark, 500.f)).angle();
+  }
+  Angle calcAngleToPoint() const
+  {
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentPenaltyMark, 0.f)).angle();
   }
 
 };

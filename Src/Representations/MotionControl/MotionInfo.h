@@ -25,6 +25,11 @@ STREAMABLE_WITH_BASE(MotionInfo, MotionRequest,
             specialActionRequest.specialAction == SpecialActionRequest::standHigh);
   }
 
+  bool isCommunicating() const
+  {
+    return motion == MotionRequest::specialAction && specialActionRequest.specialAction == SpecialActionRequest::MandarMensaje;
+  }
+
   /** Helper method to avoid long and faulty expressions in some modules
    * @return true, if the MotionInfo is about a motion that performs a kick
    */

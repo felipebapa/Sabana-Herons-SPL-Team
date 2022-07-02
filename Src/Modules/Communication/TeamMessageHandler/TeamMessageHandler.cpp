@@ -17,8 +17,6 @@ MAKE_MODULE(TeamMessageHandler, communication)
 void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
 {
 
-
-
 if(theMotionInfo.motion == MotionInfo::kick || theMotionInfo.motion == MotionInfo::specialAction || 
 theBehaviorStatus.activity== BehaviorStatus::initial || theBehaviorStatus.activity== BehaviorStatus::finished || 
 theBehaviorStatus.activity== BehaviorStatus::codeReleasePositionForKickOff || theBehaviorStatus.activity== BehaviorStatus::set){
@@ -26,7 +24,7 @@ theBehaviorStatus.activity== BehaviorStatus::codeReleasePositionForKickOff || th
 
     TeamMessageHandler::NoMandarMensaje();
 
-}else if(theRawGameInfo.setPlay == SET_PLAY_KICK_IN){
+}else if(theRawGameInfo.setPlay == SET_PLAY_KICK_IN || theRawGameInfo.setPlay == SET_PLAY_CORNER_KICK){
 
     TeamMessageHandler::MensajeSporadico();
 
@@ -336,7 +334,7 @@ void TeamMessageHandler::parseMessageIntoBMate(Teammate& currentTeammate)
     void TeamMessageHandler::MandarMensaje()
   {
 
-    sendInterval = 1000;
+    sendInterval = 5000;
 
   }
 
@@ -349,5 +347,5 @@ void TeamMessageHandler::parseMessageIntoBMate(Teammate& currentTeammate)
 
     void TeamMessageHandler::MensajeSporadico()
   {
-    sendInterval = 2000;
+    sendInterval = 1000;
   }

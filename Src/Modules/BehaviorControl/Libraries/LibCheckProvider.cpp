@@ -42,6 +42,8 @@ void LibCheckProvider::update(LibCheck& libCheck)
   libCheck.LeftDefending= isLeftDefending();
   libCheck.RightAttacking= isRightAttacking();
   libCheck.RightDefending= isRightDefending();
+  libCheck.CentralDefending = isCentralDefending();
+  libCheck.StrikerAttacking = isStrikerAttacking();
   libCheck.TeammateFallenNumber=isTeammateFallenNumber();
   libCheck.TeammateObstacleAvoid=isTeammateObstacleAvoid();
   libCheck.OpponentObstacle=isOpponentObstacle();
@@ -178,7 +180,7 @@ bool LibCheckProvider::positionToPassRight()
   for(auto const& teammate : theTeamData.teammates)
   {
     if(!teammate.isPenalized){
-      if(teammate.number == 4 && teammate.theRobotPose.translation.x() >= 2500 && teammate.theRobotPose.translation.x() < 3500 && teammate.theRobotPose.translation.y() >= -1000 && teammate.theRobotPose.translation.y() < -2000)
+      if(teammate.number == 4 && teammate.theRobotPose.translation.x() >= 2500 && teammate.theRobotPose.translation.x() < 3500 && teammate.theRobotPose.translation.y() <= -1000 && teammate.theRobotPose.translation.y() > -2000)
         IsToPass = true;
     }
   }
@@ -259,6 +261,32 @@ bool LibCheckProvider::isRightDefending()
       if(!teammate.isPenalized){
         // if(teammate.theTeamBehaviorStatus.role.playBall)
           if(teammate.number==5 && teammate.theRobotPose.translation.x() <= theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number)
+            return true;   //El Right supporter està atacando.
+        }
+    }
+    return false;
+}
+
+bool LibCheckProvider::isCentralDefending()
+{
+  for(auto const& teammate : theTeamData.teammates)
+  {
+      if(!teammate.isPenalized){
+        // if(teammate.theTeamBehaviorStatus.role.playBall)
+          if(teammate.number==2 && teammate.theRobotPose.translation.x() <= theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number)
+            return true;   //El Right supporter està atacando.
+        }
+    }
+    return false;
+}
+
+bool LibCheckProvider::isStrikerAttacking()
+{
+  for(auto const& teammate : theTeamData.teammates)
+  {
+      if(!teammate.isPenalized){
+        // if(teammate.theTeamBehaviorStatus.role.playBall)
+          if(teammate.number==4 && teammate.theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number)
             return true;   //El Right supporter està atacando.
         }
     }
@@ -390,7 +418,7 @@ int LibCheckProvider::centralLeave()
 
 int LibCheckProvider::rightLeave()
 {
-  if(isLeftAttacking() || (howManyPenalized() != 0 && !isRightPenalized()))
+  if((isLeftAttacking() && !isRightAttacking()) || (howManyPenalized() != 0 && !isRightPenalized()))
     return 6;
   else
     return 5;
@@ -398,7 +426,7 @@ int LibCheckProvider::rightLeave()
 
 int LibCheckProvider::leftLeave()
 {
-  if(isRightAttacking() || (howManyPenalized() != 0 && !isLeftPenalized()))
+  if((isRightAttacking() && !isLeftAttacking()) || (howManyPenalized() != 0 && !isLeftPenalized()))
     return 6;
   else 
     return 3;
@@ -406,7 +434,7 @@ int LibCheckProvider::leftLeave()
 
 int LibCheckProvider::leftEnter()
 {
-    if((theRobotInfo.number == 2 && isLeftPenalized()) || (theRobotInfo.number == 2 && isLeftAttacking()))
+    if((theRobotInfo.number == 2 && isLeftPenalized()) || (theRobotInfo.number == 2 && isLeftAttacking() && !isRightAttacking()))
       return 2;
     else if ((theRobotInfo.number == 3 && isCentralPenalized()) || (theRobotInfo.number == 3 && isRightPenalized()) || (theRobotInfo.number == 3 && isRightAttacking()))
       return 3;
@@ -416,7 +444,7 @@ int LibCheckProvider::leftEnter()
 
 int LibCheckProvider::rightEnter()
 {
-    if((theRobotInfo.number == 2 && isRightPenalized()) || (theRobotInfo.number == 2 && isRightAttacking()))
+    if((theRobotInfo.number == 2 && isRightPenalized()) || (theRobotInfo.number == 2 && isRightAttacking() && !isLeftAttacking()))
       return 2;
     else if ((theRobotInfo.number == 5 && isCentralPenalized()) || (theRobotInfo.number == 5 && isLeftPenalized()) || (theRobotInfo.number == 5 && isLeftAttacking()))
       return 5;

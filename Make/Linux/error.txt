@@ -1,0 +1,9 @@
+2022.7.01-17.13.39: NoSuchFileException: Could not open plugin plugins/common.jar: plugins/common.jar
+2022.7.01-17.13.39: cannot load config/spl/teams.cfg
+2022.7.01-17.13.39: cannot load config/spl/teams.cfg
+2022.7.01-17.13.39: cannot load config/spl_7v7/teams.cfg
+2022.7.01-17.13.39: cannot load config/spl_dbhc/teams.cfg
+2022.7.01-17.13.39: cannot load config/spl/teams.cfg
+2022.7.01-17.13.39: cannot load config/spl/teams.cfg
+2022.7.01-17.13.39: cannot load config/spl/teams.cfg
+2022.7.01-17.13.39: cannot load config/spl/teams.cfg

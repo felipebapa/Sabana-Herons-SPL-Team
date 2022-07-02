@@ -27,6 +27,7 @@ STREAMABLE(SpecialActionRequest,
     rightDive,
     leftDive,
     preventBall,
+    MandarMensaje,
   });
 
   /**
