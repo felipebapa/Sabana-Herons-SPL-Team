@@ -224,7 +224,6 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theLookForwardSkill();
-        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.2f, walkSpeed + 0.2f, walkSpeed + 0.2f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() + 40 - ballOffsetX, theFieldBall.positionRelative.y() + ballOffsetY/2));
       }
     }
@@ -449,7 +448,6 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theLookForwardSkill();
-        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         if(theRobotPose.translation.x() < theFieldDimensions.xPosOpponentPenaltyMark + 500)
           theKickSkill((KickRequest::kickForward), true,0.2f, false);
         if(theRobotPose.translation.x() >= theFieldDimensions.xPosOpponentPenaltyMark + 500)

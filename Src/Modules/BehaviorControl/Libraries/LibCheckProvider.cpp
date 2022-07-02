@@ -43,6 +43,7 @@ void LibCheckProvider::update(LibCheck& libCheck)
   libCheck.RightAttacking= isRightAttacking();
   libCheck.RightDefending= isRightDefending();
   libCheck.CentralDefending = isCentralDefending();
+  libCheck.StrikerAttacking = isStrikerAttacking();
   libCheck.TeammateFallenNumber=isTeammateFallenNumber();
   libCheck.TeammateObstacleAvoid=isTeammateObstacleAvoid();
   libCheck.OpponentObstacle=isOpponentObstacle();
@@ -273,6 +274,19 @@ bool LibCheckProvider::isCentralDefending()
       if(!teammate.isPenalized){
         // if(teammate.theTeamBehaviorStatus.role.playBall)
           if(teammate.number==2 && teammate.theRobotPose.translation.x() <= theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number)
+            return true;   //El Right supporter està atacando.
+        }
+    }
+    return false;
+}
+
+bool LibCheckProvider::isStrikerAttacking()
+{
+  for(auto const& teammate : theTeamData.teammates)
+  {
+      if(!teammate.isPenalized){
+        // if(teammate.theTeamBehaviorStatus.role.playBall)
+          if(teammate.number==4 && teammate.theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number)
             return true;   //El Right supporter està atacando.
         }
     }
