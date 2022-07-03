@@ -156,6 +156,7 @@ class CornerKickCard : public CornerKickCardBase
       action
       {
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle() , 2);
+        theStandSkill();
       }
     }
     state(turnToBall)
@@ -382,6 +383,7 @@ class CornerKickCard : public CornerKickCardBase
       }
       action
       {
+        theLookForwardSkill();
         if(theRobotInfo.number == 1)
         {
           if((theRobotPose.translation - KeeperPos.translation).norm() > StopThreshold)
