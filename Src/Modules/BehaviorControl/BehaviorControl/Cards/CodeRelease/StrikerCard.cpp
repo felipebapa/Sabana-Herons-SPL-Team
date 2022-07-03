@@ -538,7 +538,7 @@ class StrikerCard : public StrikerCardBase
 
   Angle calcAngleToCentralPass() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosHalfWayLine, theFieldDimensions.yPosCenterGoal)).angle();
+    return (theRobotPose.inversePose * Vector2f(100.f, 100.f)).angle();
   }
 
   bool hayObstaculo()

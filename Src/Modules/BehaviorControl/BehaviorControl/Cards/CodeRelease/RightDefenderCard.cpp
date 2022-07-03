@@ -128,12 +128,6 @@ class RightDefenderCard : public RightDefenderCardBase
       {
         theStandSkill();
         theSaySkill("the right card");
-        theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
-        if(!OpponentRobots.empty()){  
-
-            theSaySkill("Opponent");
-
-        } 
       }
     }
 
@@ -344,7 +338,7 @@ class RightDefenderCard : public RightDefenderCardBase
         theLookForwardSkill();
         theKickSkill((KickRequest::kickForward), true, 0.3f, false);
         if(theRobotPose.translation.x() >= 2500 && theRobotPose.translation.x() < theFieldDimensions.xPosOpponentPenaltyMark - 500.f)
-          theKickSkill((KickRequest::kickForward), true, 0.3f, false);
+          theKickSkill((KickRequest::kickForwardFastLong), true, 0.3f, false);
       }
     }
     state(kickRight)

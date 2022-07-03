@@ -106,7 +106,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         theSaySkill("Original Card");
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
-        theStandSkill();
       }
     }
 
@@ -234,8 +233,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
     state(alignBehindBallRight)
     {
       const Angle angleToGoal = calcAngleToGoal();
-      //const Angle angleToTeammate = calcAngleToTeammate();
-      bool hayObstaculos = hayObstaculo();
 
       transition
       {
@@ -259,8 +256,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
   state(alignBehindBallLeft)
     {
       const Angle angleToGoal = calcAngleToGoal();
-      //const Angle angleToTeammate = calcAngleToTeammate();
-      bool hayObstaculos = hayObstaculo();
 
       transition
       {
@@ -317,16 +312,14 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
     state(kickRight)
     {
-      //const Angle angleToGoal = calcAngleToGoal();
+      bool hayObstaculos = hayObstaculo();
 
       transition
       {
-        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
-          goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
-          goto start;
+        if(!hayObstaculos)
+          goto alignToGoal;
       }
 
       action
@@ -340,16 +333,14 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       state(kickLeft)
     {
-      //const Angle angleToGoal = calcAngleToGoal();
-
+      bool hayObstaculos = hayObstaculo();
+      
       transition
       {
-        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
-          goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
-          goto start;
+        if(!hayObstaculos)
+          goto alignToGoal;
       }
 
       action
@@ -379,7 +370,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       action
       {
         theLookForwardSkill();
-        theKickSkill((KickRequest::kickForward), true,0.2f, false);
+        theKickSkill((KickRequest::kickForwardFastLong), true,0.2f, false);
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }

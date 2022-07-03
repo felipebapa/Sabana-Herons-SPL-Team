@@ -129,13 +129,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         theSaySkill("the left card");
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
-        theStandSkill();
-
-        if(!OpponentRobots.empty()){  
-
-            theSaySkill("Opponent");
-
-        } 
       }
     }
 
