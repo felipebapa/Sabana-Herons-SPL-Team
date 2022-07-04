@@ -1,5 +1,5 @@
 /**
- * @file PenaltyKeeper.cpp
+ * @file PenaltyFreekickKeeperCard.cpp
  *
  * Pruebas
  *
@@ -21,7 +21,7 @@
 
 #include <string>
 
-CARD(PenaltyKeeperCard,
+CARD(PenaltyFreekickKeeperCard,
 {,
   CALLS(Activity),
   CALLS(LookForward),
@@ -46,16 +46,16 @@ CARD(PenaltyKeeperCard,
   }),
 });
 
-class PenaltyKeeperCard : public PenaltyKeeperCardBase
+class PenaltyFreekickKeeperCard : public PenaltyFreekickKeeperCardBase
 {
   bool preconditions() const override
   {
-    return (theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber) ;
+    return (theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber) ;
   }
 
   bool postconditions() const override
   {
-    return (theGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber);
+    return (theGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT && theGameInfo.setPlay != SET_PLAY_PENALTY_KICK && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber);
   }
   
   option
@@ -65,8 +65,11 @@ class PenaltyKeeperCard : public PenaltyKeeperCardBase
       {
           transition
           {
-             if(state_time > initialWaitTime)
+             
+             if(theRobotInfo.number == 1)
                goto searchForBall;
+             if(state_time > initialWaitTime)
+               goto stand;
           }
           action
           {
@@ -87,7 +90,6 @@ class PenaltyKeeperCard : public PenaltyKeeperCardBase
           }
           action
           {
-              theSaySkill("Vengase");
               theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
           }
       }     
@@ -95,7 +97,8 @@ class PenaltyKeeperCard : public PenaltyKeeperCardBase
       {
           transition
           {
-
+            if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theSpecialActionSkill.isDone()))
+              goto searchForBall;
           }  
           action
           {
@@ -107,7 +110,8 @@ class PenaltyKeeperCard : public PenaltyKeeperCardBase
       {
           transition
           {
-
+            if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theSpecialActionSkill.isDone()))
+              goto searchForBall;
           }   
           action
           {
@@ -119,13 +123,25 @@ class PenaltyKeeperCard : public PenaltyKeeperCardBase
       {
           transition
           {
-          
+            if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theSpecialActionSkill.isDone()))
+              goto searchForBall;
           }
           action
           {
               theSpecialActionSkill(SpecialActionRequest::preventBall);
           }
 
+      }
+      state(stand)
+      {
+        transition
+        {
+
+        }
+        action
+        {
+          theStandSkill();
+        }
       }
     }  
     Angle calcAngleToGoal() const
@@ -136,4 +152,4 @@ class PenaltyKeeperCard : public PenaltyKeeperCardBase
 
 };
 
-MAKE_CARD(PenaltyKeeperCard);
+MAKE_CARD(PenaltyFreekickKeeperCard);
