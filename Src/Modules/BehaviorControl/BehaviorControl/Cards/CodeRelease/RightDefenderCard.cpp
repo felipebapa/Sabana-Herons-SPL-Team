@@ -126,8 +126,8 @@ class RightDefenderCard : public RightDefenderCardBase
 
       action
       {
-        theStandSkill();
         theSaySkill("the right card");
+        theLookForwardSkill();
       }
     }
 

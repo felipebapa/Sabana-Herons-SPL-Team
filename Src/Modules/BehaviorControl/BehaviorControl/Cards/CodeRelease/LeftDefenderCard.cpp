@@ -128,7 +128,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theSaySkill("the left card");
-        theLookAtAnglesSkill(theFieldBall.positionRelative.angle(),2);
+        theStandSkill();
       }
     }
 
@@ -146,6 +146,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theLookForwardSkill();
+        theSaySkill("turn");
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(theFieldBall.positionRelative.angle(), 0.f, 0.f));
       }
@@ -166,6 +167,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theLookForwardSkill();
+        theSaySkill("walk");
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
       }
@@ -228,6 +230,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theLookForwardSkill();
+        theSaySkill("aling goal");
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
       }
@@ -248,6 +251,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theLookForwardSkill();
+        theSaySkill("behind");
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY - 10.f));
       }
     }
@@ -265,6 +269,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theLookForwardSkill();
+        theSaySkill("right");
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 45.f, theFieldBall.positionRelative.y() - ballOffsetY + 200.f));
       }
@@ -285,6 +290,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theLookForwardSkill();
+        theSaySkill("left");
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 45.f, theFieldBall.positionRelative.y() + ballOffsetY - 200.f));
       }
@@ -305,6 +311,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theLookForwardSkill();
+        theSaySkill("go go go");
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGo, theFieldBall.positionRelative.x() + 40 - ballOffsetX, theFieldBall.positionRelative.y() + ballOffsetY/2));
       }
@@ -323,6 +330,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theLookForwardSkill();
+        theSaySkill("home");
         thePathToTargetSkill(1.0, Defender1Pos);
       }
     }
@@ -337,6 +345,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theLookForwardSkill();
+        theSaySkill("kick");
         theKickSkill((KickRequest::kickForwardFastLong), true, 0.3f, false);
       }
     }
@@ -395,6 +404,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theLookForwardSkill();
+        theSaySkill("aling pass");
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGo, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
       }
@@ -414,6 +424,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theLookForwardSkill();
+        theSaySkill("aling pass striker");
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToTeammate, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
       }
