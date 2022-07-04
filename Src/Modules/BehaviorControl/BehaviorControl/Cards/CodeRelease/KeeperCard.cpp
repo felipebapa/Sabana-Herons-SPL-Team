@@ -198,11 +198,11 @@ class KeeperCard : public KeeperCardBase
         if(!theFieldBall.ballWasSeen(6000))
           goto searchForBall;
 
-        if (-100 > theFieldBall.endPositionRelative.y() && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if (-100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto GoalRiskRight;
-        if (100 < theFieldBall.endPositionRelative.y()  && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if (100 < theBallModel.estimate.position.y()  && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto GoalRiskLeft;
-        if(-100 < theFieldBall.endPositionRelative.y() && theFieldBall.endPositionRelative.y() < 100 && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if(-100 < theBallModel.estimate.position.y() && theBallModel.estimate.position.y() < 100 && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto goDown;
       }
       action
@@ -228,11 +228,11 @@ class KeeperCard : public KeeperCardBase
         if(!theFieldBall.ballWasSeen(6000))
           goto searchForBall;
         
-        if (-100 > theFieldBall.endPositionRelative.y() && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if (-100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto GoalRiskRight;
-        if (100 < theFieldBall.endPositionRelative.y()  && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if (100 < theBallModel.estimate.position.y()  && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto GoalRiskLeft;
-        if(-100 < theFieldBall.endPositionRelative.y() && theFieldBall.endPositionRelative.y() < 100 && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if(-100 < theBallModel.estimate.position.y() && theBallModel.estimate.position.y() < 100 && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto goDown;
       }
       action
@@ -257,11 +257,11 @@ class KeeperCard : public KeeperCardBase
         if(!theFieldBall.ballWasSeen(6000))
           goto searchForBall;
           
-        if (-100 > theFieldBall.endPositionRelative.y() && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if (-100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto GoalRiskRight;
-        if (100 < theFieldBall.endPositionRelative.y()  && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if (100 < theBallModel.estimate.position.y()  && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto GoalRiskLeft;
-        if(-100 < theFieldBall.endPositionRelative.y() && theFieldBall.endPositionRelative.y() < 100 && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if(-100 < theBallModel.estimate.position.y() && theBallModel.estimate.position.y() < 100 && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto goDown;
       }
       action
