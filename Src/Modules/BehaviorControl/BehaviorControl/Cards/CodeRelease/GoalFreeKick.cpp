@@ -29,6 +29,7 @@ CARD(GoalFreeKickCard,
   CALLS(WalkToTarget),
   CALLS(Kick),
   CALLS(Say),
+  CALLS(PathToTarget),
   
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
@@ -54,6 +55,14 @@ CARD(GoalFreeKickCard,
     (Rangef)({20.f, 50.f}) ballOffsetYRange,
     (int)(10) minKickWaitTime,
     (int)(3000) maxKickWaitTime,
+
+    (Pose2f)(Pose2f(0,-3000,1000)) Defender1Pos,
+    (Pose2f)(Pose2f(0,-1500,2000)) Defender2Pos,
+    (Pose2f)(Pose2f(0,-1500,-2000)) Defender3Pos,
+    (Pose2f)(Pose2f(0,2000,0)) StrikerPos,
+    (Pose2f)(Pose2f(0,-500.f,0)) KickInWaitPos,
+    (int)(100) StopThreshold,
+    (float)(15_deg) AngleThreshold,
   }),
 });
 
@@ -61,12 +70,12 @@ class GoalFreeKickCard : public GoalFreeKickCardBase
 {
   bool preconditions() const override
   {
-    return ((theGameInfo.competitionPhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_GOAL_KICK) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theRobotInfo.number == 1);
+    return ((theGameInfo.competitionPhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_GOAL_KICK) && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber);
   }
 
   bool postconditions() const override
   {
-    return ((theGameInfo.competitionPhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_GOAL_KICK) && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber && theRobotInfo.number != 1);
+    return ((theGameInfo.competitionPhase != GAME_PHASE_NORMAL && theGameInfo.setPlay != SET_PLAY_GOAL_KICK) && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber);
   }
   
   option
@@ -77,8 +86,10 @@ class GoalFreeKickCard : public GoalFreeKickCardBase
         
           transition
           {
-             if(state_time > initialWaitTime)
+             if(state_time > initialWaitTime && theRobotInfo.number==1)
                goto searchForBall;
+             if(theRobotInfo.number!=1)
+              goto positions;
           }
           action
           {
@@ -87,7 +98,7 @@ class GoalFreeKickCard : public GoalFreeKickCardBase
               theSaySkill("Clear!");
           }
       }
-      
+
       state(turnToBall)
     {
       transition
@@ -192,6 +203,78 @@ class GoalFreeKickCard : public GoalFreeKickCardBase
       {
         theLookForwardSkill();
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
+      }
+    }
+    
+    state(positions)
+    {
+      transition
+      {
+
+      }
+      action
+      {
+        if(theRobotInfo.number == 2)
+    {
+      if((theRobotPose.translation - Defender1Pos.translation).norm() > StopThreshold)
+      {
+        thePathToTargetSkill(1.0, Defender1Pos);
+      }
+      else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
+      {
+        theWalkAtRelativeSpeedSkill(Pose2f(1.0f, 0.f, 0.f));
+      }
+      else 
+      {
+        theStandSkill();
+      }
+    }
+    else if(theRobotInfo.number == 3)
+    {
+      if((theRobotPose.translation - Defender2Pos.translation).norm() > StopThreshold)
+      {
+        thePathToTargetSkill(1.0, Defender2Pos);
+      }
+      else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
+      {
+        theWalkAtRelativeSpeedSkill(Pose2f(1.0f, 0.f, 0.f));
+      }
+      else 
+      {
+        theStandSkill();
+      }
+    }
+    else if(theRobotInfo.number == 5)
+    {
+      if((theRobotPose.translation.x() != -500.f) && (theRobotPose.translation.y() != 0)){
+        thePathToTargetSkill(1.0, KickInWaitPos);
+        theSaySkill("Pass!");
+      }else{
+        theStandSkill();
+      
+        theSaySkill("In position");
+      }
+    }
+    else if(theRobotInfo.number == 4)
+    {
+      if((theRobotPose.translation - StrikerPos.translation).norm() > StopThreshold)
+      {
+        thePathToTargetSkill(1.0, StrikerPos);
+      }
+      else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
+      {
+        theWalkAtRelativeSpeedSkill(Pose2f(1.0f, 0.f, 0.f));
+      }
+      else 
+      {
+        theStandSkill();
+      }
+    }
+    else
+    {
+      theStandSkill();
+    } 
+  
       }
     }
   }

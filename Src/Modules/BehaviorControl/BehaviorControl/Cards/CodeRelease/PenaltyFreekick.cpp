@@ -52,13 +52,13 @@ class PenaltyFreekickCard : public PenaltyFreekickCardBase
 {
   bool preconditions() const override
   {
-    return (theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theRobotInfo.number == 4);
+    return (theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber);
       
   }
 
   bool postconditions() const override
   {
-    return (theGameInfo.gamePhase != GAME_PHASE_NORMAL || theGameInfo.setPlay != SET_PLAY_PENALTY_KICK || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber || theRobotInfo.number != 4);
+    return (theGameInfo.gamePhase != GAME_PHASE_NORMAL || theGameInfo.setPlay != SET_PLAY_PENALTY_KICK || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber);
   }
   
   option
@@ -68,8 +68,10 @@ class PenaltyFreekickCard : public PenaltyFreekickCardBase
       {
           transition
           {
-             if(state_time > initialWaitTime)
-               goto searchForBall;
+             if(state_time > initialWaitTime && theRobotInfo.number==4)
+                goto searchForBall;
+             if(theRobotInfo.number!=4)
+                goto stand;
           }
           action
           {
@@ -165,7 +167,7 @@ class PenaltyFreekickCard : public PenaltyFreekickCardBase
     {
         transition
         {
-            if(!theFieldBall.ballWasSeen(3000.f) || theFieldBall.positionRelative.norm() > 1000.f)
+            if(theRobotInfo.number==4 && theFieldBall.positionRelative.norm() > 1200.f)
                 goto start;
         }
         action
