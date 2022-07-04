@@ -306,6 +306,7 @@ class KickInCard : public KickInCardBase
       }
       action
       {
+        theLookForwardSkill();
         if(theRobotInfo.number == 1)
         {
           if((theRobotPose.translation - KeeperPos.translation).norm() > StopThreshold)

@@ -186,7 +186,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto GiraCabezaDer; 
         if(hayObstaculoCerca)
           goto ObsAvoid;  
-        if(theFieldBall.positionRelative.norm() < 4000.0f && !theLibCheck.CentralDefending && !theLibCheck.StrikerAttacking && !theLibCheck.RightDefending)
+        if(theFieldBall.positionRelative.norm() < 4000.0f && !theLibCheck.CentralDefending && !theLibCheck.StrikerAttacking && !theLibCheck.RightDefending && theLibCheck.closerToTheBall != 4)
           goto walkToBall;  
       }
 
@@ -303,7 +303,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
 
     state(alignBehindBallToPass)
     {
-      const Angle angleToTeammate = calcAngleToTeammate();
       const bool hayObstaculos = hayObstaculo();
       const Angle angleToGo = calcAngleToGo();
 
@@ -342,7 +341,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
     }
     state(kick)
     {     
-      const Angle angleToGoal = calcAngleToGoal();
       transition
       {
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
@@ -352,19 +350,19 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theLookForwardSkill();
-        theKickSkill((KickRequest::kickForward), true, 0.3f, false);
+        theKickSkill((KickRequest::kickForwardFastLong), true, 0.3f, false);
       }
     }
     state(kickRight)
     {
-      const Angle angleToGoal = calcAngleToGoal();
+      bool hayObstaculos = hayObstaculo();
 
       transition
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
-          goto start;
+        if(!hayObstaculos)
+          goto alignToGoal;
       }
 
       action
@@ -377,16 +375,14 @@ class LeftDefenderCard : public LeftDefenderCardBase
 
     state(kickLeft)
     {
-      const Angle angleToGoal = calcAngleToGoal();
+      bool hayObstaculos = hayObstaculo();
 
       transition
       {
-        // if(theLibCheck.iFell == 2 && (theFieldBall.positionOnField.y() < theFieldDimensions.yPosLeftGoal && theFieldBall.positionOnField.y() > theFieldDimensions.yPosRightGoal))
-        //   goto centralFallen;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
-          goto start;
+        if(!hayObstaculos)
+          goto alignToGoal;
       }
 
       action
