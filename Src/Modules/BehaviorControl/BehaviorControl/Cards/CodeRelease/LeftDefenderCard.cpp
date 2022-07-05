@@ -24,6 +24,8 @@
 #include "Tools/Modeling/Obstacle.h"
 #include "Representations/BehaviorControl/Libraries/LibCheck.h"
 #include "Representations/Communication/TeamData.h"
+#include "Representations/Modeling/TeamBallModel.h"
+
 
 
 CARD(LeftDefenderCard,
@@ -48,6 +50,7 @@ CARD(LeftDefenderCard,
   REQUIRES(BallModel),
   REQUIRES(RobotInfo),
   REQUIRES(LibCheck),
+  REQUIRES(TeamBallModel),
   DEFINES_PARAMETERS(
   {,
     (float)(0.9f) walkSpeed,
@@ -198,9 +201,12 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         if(theFieldBall.positionRelative.norm() < 2000)
           goto DefendBall;
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && theTeamBallModel.isValid)
+          goto lookBall;   
       }
       action
       {
+        theLookForwardSkill();
         thePathToTargetSkill(1.0, Pose2f(0.f, -500.f, 1500.f));
       }
     }
@@ -322,8 +328,8 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto GiraCabezaDer; 
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && theTeamBallModel.isValid)
+          goto lookBall; 
         if(hayObstaculoCerca)
           goto ObsAvoid;
       }
@@ -332,6 +338,18 @@ class LeftDefenderCard : public LeftDefenderCardBase
         theLookForwardSkill();
         theSaySkill("home");
         thePathToTargetSkill(1.0, Defender1Pos);
+      }
+    }
+    state(lookBall)
+    {
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+      }
+      action
+      {
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f((theRobotPose.inversePose * Vector2f(theTeamBallModel.position.x(),theTeamBallModel.position.y())).angle(),0.f,0.f));
       }
     }
     state(kick)
@@ -535,7 +553,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
     if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if(obstacle.center.norm() < 700.f && (obstacle.center.y() < 100 && obstacle.center.y() > -100))
+      if(obstacle.center.norm() < 500.f && (obstacle.center.y() < 150 && obstacle.center.y() > -150))
         x = true;
       }
     }

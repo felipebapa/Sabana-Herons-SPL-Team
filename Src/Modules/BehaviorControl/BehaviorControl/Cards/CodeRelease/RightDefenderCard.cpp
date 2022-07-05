@@ -23,6 +23,8 @@
 #include "Representations/BehaviorControl/Libraries/LibCheck.h"
 #include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Communication/TeamData.h"
+#include "Representations/Modeling/TeamBallModel.h"
+
 
 
 CARD(RightDefenderCard,
@@ -47,6 +49,7 @@ CARD(RightDefenderCard,
   REQUIRES(RobotInfo),
   REQUIRES(LibCheck),
   REQUIRES(ObstacleModel),
+  REQUIRES(TeamBallModel),
   DEFINES_PARAMETERS(
   {,
     (float)(0.9f) walkSpeed,
@@ -127,7 +130,7 @@ class RightDefenderCard : public RightDefenderCardBase
       action
       {
         theSaySkill("the right card");
-        theLookForwardSkill();
+        theStandSkill();
       }
     }
 
@@ -196,9 +199,12 @@ class RightDefenderCard : public RightDefenderCardBase
       {
         if(theFieldBall.positionRelative.norm() < 2000)
           goto DefendBall;
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && theTeamBallModel.isValid)
+          goto lookBall;   
       }
       action
       {
+        theLookForwardSkill();
         thePathToTargetSkill(1.0, Pose2f(0.f, -500.f, -1500.f));
       }
     }
@@ -314,8 +320,8 @@ class RightDefenderCard : public RightDefenderCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto GiraCabezaDer; 
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && theTeamBallModel.isValid)
+          goto lookBall; 
         if(hayObstaculoCerca)
           goto ObsAvoid;
       }
@@ -323,6 +329,18 @@ class RightDefenderCard : public RightDefenderCardBase
       {
         theLookForwardSkill();
         thePathToTargetSkill(1.0, Defender1Pos);
+      }
+    }
+    state(lookBall)
+    {
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+      }
+      action
+      {
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f((theRobotPose.inversePose * Vector2f(theTeamBallModel.position.x(),theTeamBallModel.position.y())).angle(),0.f,0.f));
       }
     }
     state(kick)
