@@ -65,8 +65,8 @@ CARD(BuildWallCard,
     (Pose2f)(Pose2f(0,-4050,0)) KeeperPos,
     (Pose2f)(Pose2f(0,-3000,0)) Defender1Pos,
     (Pose2f)(Pose2f(0,-2500,1500)) Defender2Pos,
-    (Pose2f)(Pose2f(0,2500,-1500)) Defender3Pos,
-    (Pose2f)(Pose2f(0,1000,0)) StrikerPos,
+    (Pose2f)(Pose2f(0,-2500,-1500)) Defender3Pos,
+    (Pose2f)(Pose2f(0,-1000,0)) StrikerPos,
     (int)(100) StopThreshold,
     (float)(15_deg) AngleThreshold,
   }),
@@ -91,6 +91,8 @@ class BuildWallCard : public BuildWallCardBase
       {
           transition
           {
+             if(theRobotInfo.number == 1)
+               goto positions;
              if(state_time > initialWaitTime)
                goto searchForBall;
           }
@@ -186,6 +188,8 @@ class BuildWallCard : public BuildWallCardBase
           goto lookLeft;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
+        if(!theFieldBall.ballWasSeen(15000))
+          goto positions;
       }
 
       action
@@ -203,6 +207,8 @@ class BuildWallCard : public BuildWallCardBase
           goto searchForBall;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
+        if(!theFieldBall.ballWasSeen(15000))
+          goto positions;
       }
       action
       {

@@ -41,6 +41,7 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanMessageParticle<idBehaviorStatus>
   KickIn,
   GoalFreeKick,
   WaitForGoalFreeKick,
+  PenaltyFreekickKeeper,
   CornerKick,
   PushingFreekick,
   CentralDefender,
