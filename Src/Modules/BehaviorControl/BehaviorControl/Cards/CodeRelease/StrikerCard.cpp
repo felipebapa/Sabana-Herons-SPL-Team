@@ -82,7 +82,7 @@ class StrikerCard : public StrikerCardBase
       if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if (obstacle.center.norm()<400.f)  
+      if (obstacle.center.norm()<200.f)  
           hayObstaculoCerca=true;
       }
     }
@@ -199,15 +199,14 @@ class StrikerCard : public StrikerCardBase
     state(avanceConBalon)
     {
       const Angle angleToGoal = calcAngleToGoal();
+      bool hayObstaculos = hayObstaculo();
 
       transition
       {
-        if(theRobotPose.translation.x() > 2500.f)
+        if(theRobotPose.translation.x() > 2500.f || hayObstaculos)
           goto alignToGoal;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto giraCabezaDer;
-        if(hayObstaculoCerca)
-          goto obsAvoid;
         if(theLibCheck.closerToTheBall == 3)
           goto receiveLeftPass;
         if(theLibCheck.closerToTheBall == 5)

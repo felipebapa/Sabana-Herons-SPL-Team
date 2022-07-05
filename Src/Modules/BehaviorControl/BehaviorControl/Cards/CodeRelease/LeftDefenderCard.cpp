@@ -349,6 +349,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       }
       action
       {
+        theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f((theRobotPose.inversePose * Vector2f(theTeamBallModel.position.x(),theTeamBallModel.position.y())).angle(),0.f,0.f));
       }
     }
