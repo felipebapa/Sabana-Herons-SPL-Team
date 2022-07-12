@@ -168,7 +168,6 @@ class RightDefenderCard : public RightDefenderCardBase
       action
       {
         theLookForwardSkill();
-        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
       }
     }
@@ -234,7 +233,6 @@ class RightDefenderCard : public RightDefenderCardBase
       action
       {
         theLookForwardSkill();
-        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
       }
     }
@@ -310,7 +308,6 @@ class RightDefenderCard : public RightDefenderCardBase
       action
       {
         theLookForwardSkill();
-        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGo, theFieldBall.positionRelative.x() + 40 - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY/2));
       }
     }
@@ -340,6 +337,7 @@ class RightDefenderCard : public RightDefenderCardBase
       }
       action
       {
+        theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f((theRobotPose.inversePose * Vector2f(theTeamBallModel.position.x(),theTeamBallModel.position.y())).angle(),0.f,0.f));
       }
     }
@@ -411,7 +409,6 @@ class RightDefenderCard : public RightDefenderCardBase
       action
       {
         theLookForwardSkill();
-        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGo, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
       }
     }
@@ -458,7 +455,7 @@ class RightDefenderCard : public RightDefenderCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(!theFieldBall.ballWasSeen(10000))
+        if(!theFieldBall.ballWasSeen(20000))
           goto goBackHome;  
       }
 
@@ -499,7 +496,7 @@ class RightDefenderCard : public RightDefenderCardBase
           goto goBackToOwnField;  
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-          if(!theFieldBall.ballWasSeen(10000))
+          if(!theFieldBall.ballWasSeen(20000))
           goto goBackHome;    
       }
 
@@ -525,7 +522,7 @@ class RightDefenderCard : public RightDefenderCardBase
           goto turnToBall;
         if(a > 2)
           goto searchForBall;
-        if(!theFieldBall.ballWasSeen(10000))
+        if(!theFieldBall.ballWasSeen(20000))
           goto goBackHome;   
       }
       action

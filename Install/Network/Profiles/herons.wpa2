@@ -3,7 +3,11 @@ ctrl_interface_group=0
 ap_scan=1
 
 network={
+<<<<<<< HEAD
   ssid="Roocup_Thailand"
+=======
+  ssid="SABANA_HERONS"
+>>>>>>> 511dc2e07d3139c806d5b8d2c59c3d5ae7250e04
   scan_ssid=1
   proto=WPA2
   pairwise=TKIP CCMP

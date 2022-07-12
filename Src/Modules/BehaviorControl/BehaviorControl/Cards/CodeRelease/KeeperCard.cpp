@@ -198,9 +198,9 @@ class KeeperCard : public KeeperCardBase
         if(!theFieldBall.ballWasSeen(6000))
           goto searchForBall;
 
-        if (-100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if (100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto GoalRiskRight;
-        if (100 < theBallModel.estimate.position.y()  && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if (-100 < theBallModel.estimate.position.y()  && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto GoalRiskLeft;
         if(-100 < theBallModel.estimate.position.y() && theBallModel.estimate.position.y() < 100 && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto goDown;
@@ -228,9 +228,9 @@ class KeeperCard : public KeeperCardBase
         if(!theFieldBall.ballWasSeen(6000))
           goto searchForBall;
         
-        if (-100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if (100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto GoalRiskRight;
-        if (100 < theBallModel.estimate.position.y()  && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if (-100 < theBallModel.estimate.position.y()  && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto GoalRiskLeft;
         if(-100 < theBallModel.estimate.position.y() && theBallModel.estimate.position.y() < 100 && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto goDown;
@@ -241,7 +241,7 @@ class KeeperCard : public KeeperCardBase
           theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, 0.f, -200));
         if(theRobotPose.translation.x() < theFieldDimensions.xPosOwnGroundline + 150 )
           theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 200, 0.f));
-        if(std::abs (theRobotPose.translation.y()) <= 500)
+        if(std::abs (theRobotPose.translation.y()) <= 450)
           theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, theFieldBall.positionRelative.y()));
         theLookAtAnglesSkill(theFieldBall.positionRelative.angle(), 2);
       }
@@ -257,9 +257,9 @@ class KeeperCard : public KeeperCardBase
         if(!theFieldBall.ballWasSeen(6000))
           goto searchForBall;
           
-        if (-100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if (100 > theBallModel.estimate.position.y() && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto GoalRiskRight;
-        if (100 < theBallModel.estimate.position.y()  && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
+        if (-100 < theBallModel.estimate.position.y()  && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto GoalRiskLeft;
         if(-100 < theBallModel.estimate.position.y() && theBallModel.estimate.position.y() < 100 && theFieldBall.endPositionRelative.x() < 0 && theBallModel.estimate.velocity.x() < -90)
           goto goDown;
@@ -271,7 +271,7 @@ class KeeperCard : public KeeperCardBase
           if(theFieldBall.positionRelative.y() < 0)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, -300.f));
           if(theFieldBall.positionRelative.y() > 0)
-            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, 300.f));
+            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, 0.f, 300.01f));
         }
         if(theRobotPose.translation.y() > 450)
           theWalkToTargetSkill(Pose2f(walkSpeed,walkSpeed, walkSpeed), Pose2f(0.f, 0.f, - 200));
@@ -286,30 +286,30 @@ class KeeperCard : public KeeperCardBase
     {
       transition
       {
-        if (!theFieldBall.ballWasSeen(ballNotSeenTimeout) || theSaySkill.isDone() || state_time > 5000)
+        if (!theFieldBall.ballWasSeen(ballNotSeenTimeout) || theSpecialActionSkill.isDone() || state_time > 5000)
           goto searchForBall;
         // CAMBIAR POR SPECIAL ACTION
       }
       action
       {
-        theSaySkill("GR R"); // CAMBIAR POR SPECIAL ACTION
+        //theSaySkill("GR R"); // CAMBIAR POR SPECIAL ACTION
         theLookForwardSkill();
-        // theSpecialActionSkill(SpecialActionRequest::rightDive);
+        theSpecialActionSkill(SpecialActionRequest::rightDive);
       }
     }
     state(GoalRiskLeft)
     {
       transition
       {
-        if (!theFieldBall.ballWasSeen(ballNotSeenTimeout) || theSaySkill.isDone() || state_time > 5000)
+        if (!theFieldBall.ballWasSeen(ballNotSeenTimeout) || theSpecialActionSkill.isDone() || state_time > 5000)
           goto searchForBall;
         // CAMBIAR POR SPECIAL ACTION
       }
       action
       {
-        theSaySkill("GR L"); // CAMBIAR POR SPECIAL ACTION
+        //theSaySkill("GR L"); // CAMBIAR POR SPECIAL ACTION
         theLookForwardSkill();
-        // theSpecialActionSkill(SpecialActionRequest::leftDive);
+        theSpecialActionSkill(SpecialActionRequest::leftDive);
         
       }
     }
@@ -317,16 +317,16 @@ class KeeperCard : public KeeperCardBase
     {
       transition
       {
-        if (!theFieldBall.ballWasSeen(ballNotSeenTimeout) || theSaySkill.isDone() || state_time > 5000)
+        if (!theFieldBall.ballWasSeen(ballNotSeenTimeout) || theSpecialActionSkill.isDone() || state_time > 5000)
           goto searchForBall;
 
         // CAMBIAR POR SPECIAL ACTION
       }
       action
       {
-        theSaySkill("Go Down"); // CAMBIAR POR SPECIAL ACTION
+        //theSaySkill("Go Down"); // CAMBIAR POR SPECIAL ACTION
         theLookForwardSkill();
-        // theSpecialActionSkill(SpecialActionRequest::preventBall);
+        theSpecialActionSkill(SpecialActionRequest::preventBall);
         
       }
     }

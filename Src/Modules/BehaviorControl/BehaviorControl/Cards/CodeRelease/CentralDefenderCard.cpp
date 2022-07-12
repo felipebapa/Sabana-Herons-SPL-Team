@@ -50,7 +50,7 @@ CARD(CentralDefenderCard,
   {,
     (float)(0.9f) walkSpeed,
     (int)(500) initialWaitTime,
-    (int)(4000) ballNotSeenTimeout,
+    (int)(7000) ballNotSeenTimeout,
     (Pose2f)(Pose2f(0,-3000,0)) Defender1Pos,
     (Angle)(5_deg) ballAlignThreshold,
     (float)(500.f) ballNearThreshold,
@@ -107,6 +107,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       action
       {
         theSaySkill("Original Card");
+        theLookForwardSkill();
         theStandSkill();
       }
     }
@@ -196,6 +197,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         
         theLookForwardSkill();
+        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
           theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
@@ -314,7 +316,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }
       action
       {
-        
+        theLookForwardSkill();
         thePathToTargetSkill(1.0, Defender1Pos);
       }
     }
@@ -327,6 +329,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }
       action
       {
+        theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f((theRobotPose.inversePose * Vector2f(theTeamBallModel.position.x(),theTeamBallModel.position.y())).angle(),0.f,0.f));
       }
     }
@@ -474,23 +477,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
       }
     }
 
-    state(searchForBall)
-    {
-      transition
-      {
-        if(theFieldBall.ballWasSeen())
-          goto turnToBall;
-        if(!theFieldBall.ballWasSeen(10000))
-          goto goBackHome; 
-      }
-
-      action
-      {
-        theLookForwardSkill();
-        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
-      }
-    }
-
     state(ObsAvoid)
     {  
       transition 
@@ -520,8 +506,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto ObsAvoid;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(a > 2)
-          goto searchForBall;
+        if(!theFieldBall.ballWasSeen(20000))
+          goto goBackHome;  
       }
       action
       {
@@ -530,7 +516,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
           theLookAtAnglesSkill(1,2);
           if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
-          //a+=1;   
       }
     } 
 
@@ -544,7 +529,9 @@ class CentralDefenderCard : public CentralDefenderCardBase
         if(hayObstaculoCerca)
           goto ObsAvoid;
         if(theFieldBall.ballWasSeen())
-          goto turnToBall;   
+          goto turnToBall; 
+        if(!theFieldBall.ballWasSeen(20000))
+          goto goBackHome;    
       }
 
       action
