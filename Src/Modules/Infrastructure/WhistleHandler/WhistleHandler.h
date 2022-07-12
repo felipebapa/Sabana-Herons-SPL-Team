@@ -41,6 +41,7 @@ private:
   unsigned timeOfLastSetState = 0;
   unsigned lastGameState = STATE_INITIAL;
   bool overrideGameState = false;
+  bool overrideGameStateGoal = false;
 
   bool checkWhistle() const;
   bool checkBall() const;
