@@ -171,7 +171,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         theLookForwardSkill();
         theSaySkill("walk");
-        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
       }
     }
@@ -191,7 +190,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theLookForwardSkill();
-        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
       }
     }
 
@@ -237,7 +235,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         theLookForwardSkill();
         theSaySkill("aling goal");
-        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
       }
     }
@@ -258,7 +255,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         theLookForwardSkill();
         theSaySkill("behind");
-        theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY - 10.f));
+        theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX - 10.f, theFieldBall.positionRelative.y() - ballOffsetY -10.f));
       }
     }
     state(alignBehindBallRight)
@@ -318,7 +315,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         theLookForwardSkill();
         theSaySkill("go go go");
-        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGo, theFieldBall.positionRelative.x() + 40 - ballOffsetX, theFieldBall.positionRelative.y() + ballOffsetY/2));
       }
     }
@@ -376,7 +372,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(!hayObstaculos)
+        if(!hayObstaculos && theFieldBall.ballWasSeen(1000))
           goto alignToGoal;
       }
 
@@ -396,7 +392,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(!hayObstaculos)
+        if(!hayObstaculos && theFieldBall.ballWasSeen(1000))
           goto alignToGoal;
       }
 
@@ -424,7 +420,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         theLookForwardSkill();
         theSaySkill("aling pass");
-        theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGo, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
       }
     }
@@ -494,11 +489,11 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto GiraCabezaIzq;
         if(hayObstaculoCerca)
           goto ObsAvoid;
-        if(theFieldBall.positionOnField.x() < 0)
+        if(theFieldBall.positionOnField.x() < 0 && theRobotPose.translation.x() > 0)
           goto goBackToOwnField;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;   
-        if(!theFieldBall.ballWasSeen(10000))
+        if(!theFieldBall.ballWasSeen(20000))
           goto goBackHome; 
       }
 
@@ -517,11 +512,11 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto GiraCabezaDer;
         if(hayObstaculoCerca)
           goto ObsAvoid;
-        if(theFieldBall.positionOnField.x() < 0)
+        if(theFieldBall.positionOnField.x() < 0 && theRobotPose.translation.x() > 0)
           goto goBackToOwnField;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(!theFieldBall.ballWasSeen(10000))
+        if(!theFieldBall.ballWasSeen(20000))
           goto goBackHome; 
       }
       action
