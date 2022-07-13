@@ -52,33 +52,34 @@ class PenaltyFreekickCard : public PenaltyFreekickCardBase
 {
   bool preconditions() const override
   {
-    return (theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theRobotInfo.number == 4);
+    return (theGameInfo.gamePhase == GAME_PHASE_NORMAL && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber);
       
   }
 
   bool postconditions() const override
   {
-    return (theGameInfo.gamePhase != GAME_PHASE_NORMAL || theGameInfo.setPlay != SET_PLAY_PENALTY_KICK || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber || theRobotInfo.number != 4);
+    return (theGameInfo.gamePhase != GAME_PHASE_NORMAL || theGameInfo.setPlay != SET_PLAY_PENALTY_KICK || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber);
   }
   
   option
   {
-      theActivitySkill(BehaviorStatus::PenaltyFreekick);
-      initial_state(start)
+    theActivitySkill(BehaviorStatus::PenaltyFreekick);
+    initial_state(start)
       {
           transition
           {
-             if(state_time > initialWaitTime)
-               goto searchForBall;
+             if(state_time > initialWaitTime && theRobotInfo.number==4)
+                goto searchForBall;
+             if(theRobotInfo.number!=4)
+                goto stand;
           }
           action
           {
               theLookForwardSkill();
               theStandSkill();
           }
-      }
-      
-      state(searchForBall)
+      }     
+    state(searchForBall)
       {
           transition
           {
@@ -89,9 +90,8 @@ class PenaltyFreekickCard : public PenaltyFreekickCardBase
           {
               theSaySkill("Searching");
           }
-      }
-      
-      state(chooseSide)
+      }   
+    state(chooseSide)
       {
           transition
           {
@@ -109,41 +109,40 @@ class PenaltyFreekickCard : public PenaltyFreekickCardBase
               //choice=0;
           }
 
-      }
-      
-      state(alignRight)
+      }     
+    state(alignRight)
       {
           const Angle angleToGoal = calcAngleToGoal();
 
           transition
           {
-              if(theFieldBall.positionRelative.x() < 180.f)
+              if(theFieldBall.positionRelative.x() < 180.f && theFieldBall.positionRelative.y() < -15.f)
                   goto kick;
           }
           action
           {
-              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal - 0.65f, theFieldBall.positionRelative.x() - 150.f, theFieldBall.positionRelative.y() + 70.f));
-              theSaySkill("Right Right Right");
+              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal -10_deg , theFieldBall.positionRelative.x() - 165.f, theFieldBall.positionRelative.y() + 70.f));
+              //theSaySkill("Right Right Right");
           }
           
       }
-       state(alignLeft)
+    state(alignLeft)
       {
           const Angle angleToGoal = calcAngleToGoal();
           
           transition
           {
               if(theFieldBall.positionRelative.x() <180.f)
-                  goto kick;
+                  goto kickLeft;
           }
           action
           {
-              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal + 0.65f, theFieldBall.positionRelative.x() - 150.f, theFieldBall.positionRelative.y() + 45.f));
-              theSaySkill("Left Left Left");
+              theWalkToTargetSkill(Pose2f(walkSpeed, 0.35f,0.35f), Pose2f(angleToGoal+30_deg, theFieldBall.positionRelative.x() - 170.f, theFieldBall.positionRelative.y() - 40.f));
+              //theSaySkill("Left Left Left");
           }
           
       }
-      state(kick)
+    state(kick)
     {
       //const Angle angleToGoal = calcAngleToGoal();
 
@@ -161,11 +160,28 @@ class PenaltyFreekickCard : public PenaltyFreekickCardBase
         
       }
     }
+    state(kickLeft)
+    {
+      //const Angle angleToGoal = calcAngleToGoal();
+
+      transition
+      {
+        if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theKickSkill.isDone()))
+          goto stand;
+      }
+
+      action
+      {
+        theLookForwardSkill();
+        //theInWalkKickSkill(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        theKickSkill((KickRequest::kickForwardFastLong), true, 0.3f, false);
+      }
+    }
     state(stand)
     {
         transition
         {
-            if(!theFieldBall.ballWasSeen(3000.f) || theFieldBall.positionRelative.norm() > 1000.f)
+            if(theRobotInfo.number==4 && theFieldBall.positionRelative.norm() > 1200.f)
                 goto start;
         }
         action

@@ -9,7 +9,7 @@ MAKE_MODULE(WhistleHandler, infrastructure)
 
 void WhistleHandler::update(GameInfo& gameInfo)
 {
-  if(theRawGameInfo.state == STATE_SET && (theRawGameInfo.gamePhase == GAME_PHASE_NORMAL || theRawGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT))
+  if((theRawGameInfo.state == STATE_SET) && (theRawGameInfo.gamePhase == GAME_PHASE_NORMAL || theRawGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT))
   {
     if(checkForIllegalMotionPenalty() || lastGameState != STATE_SET)
     {
@@ -22,12 +22,28 @@ void WhistleHandler::update(GameInfo& gameInfo)
   }
   else
     overrideGameState = false;
+  
+  if(theRawGameInfo.state == STATE_PLAYING && theRawGameInfo.gamePhase == GAME_PHASE_NORMAL)
+  {
+    if(lastGameState != STATE_PLAYING)
+    {
+      timeOfLastSetState = theFrameInfo.time;
+      overrideGameStateGoal = false;
+    }
 
+    if(!overrideGameStateGoal)
+      overrideGameStateGoal = checkWhistle() && checkBall();
+  }
+  else 
+    overrideGameStateGoal = false; 
+  
   lastGameState = theRawGameInfo.state;
-
   gameInfo = theRawGameInfo;
+  
   if(overrideGameState)
     gameInfo.state = STATE_PLAYING;
+  if(overrideGameStateGoal)
+    gameInfo.state = STATE_READY;
 }
 
 bool WhistleHandler::checkWhistle() const
