@@ -193,22 +193,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
       }
     }
 
-    state(goBackToOwnField)
-    {
-      transition
-      {
-        if(theFieldBall.positionRelative.norm() < 2000)
-          goto DefendBall;
-        if(!theFieldBall.ballWasSeen(15000))
-          goto GiraCabezaDer;    
-      }
-      action
-      {
-        theLookForwardSkill();
-        thePathToTargetSkill(1.0, Pose2f(0.f, -500.f, 1500.f));
-      }
-    }
-
     state(alignToGoal)
     {
       const Angle angleToGoal = calcAngleToGoal();
@@ -489,8 +473,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto GiraCabezaIzq;
         if(hayObstaculoCerca)
           goto ObsAvoid;
-        if(theFieldBall.positionOnField.x() < 0 && theRobotPose.translation.x() > 0)
-          goto goBackToOwnField;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;   
         if(!theFieldBall.ballWasSeen(20000))
@@ -512,8 +494,6 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto GiraCabezaDer;
         if(hayObstaculoCerca)
           goto ObsAvoid;
-        if(theFieldBall.positionOnField.x() < 0 && theRobotPose.translation.x() > 0)
-          goto goBackToOwnField;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
         if(!theFieldBall.ballWasSeen(20000))
