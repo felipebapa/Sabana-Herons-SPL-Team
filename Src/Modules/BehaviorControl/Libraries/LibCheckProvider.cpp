@@ -57,6 +57,7 @@ void LibCheckProvider::update(LibCheck& libCheck)
   libCheck.rightPenalized = isRightPenalized();
   libCheck.leftPenalized = isLeftPenalized();
   libCheck.howManyPenalized = howManyPenalized();
+  libCheck.StrikerAttacking = isStrikerAttacking();
 }
 
 
@@ -187,6 +188,18 @@ bool LibCheckProvider::positionToPassRight()
   return IsToPass;
 }
 
+bool LibCheckProvider::isStrikerAttacking()
+{
+  for(auto const& teammate : theTeamData.teammates)
+  {
+      if(!teammate.isPenalized){
+          if(teammate.number==4 && teammate.theRobotPose.translation.x()>= theFieldDimensions.xPosHalfWayLine && isCloserToTheBall()){
+            return true;
+        }
+      } 
+    }
+    return false;
+}
 bool LibCheckProvider::isLeftAttacking()
 {
   for(auto const& teammate : theTeamData.teammates)

@@ -75,6 +75,7 @@ private:
   bool isLeftPenalized();
   bool isRightPenalized();
   int howManyPenalized();
+  bool isStrikerAttacking();
   
   int callCounters[LibCheck::numOfCheckedOutputs]; /**< The counters for different checks */
   bool setArmsInThisFrame[Arms::numOfArms]; /**< This arm was set in this frame */
