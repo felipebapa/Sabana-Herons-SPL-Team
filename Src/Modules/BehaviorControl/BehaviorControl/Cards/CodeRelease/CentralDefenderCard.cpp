@@ -48,7 +48,7 @@ CARD(CentralDefenderCard,
   REQUIRES(TeamBallModel),
   DEFINES_PARAMETERS(
   {,
-    (float)(0.9f) walkSpeed,
+    (float)(0.6f) walkSpeed,
     (int)(500) initialWaitTime,
     (int)(7000) ballNotSeenTimeout,
     (Pose2f)(Pose2f(0,-3000,0)) Defender1Pos,
