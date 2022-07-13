@@ -53,7 +53,7 @@ CARD(LeftDefenderCard,
   REQUIRES(TeamBallModel),
   DEFINES_PARAMETERS(
   {,
-    (float)(0.9f) walkSpeed,
+    (float)(0.8f) walkSpeed,
     (int)(500) initialWaitTime,
     (int)(4000) ballNotSeenTimeout,
     (Pose2f)(Pose2f(0,-2500,1500)) Defender1Pos,
@@ -94,7 +94,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if (obstacle.center.norm()<400.f)  
+      if (obstacle.center.norm()<200.f)  
           hayObstaculoCerca=true;
       }
     }
@@ -183,7 +183,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto GiraCabezaDer; 
         if(hayObstaculoCerca)
           goto ObsAvoid;  
-        if(theFieldBall.positionRelative.norm() < 4000.0f && !theLibCheck.CentralDefending && !theLibCheck.StrikerAttacking && !theLibCheck.RightDefending && theLibCheck.closerToTheBall != 4)
+        if(!theLibCheck.CentralDefending && !theLibCheck.StrikerAttacking && !theLibCheck.RightDefending && theLibCheck.closerToTheBall != 4)
           goto walkToBall;  
       }
 
@@ -199,8 +199,8 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         if(theFieldBall.positionRelative.norm() < 2000)
           goto DefendBall;
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && theTeamBallModel.isValid)
-          goto lookBall;   
+        if(!theFieldBall.ballWasSeen(15000))
+          goto GiraCabezaDer;    
       }
       action
       {
@@ -225,7 +225,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
           goto alignBehindBallLeft;
         if(!hayObstaculos && !theLibCheck.positionToPassRight && theRobotPose.translation.x() < 2000)
           goto alignToPass;
-        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && theRobotPose.translation.x() >= 2500 && !hayObstaculos)
+        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && theRobotPose.translation.x() >= 1000 && !hayObstaculos)
           goto alignBehindBall;  
         if(!hayObstaculos && theRobotPose.translation.x() < 2500)
           goto alignToPassStriker;
@@ -308,7 +308,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(theRobotPose.translation.x() >= 3000 || theLibCheck.positionToPassRight || hayObstaculos)
+        if(theRobotPose.translation.x() >= 1000 || theLibCheck.positionToPassRight || hayObstaculos)
           goto alignToGoal;    
       }
       action
@@ -324,8 +324,8 @@ class LeftDefenderCard : public LeftDefenderCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && theTeamBallModel.isValid)
-          goto lookBall; 
+        if(!theFieldBall.ballWasSeen(15000))
+          goto GiraCabezaDer; 
         if(hayObstaculoCerca)
           goto ObsAvoid;
       }
@@ -485,7 +485,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       
       transition
       {
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 1500)
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 2000)
           goto GiraCabezaIzq;
         if(hayObstaculoCerca)
           goto ObsAvoid;
@@ -500,7 +500,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
-        theLookAtAnglesSkill(-1,2);
+        theLookAtAnglesSkill(-1,2, 0.75f);
       }
     } 
 
@@ -508,7 +508,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
     {
       transition
       {
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 1500)
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 2000)
           goto GiraCabezaDer;
         if(hayObstaculoCerca)
           goto ObsAvoid;
@@ -522,7 +522,7 @@ class LeftDefenderCard : public LeftDefenderCardBase
       action
       {
           theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
-          theLookAtAnglesSkill(1,2);
+          theLookAtAnglesSkill(1,2,0.75f);
           //a+=1;   
       }
     } 

@@ -48,7 +48,7 @@ CARD(CentralDefenderCard,
   REQUIRES(TeamBallModel),
   DEFINES_PARAMETERS(
   {,
-    (float)(0.6f) walkSpeed,
+    (float)(0.7f) walkSpeed,
     (int)(500) initialWaitTime,
     (int)(7000) ballNotSeenTimeout,
     (Pose2f)(Pose2f(0,-3000,0)) Defender1Pos,
@@ -89,7 +89,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       if(!theObstacleModel.obstacles.empty()){     //Tenemos obstàculos, entonces, actuamos.   
       for(const auto& obstacle : theObstacleModel.obstacles){
         //See if the obstacle is first than the target   
-      if (obstacle.center.norm()<400.f && obstacle.isOpponent())  
+      if (obstacle.center.norm()<200.f && obstacle.isOpponent())  
           hayObstaculoCerca=true;
       }
       if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
@@ -298,7 +298,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
       action
       {
         theSaySkill("behind pass");
-        theLookForwardSkill();        theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToTeammate, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        theLookForwardSkill();        
+        theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToTeammate, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
@@ -309,8 +310,8 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && theTeamBallModel.isValid)
-          goto lookBall;   
+        if(!theFieldBall.ballWasSeen(15000))
+          goto GiraCabezaDer;   
         if(hayObstaculoCerca)
           goto ObsAvoid;
       }
@@ -500,7 +501,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     {
       transition
       {
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 1500)
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 2000)
           goto GiraCabezaDer;
         if(hayObstaculoCerca)
           goto ObsAvoid;
@@ -513,7 +514,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         
           theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
-          theLookAtAnglesSkill(1,2);
+          theLookAtAnglesSkill(1,2,0.75f);
           if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
@@ -524,7 +525,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       
       transition
       {
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 1500)
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 2000)
           goto GiraCabezaIzq;
         if(hayObstaculoCerca)
           goto ObsAvoid;
@@ -538,7 +539,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
-        theLookAtAnglesSkill(-1,2);
+        theLookAtAnglesSkill(-1,2, 0.75f);
         if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
             theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
       }
