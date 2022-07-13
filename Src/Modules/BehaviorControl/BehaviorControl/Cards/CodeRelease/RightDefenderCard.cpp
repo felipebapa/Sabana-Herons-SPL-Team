@@ -206,8 +206,8 @@ class RightDefenderCard : public RightDefenderCardBase
           goto alignBehindBallRight;  
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && hayObstaculos && random == 1) 
           goto alignBehindBallLeft;
-        if(!hayObstaculos && !theLibCheck.positionToPassLeft && theRobotPose.translation.x() < 2000)
-          goto alignToPass;  
+        // if(!hayObstaculos && !theLibCheck.positionToPassLeft && theRobotPose.translation.x() < 2000)
+        //   goto alignToPass;  
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
           goto alignBehindBall;
         if(!hayObstaculos && theRobotPose.translation.x() < 2500)
@@ -305,6 +305,8 @@ class RightDefenderCard : public RightDefenderCardBase
           goto GiraCabezaDer;  
         if(hayObstaculoCerca)
           goto ObsAvoid;
+        if(theLibCheck.StrikerAttacking)
+          goto attack;  
       }
       action
       {
@@ -379,23 +381,23 @@ class RightDefenderCard : public RightDefenderCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() + 2000));
       }
     }
-    state(alignToPass)
-    {
-      const Angle angleToGo = calcAngleToGo();
+    // state(alignToPass)
+    // {
+    //   const Angle angleToGo = calcAngleToGo();
 
-      transition
-      {
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto GiraCabezaDer; 
-        if(std::abs(angleToGo) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
-          goto kick;
-      }
-      action
-      {
-        theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGo, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
-      }
-    }
+    //   transition
+    //   {
+    //     if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+    //       goto GiraCabezaDer; 
+    //     if(std::abs(angleToGo) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
+    //       goto kick;
+    //   }
+    //   action
+    //   {
+    //     theLookForwardSkill();
+    //     theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGo, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
+    //   }
+    // }
     state(alignToPassStriker)
     {
       const Angle angleToTeammate = calcAngleToTeammate();
@@ -449,8 +451,25 @@ class RightDefenderCard : public RightDefenderCardBase
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
     }
-
-    state(ObsAvoid)
+    state(attack)
+    {
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+        if(!theFieldBall.ballWasSeen(15000))
+          goto GiraCabezaDer;
+        if(hayObstaculoCerca)
+          goto ObsAvoid;      
+      }
+      action
+      {
+        theLookForwardSkill();
+        thePathToTargetSkill(1.0, Pose2f(0,0,-1500));
+      }
+    }   
+     
+   state(ObsAvoid)
     {  
       transition 
       {
@@ -476,9 +495,12 @@ class RightDefenderCard : public RightDefenderCardBase
           goto GiraCabezaIzq;
         if(hayObstaculoCerca)
           goto ObsAvoid;
+        
+        if(theLibCheck.StrikerAttacking)
+          goto attack;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-          if(!theFieldBall.ballWasSeen(20000))
+        if(!theFieldBall.ballWasSeen(20000))
           goto goBackHome;    
       }
 
@@ -500,6 +522,8 @@ class RightDefenderCard : public RightDefenderCardBase
           goto ObsAvoid; 
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
+        if(theLibCheck.StrikerAttacking)
+          goto attack; 
         if(a > 2)
           goto searchForBall;
         if(!theFieldBall.ballWasSeen(20000))
