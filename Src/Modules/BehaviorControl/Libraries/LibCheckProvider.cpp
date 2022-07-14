@@ -259,7 +259,7 @@ bool LibCheckProvider::isRightDefending()
 
       if(!teammate.isPenalized){
         // if(teammate.theTeamBehaviorStatus.role.playBall)
-          if(teammate.number==5 && teammate.theRobotPose.translation.x() <= theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number)
+          if(teammate.number==2 && teammate.theRobotPose.translation.x() <= theFieldDimensions.xPosHalfWayLine && LibCheckProvider::isCloserToTheBall()==teammate.number)
             return true;   //El Right supporter està atacando.
         }
     }
