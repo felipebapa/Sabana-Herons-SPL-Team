@@ -24,7 +24,7 @@ CARD(CodeReleasePositionForKickOffCard,
   REQUIRES(RobotPose),
   DEFINES_PARAMETERS(
   {,
-    (Pose2f)(Pose2f(0,-4050,0)) KeeperPos,
+    (Pose2f)(Pose2f(0,-4150,0)) KeeperPos,
     (Pose2f)(Pose2f(0,-3000,0)) Defender1Pos,
     (Pose2f)(Pose2f(0,-2500,1500)) Defender2Pos,
     (Pose2f)(Pose2f(0,-2500,-1500)) Defender3Pos,
@@ -57,7 +57,7 @@ class CodeReleasePositionForKickOffCard : public CodeReleasePositionForKickOffCa
     {
       if((theRobotPose.translation - KeeperPos.translation).norm() > StopThreshold)
       {
-        thePathToTargetSkill(0.6f, KeeperPos);
+        thePathToTargetSkill(0.7f, KeeperPos);
       }
       else if (theRobotPose.rotation < -AngleThreshold || theRobotPose.rotation > AngleThreshold)
       {

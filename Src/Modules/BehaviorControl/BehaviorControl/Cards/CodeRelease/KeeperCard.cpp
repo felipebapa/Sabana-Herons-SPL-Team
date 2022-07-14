@@ -294,7 +294,7 @@ class KeeperCard : public KeeperCardBase
       {
         //theSaySkill("GR R"); // CAMBIAR POR SPECIAL ACTION
         theLookForwardSkill();
-        //theSpecialActionSkill(SpecialActionRequest::rightDive);
+        theSpecialActionSkill(SpecialActionRequest::rightDive);
       }
     }
     state(GoalRiskLeft)
@@ -309,7 +309,7 @@ class KeeperCard : public KeeperCardBase
       {
         //theSaySkill("GR L"); // CAMBIAR POR SPECIAL ACTION
         theLookForwardSkill();
-        //theSpecialActionSkill(SpecialActionRequest::leftDive);
+        theSpecialActionSkill(SpecialActionRequest::leftDive);
         
       }
     }
@@ -326,7 +326,7 @@ class KeeperCard : public KeeperCardBase
       {
         //theSaySkill("Go Down"); // CAMBIAR POR SPECIAL ACTION
         theLookForwardSkill();
-        //theSpecialActionSkill(SpecialActionRequest::preventBall);
+        theSpecialActionSkill(SpecialActionRequest::preventBall);
         
       }
     }
