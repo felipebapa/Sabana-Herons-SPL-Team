@@ -237,7 +237,7 @@ class RightDefenderCard : public RightDefenderCardBase
       {
         theLookForwardSkill();
         theKeyFrameArmsSkill(ArmKeyFrameRequest::back,false);
-        theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX -15.f, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
     state(alignBehindBallRight)

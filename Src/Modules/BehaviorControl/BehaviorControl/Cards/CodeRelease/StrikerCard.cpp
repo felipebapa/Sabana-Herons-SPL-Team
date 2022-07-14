@@ -253,7 +253,7 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theLookForwardSkill();
-        thePathToTargetSkill(walkSpeed + 0.3f,Pose2f(angleToPass, 2000.f, 1000.f));
+        thePathToTargetSkill(walkSpeed + 0.3f,Pose2f(angleToPass, 0.f, 2000.f));
       }
     }
 

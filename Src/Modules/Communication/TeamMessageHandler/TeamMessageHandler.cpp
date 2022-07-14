@@ -347,5 +347,5 @@ void TeamMessageHandler::parseMessageIntoBMate(Teammate& currentTeammate)
 
     void TeamMessageHandler::MensajeSporadico()
   {
-    sendInterval = 1000;
+    sendInterval = 3000;
   }
