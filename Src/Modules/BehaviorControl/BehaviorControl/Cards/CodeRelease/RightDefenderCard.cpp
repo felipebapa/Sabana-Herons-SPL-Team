@@ -142,8 +142,6 @@ class RightDefenderCard : public RightDefenderCardBase
           goto GiraCabezaDer; 
         if(std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold && !hayObstaculoCerca)
           goto DefendBall;
-        if(hayObstaculoCerca)
-          goto ObsAvoid;
       }    
       action
       {
@@ -161,7 +159,7 @@ class RightDefenderCard : public RightDefenderCardBase
           goto GiraCabezaDer; 
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold) && !hayObstaculoCerca)
           goto alignToGoal;
-        if(hayObstaculoCerca)
+        if(hayObstaculoCerca && theFieldBall.positionOnField.norm() > 200.f)
           goto ObsAvoid;
       }
 
@@ -178,9 +176,7 @@ class RightDefenderCard : public RightDefenderCardBase
       {
 
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto GiraCabezaDer;
-        if(hayObstaculoCerca)
-          goto ObsAvoid;   
+          goto GiraCabezaDer;  
         if(theFieldBall.positionRelative.norm() < 4000.0f && !theLibCheck.CentralDefending && !theLibCheck.StrikerAttacking && !theLibCheck.LeftDefending && theLibCheck.closerToTheBall != 4)
           goto walkToBall;  
       }
@@ -303,10 +299,8 @@ class RightDefenderCard : public RightDefenderCardBase
           goto turnToBall;
         if(!theFieldBall.ballWasSeen(15000))
           goto GiraCabezaDer;  
-        if(hayObstaculoCerca)
-          goto ObsAvoid;
-        if(theLibCheck.StrikerAttacking)
-          goto attack;  
+        if(hayObstaculoCerca && theFieldBall.positionOnField.norm() > 200.f)
+          goto ObsAvoid;  
       }
       action
       {
@@ -450,25 +444,7 @@ class RightDefenderCard : public RightDefenderCardBase
         theLookForwardSkill();
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
       }
-    }
-    state(attack)
-    {
-      transition
-      {
-        if(theFieldBall.ballWasSeen())
-          goto turnToBall;
-        if(!theFieldBall.ballWasSeen(15000))
-          goto GiraCabezaDer;
-        if(hayObstaculoCerca)
-          goto ObsAvoid;      
-      }
-      action
-      {
-        theLookForwardSkill();
-        thePathToTargetSkill(1.0, Pose2f(0,0,-1500));
-      }
-    }   
-     
+    }     
    state(ObsAvoid)
     {  
       transition 
@@ -493,11 +469,6 @@ class RightDefenderCard : public RightDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 2000)
           goto GiraCabezaIzq;
-        if(hayObstaculoCerca)
-          goto ObsAvoid;
-        
-        if(theLibCheck.StrikerAttacking)
-          goto attack;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
         if(!theFieldBall.ballWasSeen(20000))
@@ -518,12 +489,8 @@ class RightDefenderCard : public RightDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 2000)
           goto GiraCabezaDer;
-        if(hayObstaculoCerca)
-          goto ObsAvoid; 
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(theLibCheck.StrikerAttacking)
-          goto attack; 
         if(a > 2)
           goto searchForBall;
         if(!theFieldBall.ballWasSeen(20000))

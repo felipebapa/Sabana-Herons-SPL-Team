@@ -120,8 +120,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto GiraCabezaDer;  
         if(((std::abs(theFieldBall.positionRelative.angle()) < ballAlignThreshold) || (theFieldBall.positionRelative.x() < theFieldDimensions.xPosHalfWayLine)) && !hayObstaculoCerca)
           goto DefendBall;  
-        if(hayObstaculoCerca)
-          goto ObsAvoid;
       }  
       action
       {
@@ -136,8 +134,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
     {
       transition
       {
-        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0 ))
-          goto waitBall;
+
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold) && !theLibCheck.LeftDefending && !theLibCheck.RightDefending)
@@ -152,33 +149,10 @@ class CentralDefenderCard : public CentralDefenderCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), theFieldBall.positionRelative);
       }
     }
-
-    state(waitBall)
-    {
-
-      transition
-      {
-        if(theFieldBall.ballWasSeen())
-          goto turnToBall;
-        if(!theFieldBall.ballWasSeen(4000))
-        goto goBackHome;   
-        if(hayObstaculoCerca)
-          goto ObsAvoid;
-        if(theRobotPose.translation.x() < 0)
-          goto DefendBall;  
-      }    
-      action
-      {
-        theLookForwardSkill();
-      }
-    }
-
     state(DefendBall)
     {
       transition
       {
-        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
-          goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(theFieldBall.positionRelative.norm() < 4000.0f && !hayObstaculoCerca && !theLibCheck.LeftDefending && !theLibCheck.RightDefending && theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine)
@@ -203,8 +177,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       transition
       {
-        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
-          goto waitBall;
+
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && random == 0 && hayObstaculos)
@@ -231,8 +204,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       transition
       {
-        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
-          goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(!theFieldBall.ballWasSeen())
@@ -253,8 +224,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       transition
       {
-        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
-          goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer;  
         if(!theFieldBall.ballWasSeen())
@@ -296,26 +265,13 @@ class CentralDefenderCard : public CentralDefenderCardBase
           goto turnToBall;
         if(!theFieldBall.ballWasSeen(15000))
           goto GiraCabezaDer;   
-        if(hayObstaculoCerca)
+        if(hayObstaculoCerca && theFieldBall.positionOnField.norm() > 200.f)
           goto ObsAvoid;
       }
       action
       {
         theLookForwardSkill();
         thePathToTargetSkill(1.0, Defender1Pos);
-      }
-    }
-    state(lookBall)
-    {
-      transition
-      {
-        if(theFieldBall.ballWasSeen())
-          goto turnToBall;
-      }
-      action
-      {
-        theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f((theRobotPose.inversePose * Vector2f(theTeamBallModel.position.x(),theTeamBallModel.position.y())).angle(),0.f,0.f));
       }
     }
     state(kickRight)
@@ -326,7 +282,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(!hayObstaculos)
+        if(!hayObstaculos && theFieldBall.ballWasSeen(1000))
           goto alignToGoal;
       }
 
@@ -345,7 +301,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(!hayObstaculos)
+        if(!hayObstaculos && theFieldBall.ballWasSeen(1000))
           goto alignToGoal;
       }
 
@@ -362,14 +318,10 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       transition
       {
-        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
-          goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
           goto start;
-        if(hayObstaculos)
-          goto alignToGoal;
       }
       action
       {
@@ -386,8 +338,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       transition
       {
-        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
-          goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(std::abs(angleToTeammate) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
@@ -411,16 +361,12 @@ class CentralDefenderCard : public CentralDefenderCardBase
 
       transition
       {
-        if((theRobotPose.translation.x() >= theFieldDimensions.xPosHalfWayLine) || (theFieldBall.positionRelative.x()*-1 >= 0))
-          goto waitBall;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
         if(std::abs(angleToClearance) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
           goto alignBehindBallToClearance;
         if(!hayObstaculos && theLibCheck.positionToPass)
-          goto alignToPass;  
-        if(hayObstaculos)
-          goto alignToGoal;
+          goto alignToPass;
       }
 
       action
@@ -439,8 +385,6 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(std::abs(angleToClearance) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()) && !hayObstaculos)
           goto pass; 
-        if(hayObstaculos)
-          goto alignToGoal;
       }
       action
       {
@@ -475,7 +419,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 2000)
           goto GiraCabezaDer;
-        if(hayObstaculoCerca)
+        if(hayObstaculoCerca && theFieldBall.positionOnField.norm() > 200.f)
           goto ObsAvoid;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
@@ -497,7 +441,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout) && state_time > 2000)
           goto GiraCabezaIzq;
-        if(hayObstaculoCerca)
+        if(hayObstaculoCerca && theFieldBall.positionOnField.norm() > 200.f)
           goto ObsAvoid;
         if(theFieldBall.ballWasSeen())
           goto turnToBall; 
