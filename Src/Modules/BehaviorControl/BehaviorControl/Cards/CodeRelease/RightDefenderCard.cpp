@@ -177,7 +177,7 @@ class RightDefenderCard : public RightDefenderCardBase
 
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer;  
-        if(theFieldBall.positionRelative.norm() < 4000.0f && !theLibCheck.CentralDefending && !theLibCheck.StrikerAttacking && !theLibCheck.LeftDefending && theLibCheck.closerToTheBall != 4)
+        if(!theLibCheck.CentralDefending && !theLibCheck.LeftDefending)
           goto walkToBall;  
       }
 

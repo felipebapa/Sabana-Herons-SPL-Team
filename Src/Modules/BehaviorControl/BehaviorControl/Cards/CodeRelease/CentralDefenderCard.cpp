@@ -155,7 +155,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer; 
-        if(theFieldBall.positionRelative.norm() < 4000.0f && !hayObstaculoCerca && !theLibCheck.LeftDefending && !theLibCheck.RightDefending && theFieldBall.positionOnField.x() < theFieldDimensions.xPosHalfWayLine)
+        if(!theLibCheck.LeftDefending && !theLibCheck.RightDefending)
           goto walkToBall;  
         if(hayObstaculoCerca)
           goto ObsAvoid;
