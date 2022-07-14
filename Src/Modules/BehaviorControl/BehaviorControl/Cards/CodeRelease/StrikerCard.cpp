@@ -307,7 +307,7 @@ class StrikerCard : public StrikerCardBase
           goto alignRight;
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && hayObstaculos && random == 1)
           goto alignLeft;
-        if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold )
+        if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold )
           goto alignBehindBall;
       }
       action
@@ -331,7 +331,7 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed + 0.4f, walkSpeed + 0.4f, walkSpeed + 0.4f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX-20.f, theFieldBall.positionRelative.y() - ballOffsetY));
+        theWalkToTargetSkill(Pose2f(walkSpeed + 0.2f, walkSpeed + 0.2f, walkSpeed + 0.2f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX-25.f, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
 
@@ -379,8 +379,6 @@ class StrikerCard : public StrikerCardBase
 
     state(kickAtGoal)
     {
-      const Angle angleToGoal = calcAngleToGoal();
-
       transition
       {
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
