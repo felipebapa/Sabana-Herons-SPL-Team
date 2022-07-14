@@ -182,6 +182,9 @@ class StrikerCard : public StrikerCardBase
           goto giraCabezaDer;
         if(theFieldBall.positionRelative.squaredNorm() < sqr(ballNearThreshold))
           goto alignToGoal;
+        if(hayObstaculoCerca && theFieldBall.positionOnField.norm() > 200.f)
+          goto obsAvoid;
+
       }
       action
       {
@@ -195,7 +198,7 @@ class StrikerCard : public StrikerCardBase
 
       transition
       {
-        if(hayObstaculoCerca)
+        if(hayObstaculoCerca && theFieldBall.positionOnField.norm() > 200.f)
           goto obsAvoid;
         if(!theLibCheck.LeftAttacking || (theLibCheck.closerToTheBall != 2 && theLibCheck.closerToTheBall != 3 && theLibCheck.closerToTheBall != 5))
           goto walkToBall;
@@ -217,7 +220,7 @@ class StrikerCard : public StrikerCardBase
 
       transition
       {
-        if(hayObstaculoCerca)
+        if(hayObstaculoCerca && theFieldBall.positionOnField.norm() > 200.f)
           goto obsAvoid;
         if(!theLibCheck.RightAttacking || (theLibCheck.closerToTheBall != 2 && theLibCheck.closerToTheBall != 3 && theLibCheck.closerToTheBall != 5))
           goto walkToBall;
@@ -239,7 +242,7 @@ class StrikerCard : public StrikerCardBase
 
       transition
       {
-        if(hayObstaculoCerca)
+        if(hayObstaculoCerca && theFieldBall.positionOnField.norm() > 200.f)
           goto obsAvoid;
         if(theLibCheck.closerToTheBall == 3)
           goto receiveLeftPass;
