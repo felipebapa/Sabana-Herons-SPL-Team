@@ -50,7 +50,7 @@ class OpponentKickOffWaitCard : public OpponentKickOffWaitCardBase
 {
   bool preconditions() const override
   {
-    return (theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber && theGameInfo.state == STATE_READY);
+    return false;
   }
 
   bool postconditions() const override

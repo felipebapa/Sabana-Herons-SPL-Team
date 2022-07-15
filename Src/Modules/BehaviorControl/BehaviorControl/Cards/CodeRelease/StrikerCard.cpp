@@ -53,7 +53,7 @@ CARD(StrikerCard,
     (float)(100.f) ballYThreshold,
     (Angle)(2_deg) angleToGoalThresholdPrecise,
     (float)(150.f) ballOffsetX,
-    (Rangef)({140.f, 170.f}) ballOffsetXRange,
+    (Rangef)({140.f, 190.f}) ballOffsetXRange,
     (float)(40.f) ballOffsetY,
     (Rangef)({20.f, 50.f}) ballOffsetYRange,
     (int)(10) minKickWaitTime,
@@ -205,7 +205,7 @@ class StrikerCard : public StrikerCardBase
           goto turnToBall;
         if(hayObstaculoCerca && theFieldBall.positionOnField.norm() > 200.f)
           goto obsAvoid;
-        if(thePathToTargetSkill.isDone())
+        if(!theFieldBall.ballWasSeen(17000))
           goto giraCabezaDer;
       }
       action
@@ -250,7 +250,7 @@ class StrikerCard : public StrikerCardBase
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto giraCabezaDer;
-        if(std::abs(angleToGoal) < angleToGoalThresholdPrecise && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
+        if(std::abs(angleToGoal) < angleToGoalThreshold && ballOffsetXRange.isInside(theFieldBall.positionRelative.x()) && ballOffsetYRange.isInside(theFieldBall.positionRelative.y()))
           goto kickAtGoal; 
       }
       action
