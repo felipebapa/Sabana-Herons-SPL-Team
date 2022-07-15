@@ -206,7 +206,7 @@ class StrikerCard : public StrikerCardBase
           goto turnToBall;
         if(hayObstaculoCerca && theFieldBall.positionOnField.norm() > 200.f)
           goto obsAvoid;
-        if((theRobotPose.translation.x() > 1600 && theRobotPose.translation.x() < 2400) )
+        if((theRobotPose.translation.x() > 1200 && theRobotPose.translation.x() < 2800) )
           goto giraCabezaDer;
       }
       action
@@ -239,7 +239,7 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
+        theWalkToTargetSkill(Pose2f(walkSpeed + 0.2f, walkSpeed + 0.2f, walkSpeed + 0.2f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
       }
     }
  
