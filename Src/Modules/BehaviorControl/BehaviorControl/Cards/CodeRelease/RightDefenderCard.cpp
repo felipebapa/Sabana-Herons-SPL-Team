@@ -202,8 +202,8 @@ class RightDefenderCard : public RightDefenderCardBase
           goto alignBehindBallRight;  
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold && hayObstaculos && random == 1) 
           goto alignBehindBallLeft;
-        // if(!hayObstaculos && !theLibCheck.positionToPassLeft && theRobotPose.translation.x() < 2000)
-        //   goto alignToPass;  
+        if(!hayObstaculos && !theLibCheck.positionToPassLeft && theRobotPose.translation.x() < 2000)
+          goto alignToPass;  
         if(std::abs(angleToGoal) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
           goto alignBehindBall;
         if(!hayObstaculos && theRobotPose.translation.x() < 2500)
@@ -273,24 +273,24 @@ class RightDefenderCard : public RightDefenderCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX + 45.f, theFieldBall.positionRelative.y() + ballOffsetY - 200.f));
       }
     }  
-    // state(alignBehindBallToPass)
-    // {
-    //   const bool hayObstaculos = hayObstaculo();
-    //   const Angle angleToGo = calcAngleToGo();
+    state(alignBehindBallToPass)
+    {
+      const bool hayObstaculos = hayObstaculo();
+      const Angle angleToGo = calcAngleToGo();
 
-    //   transition
-    //   {
-    //     if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-    //       goto GiraCabezaDer; 
-    //     if(theRobotPose.translation.x() >= 1000 || theLibCheck.positionToPassLeft || hayObstaculos)
-    //       goto alignToGoal;
-    //   }
-    //   action
-    //   {
-    //     theLookForwardSkill();
-    //     theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGo, theFieldBall.positionRelative.x() + 40 - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY/2));
-    //   }
-    // }
+      transition
+      {
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto GiraCabezaDer; 
+        if(theRobotPose.translation.x() >= 1000 || theLibCheck.positionToPassLeft || hayObstaculos)
+          goto alignToGoal;
+      }
+      action
+      {
+        theLookForwardSkill();
+        theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGo, theFieldBall.positionRelative.x() + 40 - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY/2));
+      }
+    }
 
     state(goBackHome){
       transition
@@ -336,10 +336,7 @@ class RightDefenderCard : public RightDefenderCardBase
       action
       {
         theLookForwardSkill();
-        if(theFieldBall.positionOnField.x() < 1000)
-          theInWalkKickSkill(WalkKickVariant(WalkKicks::forwardOLD, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
-        if(theFieldBall.positionOnField.x() >= 1000)
-          theKickSkill((KickRequest::kickForwardFastLong), true, 0.3f, false);
+        theKickSkill((KickRequest::kickForwardFastLong), true, 0.3f, false);
       }
     }
     state(kickRight)
@@ -380,23 +377,23 @@ class RightDefenderCard : public RightDefenderCardBase
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(0.f,0.f,theRobotPose.inversePose.translation.y() + 2000));
       }
     }
-    // state(alignToPass)
-    // {
-    //   const Angle angleToGo = calcAngleToGo();
+    state(alignToPass)
+    {
+      const Angle angleToGo = calcAngleToGo();
 
-    //   transition
-    //   {
-    //     if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-    //       goto GiraCabezaDer; 
-    //     if(std::abs(angleToGo) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
-    //       goto kick;
-    //   }
-    //   action
-    //   {
-    //     theLookForwardSkill();
-    //     theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGo, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
-    //   }
-    // }
+      transition
+      {
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto GiraCabezaDer; 
+        if(std::abs(angleToGo) < angleToGoalThreshold && std::abs(theFieldBall.positionRelative.y()) < ballYThreshold)
+          goto kick;
+      }
+      action
+      {
+        theLookForwardSkill();
+        theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToGo, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
+      }
+    }
     state(alignToPassStriker)
     {
       const Angle angleToTeammate = calcAngleToTeammate();
