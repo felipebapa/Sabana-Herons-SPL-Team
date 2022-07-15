@@ -91,6 +91,9 @@ class StrikerCard : public StrikerCardBase
     {
       transition
       {
+
+        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+          goto giraCabezaDer;
         if(state_time > initialWaitTime)
           goto turnToBall;
       }
