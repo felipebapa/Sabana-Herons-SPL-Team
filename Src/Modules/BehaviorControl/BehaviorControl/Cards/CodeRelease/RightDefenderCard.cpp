@@ -77,12 +77,12 @@ class RightDefenderCard : public RightDefenderCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == 6;
+    return theRobotInfo.number == 5;
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != 6;
+    return theRobotInfo.number != 5;
   }
 
   option
@@ -177,7 +177,7 @@ class RightDefenderCard : public RightDefenderCardBase
 
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto GiraCabezaDer;  
-        if(!theLibCheck.CentralDefending && !theLibCheck.LeftDefending)
+        if(!theLibCheck.RightDefending && !theLibCheck.LeftDefending)
           goto walkToBall;  
       }
 
@@ -301,11 +301,13 @@ class RightDefenderCard : public RightDefenderCardBase
           goto GiraCabezaDer;  
         if(hayObstaculoCerca && theFieldBall.positionOnField.norm() > 200.f)
           goto ObsAvoid;  
+        if(theLibCheck.StrikerAttacking)
+          goto attack;    
       }
       action
       {
         theLookForwardSkill();
-        thePathToTargetSkill(1.0, Defender1Pos);
+        thePathToTargetSkill(walkSpeed, Defender1Pos);
       }
     }
     state(lookBall)
@@ -323,6 +325,8 @@ class RightDefenderCard : public RightDefenderCardBase
     }
     state(kick)
     {
+      const Angle angleToGoal = calcAngleToGoal();
+
       transition
       {
         if(state_time > maxKickWaitTime || (state_time > minKickWaitTime && theInWalkKickSkill.isDone()))
@@ -332,8 +336,9 @@ class RightDefenderCard : public RightDefenderCardBase
       action
       {
         theLookForwardSkill();
-        theKickSkill((KickRequest::kickForward), true, 0.3f, false);
-        if(theRobotPose.translation.x() >= 2500 && theRobotPose.translation.x() < theFieldDimensions.xPosOpponentPenaltyMark - 500.f)
+        if(theFieldBall.positionOnField.x() < 1000)
+          theInWalkKickSkill(WalkKickVariant(WalkKicks::forwardOLD, Legs::left), Pose2f(angleToGoal, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        if(theFieldBall.positionOnField.x() >= 1000)
           theKickSkill((KickRequest::kickForwardFastLong), true, 0.3f, false);
       }
     }
@@ -428,23 +433,7 @@ class RightDefenderCard : public RightDefenderCardBase
         theLookForwardSkill();
         theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToTeammate, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
       }
-    }
-    state(searchForBall)
-    {
-      transition
-      {
-        if(theFieldBall.ballWasSeen())
-          goto turnToBall;
-        if(!theFieldBall.ballWasSeen(20000))
-          goto goBackHome;  
-      }
-
-      action
-      {
-        theLookForwardSkill();
-        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
-      }
-    }     
+    }  
    state(ObsAvoid)
     {  
       transition 
@@ -461,6 +450,24 @@ class RightDefenderCard : public RightDefenderCardBase
         }
       }
     }
+    state(attack)
+    {
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          goto turnToBall;
+        if(!theFieldBall.ballWasSeen(10000))
+          goto GiraCabezaDer; 
+        if(hayObstaculoCerca && theFieldBall.positionOnField.norm() > 200.f)
+          goto ObsAvoid;    
+
+      }
+      action
+      {
+        theLookForwardSkill();
+        thePathToTargetSkill(walkSpeed, Pose2f(0,0,1-500));
+      }
+    }
 
     state(GiraCabezaDer)
     {
@@ -471,8 +478,10 @@ class RightDefenderCard : public RightDefenderCardBase
           goto GiraCabezaIzq;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(!theFieldBall.ballWasSeen(20000))
+        if(!theFieldBall.ballWasSeen(10000))
           goto goBackHome;    
+        if(theLibCheck.StrikerAttacking)
+          goto attack;    
       }
 
       action
@@ -491,10 +500,10 @@ class RightDefenderCard : public RightDefenderCardBase
           goto GiraCabezaDer;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
-        if(a > 2)
-          goto searchForBall;
-        if(!theFieldBall.ballWasSeen(20000))
+        if(!theFieldBall.ballWasSeen(10000))
           goto goBackHome;   
+        if(theLibCheck.StrikerAttacking)
+          goto attack;    
       }
       action
       {

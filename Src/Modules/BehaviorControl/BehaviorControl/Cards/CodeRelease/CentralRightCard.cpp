@@ -76,12 +76,12 @@ class CentralRightCard : public CentralRightCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == 2;
+    return theRobotInfo.number == 6;
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != 2;
+    return theRobotInfo.number != 6;
   }
 
   option
