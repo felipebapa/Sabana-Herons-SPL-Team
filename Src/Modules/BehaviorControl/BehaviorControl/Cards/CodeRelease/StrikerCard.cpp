@@ -144,7 +144,7 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
-        theLookAtAnglesSkill(-1,2,0.75f);
+        theLookAtAnglesSkill(-1,2,1.f);
       }
     }
 
@@ -168,7 +168,7 @@ class StrikerCard : public StrikerCardBase
       action
       {
         theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
-        theLookAtAnglesSkill(1,2,0.75f);
+        theLookAtAnglesSkill(1,2,1.f);
       }
     }
 
@@ -198,11 +198,12 @@ class StrikerCard : public StrikerCardBase
     {
       transition
       {
+        
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
         if(hayObstaculoCerca && theFieldBall.positionOnField.norm() > 200.f)
           goto obsAvoid;
-        if(thePathToTargetSkill.isDone())
+        if((theRobotPose.translation.x() > 1600 && theRobotPose.translation.x() < 2400) )
           goto giraCabezaDer;
       }
       action
