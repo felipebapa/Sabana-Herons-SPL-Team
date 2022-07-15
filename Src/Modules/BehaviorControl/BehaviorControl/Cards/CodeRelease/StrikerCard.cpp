@@ -110,7 +110,7 @@ class StrikerCard : public StrikerCardBase
           goto receiveLeftPass;
         if(theLibCheck.closerToTheBall == 5)
           goto receiveRightPass;
-        if(theLibCheck.closerToTheBall == 2)
+        if(!theFieldBall.ballWasSeen(10000))
           goto receiveCentralPass;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto giraCabezaDer;
@@ -134,7 +134,7 @@ class StrikerCard : public StrikerCardBase
           goto receiveLeftPass;
         if(theLibCheck.closerToTheBall == 5 && theLibCheck.RightAttacking)
           goto receiveRightPass;
-        if(theLibCheck.closerToTheBall == 2)
+        if(!theFieldBall.ballWasSeen(10000))
           goto receiveCentralPass;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
@@ -156,7 +156,7 @@ class StrikerCard : public StrikerCardBase
           goto receiveLeftPass;
         if(theLibCheck.closerToTheBall == 5 && theLibCheck.RightAttacking)
           goto receiveRightPass;
-        if(theLibCheck.closerToTheBall == 2)
+        if(!theFieldBall.ballWasSeen(10000))
           goto receiveCentralPass;
         if(theFieldBall.ballWasSeen())
           goto turnToBall;
@@ -176,7 +176,7 @@ class StrikerCard : public StrikerCardBase
           goto receiveLeftPass;
         if(theLibCheck.closerToTheBall == 5 && theLibCheck.RightAttacking)
           goto receiveRightPass;
-        if(theLibCheck.closerToTheBall == 2)
+        if(!theFieldBall.ballWasSeen(10000))
           goto receiveCentralPass;
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
           goto giraCabezaDer;
@@ -202,7 +202,7 @@ class StrikerCard : public StrikerCardBase
           goto obsAvoid;
         if(!theLibCheck.LeftAttacking || (theLibCheck.closerToTheBall != 2 && theLibCheck.closerToTheBall != 3 && theLibCheck.closerToTheBall != 5))
           goto walkToBall;
-        if(theLibCheck.closerToTheBall == 2 && !theLibCheck.LeftAttacking)
+        if(!theFieldBall.ballWasSeen(10000))
           goto receiveCentralPass;
         if(theRobotPose.translation.x() >= 2500 && theRobotPose.translation.x() < 3500 && theRobotPose.translation.y() >= -2000 && theRobotPose.translation.y() < -1000)
           goto waitAtSidePass;

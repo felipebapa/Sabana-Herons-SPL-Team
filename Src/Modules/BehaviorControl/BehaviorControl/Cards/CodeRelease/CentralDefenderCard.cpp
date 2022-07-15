@@ -73,12 +73,12 @@ class CentralDefenderCard : public CentralDefenderCardBase
 {
   bool preconditions() const override
   {
-    return theRobotInfo.number == 6;
+    return theRobotInfo.number == 2;
   }
 
   bool postconditions() const override
   {
-    return theRobotInfo.number != 6;
+    return theRobotInfo.number != 2;
   }
 
   option
@@ -254,7 +254,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         theSaySkill("behind pass");
         theLookForwardSkill();        
-        theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToTeammate, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToTeammate, theFieldBall.positionRelative.x() - ballOffsetX, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
 
@@ -271,7 +271,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       action
       {
         theLookForwardSkill();
-        thePathToTargetSkill(1.0, Defender1Pos);
+        thePathToTargetSkill(walkSpeed, Defender1Pos);
       }
     }
     state(kickRight)
@@ -373,7 +373,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         theSaySkill("align clearance");
         theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed+ 0.3f), Pose2f(angleToClearance, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToClearance, theFieldBall.positionRelative.x() - ballAlignOffsetX, theFieldBall.positionRelative.y()));
       }
     }
     state(alignBehindBallToClearance)
@@ -390,9 +390,7 @@ class CentralDefenderCard : public CentralDefenderCardBase
       {
         theSaySkill("behind clearance");
         theLookForwardSkill();
-        theWalkToTargetSkill(Pose2f(walkSpeed + 0.3f, walkSpeed + 0.3f, walkSpeed + 0.3f), Pose2f(angleToClearance, theFieldBall.positionRelative.x() - ballOffsetX  - 17, theFieldBall.positionRelative.y() - ballOffsetY));
-        if(theRobotPose.translation.x() > theFieldDimensions.xPosHalfWayLine)
-            theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(0.f, theRobotPose.inversePose.translation.x() - 500, 0.f));
+        theWalkToTargetSkill(Pose2f(walkSpeed, walkSpeed, walkSpeed), Pose2f(angleToClearance, theFieldBall.positionRelative.x() - ballOffsetX  - 17, theFieldBall.positionRelative.y() - ballOffsetY));
       }
     }
 
